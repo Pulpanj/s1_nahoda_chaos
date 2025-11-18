@@ -1,0 +1,98 @@
+---
+title: |
+    O čem to je ? 
+
+author: "prof. RNDr. Petr Chvosta, CSc."
+
+# image: profile.jpg
+about:
+    template: marquee
+#   broadside
+#   links:
+#     - icon: twitter
+#       text: Twitter
+#       href: https://twitter.com
+#     - icon: linkedin
+#       text: LinkedIn
+#       href: https://linkedin.com
+#     - icon: github
+#       text: Github
+#       href: https://github.com
+
+---
+
+![](images/BifDiag.png)
+
+Název:	
+:    Náhoda, nelinearita, chaos, komplexita. Moderní příspěvky fyziky k porozumění světu kolem nás. (11577)
+
+Detail programu CŽV na Univerzitě Karlově:
+:   <https://is.cuni.cz/studium/prijimacky/index.php?do=detail_kurz&cid=11577>
+
+Garant programu:
+:	prof. RNDr. Petr Chvosta, CSc.
+
+Pracoviště garantující program:	
+:   Katedra makromolekulární fyziky (32-KMF)
+
+Způsob výuky programu:
+:   prezenční
+
+Jazyk, v němž je program uskutečňován:	
+:    čeština
+
+Místo konání:	
+:    Budova MFF UK, V Holešovičkách 2, Praha 8, Troja, posluchárna T2
+
+Časový a obsahový plán programu:	
+:   Dílna bude probíhat vždy v pondělí od 14:00 do 15:30
+
+Charakteristika programu:	
+:   Kurz je určen posluchačům nejrůznějších profesí, vítáni jsou zájemci ze širší veřejnosti.
+
+Kurz má charakter tvůrčí dílny. Je organizován v tematicky oddělených seancích. Seance mají pevnou strukturu: briefing, teorie, realizace, vyhodnocení. V průběhu jedné seance je řešena vždy jedna konkrétní úloha (analýza jednoho zajímavého modelu, metody, či algoritmu). Při formulaci problému se používá běžný pojmový aparát z oblasti přírodních věd, předpokládá se znalost středoškolské matematiky a základů programování. Výkladová část je vedena široce přístupnou, esejistickou formou. Uplatňují se jednoduché grafické ilustrace, užitečné analogie a zjednodušení. Vytvářejí se jednoduché počítačové simulace.
+
+V pozadí všech seancí je dynamika interagujících systémů vzdálených od rovnováhy. Specificky ve fyzice kondenzovaných soustav operují zmíněné systémy na pomezí mikrosvěta a makrosvěta. Avšak v obecnějším kontextu se uplatňují prvky stochastické a nelineární analýzy, zpětnovazebné mechanizmy, adaptabilita, herní strategie.
+
+Dílna poskytuje základní orientaci v těchto metodách ve vztahu k fyzice, avšak ukazuje, že jejich použitelnost je mnohem širší: uplatňují se například v biofyzice, lékařské diagnostice, ekonomii, sociologii, ekologii, apod. Zde všude se při dynamické interakci velkého počtu výchozích entit vynořují kvalitativně podobné kolektivní vlastnosti.
+
+Každý účastník dílny si jednoduché příklady těchto metod sám „osahá“ a tím učiní první kroky k vlastním aplikacím a k dalšímu specificky zaměřenému studiu.
+
+
+Každá jednotlivá seance má jisté pracovní, zábavné a často poněkud neurčité označení. Za ním se vždy skrývá konkrétní metoda moderní teorie komplexních systémů (uvedená dále v závorce). Detailní výběr témat bude proveden po vzájemné poradě na základě většinového zájmu. Tématické okruhy budou popřípadě doplněny.
+
+### Širší přehled seancí:
+
+  - Krása a překvapení v jednoduchosti (zlatý řez a Fibonacciho posloupnost ve fyzice a jinde).
+  - Námořník před hospodou a polymerní věda (teorie náhodného bloudění).
+  - Úloha o bankrotování (difúze za přítomnosti absorpčních hranic).
+  - Jak kombinací dvou zel vzniká dobro (princip činnosti molekulárního motoru).
+  - Jak zachránit tonoucího (variační principy a optimální strategie).
+  - Tvary mýdlových bublin (minimální plochy v přírodě).
+  - Gulliver v zemi Liliputů (zákony škálování a jejich důsledky).
+  - Je entropie nepořádek, volnost, nebo co vlastně ? (termodynamická a statistická entropie).
+  - Falešná hrací kostka (Shannonova teorie informace) .
+  - Hra „Naval prachy“ (relaxace a ustavení rovnováhy).
+  - Atmosféra z hrášků (teorie Brownova pohybu).
+  - Model psů a blech (Ehrenfestův model relaxačního procesu).
+  - Parkovací problém a výběr sekretářky (optimalizace rozhodování při neúplné informaci).
+  - Myš v bludišti (dynamická metoda metoda Monte Carlo) .
+  - Dravec a kořist, kdo z koho (dynamika interagujících populací).
+  - Jak se do lesa volá...(teorie lineární a nelineární odezvy).
+  - Každý má svou ochrannou bublinu (teorie katastrof a kvalitativní skoky).
+  - XXXL čísla (mikrostav versus makrostav, dynamika chemických reakcí).
+  - Fraktály všude (geometrická a dynamická samopodobnost) .
+  - Hra života (jednoduché genetické algoritmy, růstové modely).
+  - Chaos a její děti (evoluční modely v diskrétním čase).
+  - Podivný atraktor (dynamický vznik prostorových a časových struktur).
+  - Bez odměny za čekání (procesy obnovy, systémy obsluhy)
+
+  - Individualismus, kolektivismus, altruismus ? (pojmy a metody teorie her, stabilní strategie)
+  - Dynamika epidemie Covid (větvící se náhodné procesy).
+  - Pozitivní test na nemoc? (podmíněná pravděpodobnost v lékařské diagnostice)
+  - Hledání řádu (statistické zpracování dat, korelace).
+  - Problém obchodního cestujícího (dynamické programování, algoritmy).
+  - Když se spouští laviny (samoorganizace systému do kritického stavu).
+  - Kolik ryb je v rybníce? (Makrovovy řetězce).
+  - V pavučině sítí (grafy a náhodné grafy).
+  - Spirály a víry (vznik prostorových struktur, matematická biologie).

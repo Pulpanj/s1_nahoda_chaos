@@ -1,4 +1,41 @@
+/* css styles */
+/* Code to resize image on secondary page and remove black background */
 
+/* styles.css */
+
+/* div.quarto-post .thumbnail img {
+    width: 75px;
+    height: 75px;
+} */
+
+/* Change hover color for post titles in a table/list */
+/* Your desired hover color */
+/* Optional */
+/* .quarto-listing-table tbody:hover {
+    color: #ff6600;
+    text-decoration: underline;
+} */
+
+/* .quarto-listing-table:hover td {
+    background-color: coral;
+} */
+
+/* tr:hover {
+    background-color: #f5f5f5;
+} */
+
+/* Change hover background color on listing table rows */
+/* Replace with your desired color */
+/* .quarto-listing-table tbody tr:hover {
+    background-color: #488fcd;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #c8e6c9 !important;
+} */
+
+/* Example: Set fixed widths for listing columns */
+/* e.g., updated column */
 .quarto-listing-table td:nth-child(1) {
     width: 200px;
 }
@@ -38,9 +75,9 @@
 }
 
 /* Light blue, change to your preferred color */
-.quarto-listing-table table table-striped table-hover {
+/* quarto-listing-table table table-striped table-hover {
     background-color: #1a5e9e;
-}
+} */
 
 
 /* <header id="title-block-header" class="quarto-title-block"><h1 class="title display-7">Post With Code</h1></header> */

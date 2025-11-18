@@ -1,0 +1,129 @@
+---
+title: "Post With many chapters"
+subtitle: "sdlfkaslf kaslkasdl fkals Post With Code"
+# author: "Jaroslav Půlpán"
+updated: "2025-11-04"
+date: "2025-10-18"
+categories: [news, code, analysis]
+# ntblink: "[[Jupiter](/images/jupyter_notebook_icon.png){width=50%}](posts/post-with-code2/x_name.ipynb) "
+# ntblink: "[![Jupiter](images/jupyter_notebook_icon.png){width=60px} ](posts/post-with-code2/x_name.ipynb){target='_blank'}"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/post-with-code2/x_name.pdf) "
+image: "image.jpg"
+# about:
+#   template: marquee
+#   links:
+#     - icon: envelope
+#       href: mailto:your_email@address.com
+#     - icon: linkedin
+#       href: https://www.linkedin.com/in/your_username
+format:
+    typst:
+        output-file: "x_name"
+        output-ext: "pdf"
+    # ipynb:
+    #     output-file: "x_name"
+    #     output-ext: "ipynb"
+---
+
+
+
+<!-- Tato stranka je dostupna i jako #   [![my xx Text](../../ximage.jpg)](microstavy_makrostavy.pdf) -->
+
+<!-- ![xx image](../../ximage.jpg)
+[![my xx Text](../../ximage.jpg)](microstavy_makrostavy.pdf) -->
+
+# huhh
+This is a post with executable code.
+
+
+## xxhuhh
+This is a post with executable code.
+
+
+## xxxhuhh
+This is a post with executable code.
+
+
+# huhh
+This is a post with executable code.
+
+
+
+# huhh
+This is a post with executable code.
+
+
+## xxhuhh
+This is a post with executable code.
+
+
+## xxxhuhh
+This is a post with executable code.
+
+
+# huhh
+This is a post with executable code.
+
+
+# huhh
+This is a post with executable code.
+
+
+## xxhuhh
+This is a post with executable code.
+
+
+## xxxhuhh
+This is a post with executable code.
+
+
+# huhh
+This is a post with executable code.
+
+
+# huhh
+This is a post with executable code.
+
+
+## xxhuhh
+This is a post with executable code.
+
+
+## xxxhuhh
+This is a post with executable code.
+
+
+# huhh
+This is a post with executable code.
+
+
+# huhh
+This is a post with executable code.
+
+
+## xxhuhh
+This is a post with executable code.
+
+
+## xxxhuhh
+This is a post with executable code.
+
+
+## huhh
+This is a post with executable code.
+
+
+### 3huhh
+This is a post with executable code.
+
+
+#### 4 xxhuhh
+This is a post with executable code.
+
+
+###### 5.xxxhuhh
+This is a post with executable code.
+
+
+# huhh
+This is a post with executable code.

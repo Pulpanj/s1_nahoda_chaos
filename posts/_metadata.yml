@@ -1,8 +1,90 @@
-# options specified here will apply to all posts in this folder
+
+
+# engine: julia
+
+# metadata-files:
+#   - _environment.yml
 
 # freeze computational output
 # (see https://quarto.org/docs/projects/code-execution.html#freeze)
-freeze: true
+# freeze: true
+
+author: 
+  name: "Jarda Půlpán"
+  email: "pulpanj@volny.cz"
+
 
 # Enable banner style title blocks
 title-block-banner: true
+
+format:
+  typst:
+      keep-typ: false
+      toc: true
+      number-sections: true
+      toc-depth: 2       # Optional: controls heading levels shown
+      number-depth: 2
+      include-in-header:
+          - text: |
+              #show raw: set text(font: "Cascadia Code")
+              #show raw.where(block: true): set block(
+              fill: rgb("#f9f9f9ff"),
+              inset: 10pt,
+              radius: 4pt,
+              stroke: 0.3pt +  rgb("#c2c2c1ff"),
+              )
+              #set raw(theme: "/resources/jp.tmTheme")
+              #show raw.where(block: true): code => {
+              show raw.line: line => {
+                  if line.number < 10 {
+                  text(fill: olive,style:"italic",weight:"light")[~#line.number]
+                  } else {
+                  text(fill: olive,style:"italic",weight:"light")[#line.number]
+                  }
+                  h(1em)
+                  line.body
+              }
+              code
+              }
+
+      code-annotations: below
+
+  html:
+    theme:
+      # - lux,cosmo
+      # - brand
+      light: brand
+      dark: slate
+    toc: true
+    toc-location: "left" # Options: left, right, body
+    toc-title: "**Obsah:**"
+    toc-depth: 4       # Optional: controls heading levels shown
+    number-sections: false
+    number-depth: 3
+    toc-expand: 2
+    smooth-scroll: true
+    anchor-sections: true
+    code-block-border-left: "#0b4edeff" 
+    #"#2561f7ff"
+    code-block-bg: "#fafaf1ff"
+    # code-block-bg: "#fafafaff"
+    # highlight-style: /resources/jptango.theme
+    # highlight-style: tango
+    highlight-style: ./jptango.theme
+    # highlight-style: tango
+    code-line-numbers: true
+    code-overflow: wrap
+    code-annotations: hover
+    code-fold: true
+    # code-tools: 
+    #   source: true
+    #   caption: Source
+    #   toggle: false
+  # ipynb: default
+css: /resources/styles.css        
+
+format-links:
+  - ipynb
+  - format: typst
+    text: PDF
+    icon: file-pdf
