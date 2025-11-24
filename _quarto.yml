@@ -78,7 +78,7 @@ website:
         href: ./aboutme.qmd
         text: " "
       - icon: github
-        href: https://github.com/pulpanj
+        href: https://github.com/Pulpanj/s1_nahoda_chaos
       - icon: envelope
         href: email:pulpanj@volny.cz
     #   - icon: rss

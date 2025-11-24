@@ -3,6 +3,7 @@ title: "Fixní body a jejich stabilita"
 # author: "Harlow Malloc"
 date: "2025-11-10"
 updated: "2025-11-23"
+description: "Definice stability fixních bodů na základě pohybové rovnice a jejich analýza pomocí pavoučích grafů"
 draft: false
 categories: ["Nelineární dynamika", "seance"]
 # image: "image.jpg"
