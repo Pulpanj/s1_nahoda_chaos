@@ -3,6 +3,7 @@ title: "Post Julia Code"
 author: "Harlow Malloc"
 date: "2025-11-02"
 updated: "2025-11-08"
+draft: true
 categories: [news, code, analysis]
 image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/julia_test/j_name.pdf) "

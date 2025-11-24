@@ -1,0 +1,19 @@
+---
+title: Seznam dostupné literatury 
+toc: false
+tbl-colwidths: [85,15]
+---
+
+
+
+
+<!-- ::: {#tbl-panel layout-ncol=2 } -->
+
+|  |  |  |
+|-------------------------------|-----------------------------------------|------------------| 
+|   - **Název:**  NONLINEAR DYNAMICS AND CHAOS: With Applications to Physics, Biology, Chemistry, and Engineering \
+    - **Autor:**  Steven H. Strogatz \
+    - **URL:**  <https://www.biodyn.ro/course/literatura/Nonlinear_Dynamics_and_Chaos_2018_Steven_H._Strogatz.pdf> \
+    - **Rok:**  2018 \
+| [![my xx Text](/images/nonlinear-dynamics-and-chaos-2nd-ed.jpg){width=1.8in}](https://www.biodyn.ro/course/literatura/Nonlinear_Dynamics_and_Chaos_2018_Steven_H._Strogatz.pdf) |
+

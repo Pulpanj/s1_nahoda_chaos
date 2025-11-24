@@ -15,8 +15,8 @@ listing:
   type: table
   categories: true
   filter-ui: true
-  table-hover:  true
-  table-striped: false
+  # table-hover:  true
+  table-striped: true
   max-description-length: 250
   field-display-names:
     title: "Název"
@@ -26,7 +26,7 @@ listing:
     pdflink: "PDF"
     # ntblink: "Notebook"
   fields: [updated, title, description,date,pdflink,categories ]
-# page-layout: article
+page-layout: article
 title-block-banner: true
 
 format:

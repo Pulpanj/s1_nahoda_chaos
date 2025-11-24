@@ -28,7 +28,7 @@ date-format: iso
 
 website:
   description: "Blog psaný na základě přednášek university 3 věku na MFF UK: Náhoda, nelinearita, chaos, komplexita. Moderní příspěvky fyziky k porozumění světu kolem nás."
-  site-url: https://your-website-url.example.com # you must change this appropriately for RSS feeds to work properly
+  site-url: http://www.pulpanj.me.cz/blogs/u3v/s1_nahoda_chaos/ # you must change this appropriately for RSS feeds to work properly
   title: "U3V_1> Náhoda, nelinearita, chaos, komplexita"
   open-graph: true
   # navbar:
@@ -119,7 +119,7 @@ website:
   announcement: 
     icon: info-circle
     dismissable: true
-    content: "**Varování** - tento blog je stále ve výstavbě "
+    content: "**Varování** - tento blog je stále ve výstavbě, časem přidám i materialy z počátečních seancí. "
     type: primary
     position: below-navbar  
   # reader-mode: true            

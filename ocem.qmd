@@ -4,9 +4,11 @@ title: |
 
 author: "prof. RNDr. Petr Chvosta, CSc."
 
+
+toc: false
 # image: profile.jpg
-about:
-    template: marquee
+# about:
+#     template: trestles
 #   broadside
 #   links:
 #     - icon: twitter
@@ -21,7 +23,7 @@ about:
 
 ---
 
-![](images/BifDiag.png)
+![](images/BifDiag.png){width="75%"}
 
 Název:	
 :    Náhoda, nelinearita, chaos, komplexita. Moderní příspěvky fyziky k porozumění světu kolem nás. (11577)

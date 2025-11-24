@@ -1,0 +1,154 @@
+---
+title: "Fixní body a jejich stabilita"
+# author: "Harlow Malloc"
+date: "2025-11-10"
+updated: "2025-11-23"
+draft: false
+categories: ["Nelineární dynamika", "seance"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p6_nelinearni_dynamika/fixni_body.pdf) "
+
+html-math-method: katex
+engine: julia
+
+format:
+    typst:
+        output-file: "fixni_body"
+        output-ext: "pdf"
+
+---
+
+## Fixní body v nelineární dynamice
+
+V případě jedno-dimenzionálního systému s diskrétním časem je jeho stav popsán posloupností stavů $\{x_i\}$ v diskrétních časových bodech $i=0,1,2,3,...$.
+
+Obecné vyjádření takovéto posloupnosti je definováno pomocí diferenční rovnice prvního řádu a její počáteční podmínkou. Diferenční rovnice vyjadřuje závislost následujícího stavu na jednom předchozím stavu:
+
+$$
+x_{n+1} = f(x_n,A,B...)
+$$ $$
+x_0=C
+$$
+
+kde
+
+-   $f(x_n,A,B...)$ je pohybová rovnice systému
+
+<!-- -->
+
+-   $A,B,...$ jsou parametry pohybové rovnice a
+
+-   $C$ je počáteční stav v čase 0
+
+Fixním bodem je hodnota $x^*$ splňující podminku:
+
+$$
+f(x^*,A,B...)=x^*
+$$
+
+t.j. každé řešení diferenční rovnice, které nezmění hodnotu předchozího stavu $x_0$.
+
+Obecně může existovat několik fixních bodů, jejich počet závisí na parametrech pohybové rovnice $(A,B,...)$
+
+```{julia}
+#| label: konvergence
+#| fig-cap: "Fixní body  pohybové rovnice definované parabolou"
+
+using Plots, LaTeXStrings
+
+function motion_p2(x, a, b, c)
+    return a * x^2 + b * x + c
+end
+
+function parabola(x)
+    return motion_p2(x, -1, 2, 0)
+end
+
+function basegraph()
+
+    plot(
+        x -> parabola(x), -0.5, 2, label=L"$y=f(x)=-x^2+2x$", linewidth=3,
+        linecolor=:red, legend=:bottomright,
+        ylabel="y", yticks=range(-1, 1.5, step=0.5),
+        xlabel="x", xticks=range(-0.5, 2, step=0.5),
+        framestyle=:origin,
+        grid=:on, minorgrid=true,
+        size=(900, 600),
+        show=false
+    )
+    plot!([-1.0, 2.0], [-1.0, 2.0], label=L"y=x", xlim=(-0.5, 2), ylim=(-1, 1.5),
+        linewidth=1, linecolor=:blue, show=false)
+    annotate!(0 + 0.1, 0 - 0.2, Plots.text(L"$x_1^*$", :green), show=false)
+    annotate!(1, 1 + 0.2, Plots.text(L"$x_2^*$", :darkorange2), show=false)
+    p0 = scatter!([0 1], [0 1], mc=[:green :darkorange2],
+        label=[L"Fixní bod $x_1^*$" L"Fixní bod $x_2^*$"], markersize=4)
+    return p0
+end
+display(basegraph())
+
+```
+
+## Stabilita fixních bodů
+
+### Pavučinové diagramy pro různé počáteční hodnoty $x_0$
+
+Konvergence posloupnosti $\{x_i\}$ závisí na počáteční hodnotě $x_0$ a lze ji znázornit pomocí pavoučího grafu (cob webing), který zobrazuje posloupnost $\{x_i\}$ pomocí průsečíků s přímkou $y=x$ a jejich následnou projekcí na pohybovou funkci $f(x,A,B...)$.
+
+Zde je Julia funkce, ktera tento graf popisuje:
+
+```{julia}
+#| label: pavucina_fce
+#| output: false
+#| code-fold: show
+using DataFrames, DataFramesMeta, MarkdownTables
+
+function cobweb(; x0=0.5, n_cobs=5, motion_fce=parabola)
+
+    x = Array{Float64}(undef, n_cobs + 1)
+    lineX = Array{Float64}(undef, 2 * n_cobs + 1)
+    lineY = Array{Float64}(undef, 2 * n_cobs + 1)
+    x[begin+0] = x0
+    lineX[begin+0] = x0
+    lineY[begin+0] = 0
+    for i in 1:n_cobs
+        x[begin+i] = motion_fce(x[begin+i-1])
+        lineX[begin+2*i-1] = x[begin+i-1]
+        lineY[begin+2*i-1] = x[begin+i]
+        lineX[begin+2*i] = x[begin+i]
+        lineY[begin+2*i] = x[begin+i]
+    end
+    df = DataFrame(i=0:n_cobs, x=x)
+    display(markdown_table(select(df, "i" => "i", "x" => L"x_i")))
+    p1 = basegraph()
+    p1 = plot!(lineX, lineY, arrow=Plots.Arrow(:closed, :head, 4.5, 2.2), linecolor=:darkgrey, label="x0=$x0")
+    display(p1)
+end
+```
+
+#### Konvergence ke stabilnímu fixnímu bodu $x_2^*$
+
+```{julia}
+#| label: pavucina1
+#| fig-cap: "konvergence ke stabilnímu fixnímu bodu $x_2^*$" 
+#| 
+cobweb(x0=1.75, n_cobs=5)
+
+```
+
+#### Divergence od nestabilního fixního bodu  $x_0^*$
+
+```{julia}
+#| label: pavucina2
+#| fig-cap: "divergence od nestabilního fixního bodu $x_0^*$" 
+#| 
+cobweb(x0=0.05,  n_cobs=10)
+```
+
+Obecně stabilita fixních bodů - stejně jako jejich počet - závisí na parametrech pohybové rovnice $A,B,...$. 
+
+Je ale možné odvodit zdali je daný fixní bod $x^*$ stabilní. Pokud je  splněna následující podmínka je fixni bod $x^*$ stabilní:
+
+$$
+abs([\frac{\mathrm df(x)}{\mathrm dx}]_{x=x^*}) <1
+$$ 
+
