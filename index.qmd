@@ -1,5 +1,12 @@
 ---
 title: "1.semestr: Náhoda, nelinearita, chaos, komplexita"
+
+
+author: 
+  name: "Jarda Půlpán"
+  email: "pulpanj@volny.cz"
+
+
 listing:
   contents: posts
   feed: false

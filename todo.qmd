@@ -1,0 +1,76 @@
+---
+title: |
+    To-do list  
+
+toc: false
+draft: false
+---
+
+# Interni todo list blogu U3V
+
+## Co vylepšit na strankách
+
+- ~~SSL cetifikat na pulpanj.me.cz~~
+-   ~~literatura doplnit~~
+-   linky do literatury doplnit do postu
+-   pridat policka newly added a pole pro logicke razeni do seznamu postu
+-   post fixni body
+    -   pavouci diagram doplnit sipky
+    -   ~~doplnit definici stabilniho bodu~~
+    -   priklad pohyb fce 3. rady s 3 fixnimi body
+
+## Náměty ze seancí
+
+-   Optimalizace
+    -   muz s pletivem
+    -   max. objem pri minimalnim povrchu
+    -   delka docurani
+    -   spojnice 4 mest
+    -   zachrana tonouciho (+optika)
+    -   priklad Lagrangeovy multiplikatory
+    -   Menealova uloha (bubliny)
+-   Kombinatorika
+    -   soucet hodu k kostek
+    -   doba cekani na prvni sestku
+    -   pravdepodobnost alespon jedne 6-ky pri hodu k kostkami (Demetre)
+    -   uloha se satnarkou
+-   Bayes rule
+    -   TV sourtez s 3 dvermi
+-   Statistika
+    -   Bernouliho process
+    -   Poisonovo rozdeleni priklad s vanocnim testem (limita bernouliho)
+    -   vymirani slechtickych jmen
+    -   zakon velkych cisel
+    -   nahodna prochazka
+        -   pravdepodobnost navratu
+        -   pocet zmen znamenka
+-   Markovovy retezce
+    -   model psu a blech
+    -   pravdepodobnosti stavu
+-   Dynamika
+    -   Linearni dynamika s diskretnim casem
+    -   Nelinearni dynamika s diskretnim casem
+        -   konvergence, cykly, chaos
+        -   ~~fixni body~~
+        -   bifuracni diagram
+    -   Dynamika se spojitym casem
+        -   Verhusuv model
+        -   Riccatiho differencialni rovnice)
+        -   stabilita stabilnich bodu
+        -   pohybova rovnice kmitani
+        -   vynucene kmity
+-   Informacni entropie
+    -   ~~odvozeni bitu pro shodne pravdepodobnosti~~
+    -   odvozeni bitu pro neshodne pravdepodobnosti
+    -   problem o klokanech
+    -   3-stenna kostka a heatmap entropie/energie
+    -   4-stenna kostka a zadane momenty
+-   Matematika
+    -   dukaz nekonecneho poctu prvocisel
+    -   pingeon princip 
+
+## JP nápady
+
+- machacek
+- markov retezec prepaid karet
+- informacni entropie pro prirazovani fraud pripadu spravedlive

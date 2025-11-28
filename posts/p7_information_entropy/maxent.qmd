@@ -1,0 +1,100 @@
+---
+title: "MAXENT princip"
+date: "2025-11-24"
+updated: "2025-11-28"
+description: "Princip maximální informační entropie a ukázky MAXENT výpočtů"
+draft: false
+categories: ["Informační entropie", "Seance"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p7_information_entropy/maxent.pdf) "
+
+html-math-method: katex
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "maxent"
+        output-ext: "pdf"
+        engine: typst
+---
+
+```{julia}
+#| echo: false
+#| output: false
+include("entropy.jl")
+```
+
+
+# Entropie pokusu s 2 možnými výsledky
+
+Jak se mění entropie pokud pokus/zpráva muže mit jen 2 možné výsledky, které
+mají pravděpodobnosti $p_1,p_2$ (a kde $p_2=(1-p_1)$) ?
+
+Výpočet  entropie pro hodnoty $p1 \in<0,0.01,0.02,\ldots,1>$:
+
+```{julia}
+#| echo: true
+#| output: false
+#| code-fold: false
+
+# entropie pro  p1 od 0 do 1
+p_Q = [
+  (p1, entropy([p1, 1 - p1], verbose=false))
+	for p1 in range(0, 1, step=0.01)
+]
+```
+
+Graf závislost informační entropie na pravděpodobnosti prvního stavu $p_1$
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: true
+
+using Plots, LaTeXStrings
+
+gr_entropy = plot(
+	first.(p_Q), last.(p_Q),
+	linecolor = :red, legend = nothing, linewidth = 2,
+	ylabel = "Q", yticks = range(0, 1.2, step = 0.1), ylim = (0, 1.2),
+	xlabel = L"p_1", xticks = range(0, 1, step = 0.1),
+	framestyle = :origin, top_margin = 5Plots.mm,
+	grid = :on,
+	# minorgrid=true,
+	size = (900, 500), show = true,
+)
+plot!([0.5, 0.5], [0, 1], arrow = Plots.Arrow(:closed, :head, 4.5, 2.2), linecolor = :darkgrey)
+
+scatter!([0.5], [1], mc = [:blue],
+	label = [L"Fixní bod $x_1^*$" L"Fixní bod $x_2^*$"], markersize = 4)
+annotate!(0.5, 1 + 0.15, Plots.text("Maximální entropie=1", :blue), show = false)
+annotate!(0.5, 1 + 0.05, Plots.text(L"pro $p_1=p_2=0.5$ ", :blue), show = false)
+display(gr_entropy);
+```
+# Princip Maximální Entropie
+
+Výsledek předchozího příkladu, kdy největší entropie nastává v případě, že jsou
+obě pravdepodobnosti shodné. To je stav kdy o systému nic nevíme a jediné 
+co lze tedy předpokládat je shodnost všech výsledků t.j.  $p_1=p_2=0.5$. 
+
+Tato =uvaha  odkazuje  na mnohem obecnější princip. Neúplnost
+našich znalosti o systému umožňuje zdánlivě volně volit mezi všemi možnými
+stavy, nepravděpodobnější je ale stav mající nejvyšší entropii.
+
+::: {.callout-tip title="Princip maximální entropie (MAXENT)" icon=false}
+
+Princip maximální entropie, že je nejpravděpodobnější rozdělení toho systému
+takové, které má nejvyšší možnou entropii za podmínek, které o systému známe.
+:::
+
+Princip maximální entropie se projevuje v mnoha oblastech, například:
+
+- V termodynamice se MAXENT princip rovná tomu, že v izolovaném systému směřuje
+vývoj přirozeně k dosažení maximální entropie, což odpovídá stavu
+termodynamické rovnováhy.
+
+- V informatice a teorii informace MAXENT princip znamená, že nejlepší odhad
+nebo model je ten, který přisuzuje nejvyšší možnou nejistotu.
+

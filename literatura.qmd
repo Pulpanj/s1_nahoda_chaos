@@ -1,19 +1,91 @@
 ---
 title: Seznam dostupné literatury 
 toc: false
-tbl-colwidths: [85,15]
+
 ---
 
 
+::: {.grid}
 
 
-<!-- ::: {#tbl-panel layout-ncol=2 } -->
 
-|  |  |  |
-|-------------------------------|-----------------------------------------|------------------| 
-|   - **Název:**  NONLINEAR DYNAMICS AND CHAOS: With Applications to Physics, Biology, Chemistry, and Engineering \
-    - **Autor:**  Steven H. Strogatz \
-    - **URL:**  <https://www.biodyn.ro/course/literatura/Nonlinear_Dynamics_and_Chaos_2018_Steven_H._Strogatz.pdf> \
-    - **Rok:**  2018 \
-| [![my xx Text](/images/nonlinear-dynamics-and-chaos-2nd-ed.jpg){width=1.8in}](https://www.biodyn.ro/course/literatura/Nonlinear_Dynamics_and_Chaos_2018_Steven_H._Strogatz.pdf) |
+
+::: {.g-col-2}
+[![](/images/pdf_icon.png){width=1.2in}](https://math.dartmouth.edu/~prob/prob/prob.pdf) 
+:::
+
+::: {.g-col-10}
+|  |  |
+|:----------|:------------------------------------------------------------| 
+|   **Název:** | Grinstead and Snell’s Introduction to Probability |
+|    **Autor:** | harles M. Grinstead, J. Laurie Snell. |
+|    **URL:**  |<https://math.dartmouth.edu/~prob/prob/prob.pdf> |
+|    **Rok:**  | 2006 | 
+:::
+
+<!-- ============================== -->
+
+::: {.g-col-2}
+![](/images/kaplan.jpg){width=1.2in}
+:::
+
+::: {.g-col-10}
+|  |  |
+|:----------|:------------------------------------------------------------| 
+|   **Název:** | Understanding Nonlinear Dynamics |
+|    **Autor:** | Daniel Kaplan, Leon Glass |
+|    **URL:**  |<https://link.springer.com/book/10.1007/978-1-4612-0823-5> |
+|    **PDF download:**  |<https://www.academia.edu/88608923/Understanding_Nonlinear_Dynamics> |
+|    **Rok:**  | February 1995 | 
+:::
+
+<!-- ============================== -->
+
+
+::: {.g-col-2}
+[![](/images/nonlinear-dynamics-and-chaos-2nd-ed.jpg){width=1.2in}](https://www.biodyn.ro/course/literatura/Nonlinear_Dynamics_and_Chaos_2018_Steven_H._Strogatz.pdf) 
+:::
+
+::: {.g-col-10}
+|  |  |
+|:----------|:------------------------------------------------------------| 
+|   **Název:** | NONLINEAR DYNAMICS AND CHAOS: With Applications to Physics, Biology, Chemistry, and Engineering |
+|    **Autor:** | Steven H. Strogatz |
+|    **URL:**  |<https://www.biodyn.ro/course/literatura/Nonlinear_Dynamics_and_Chaos_2018_Steven_H._Strogatz.pdf> |
+|    **Rok:**  | 2018 | 
+:::
+
+
+
+::: {.g-col-2}
+[![](/images/pdf_icon.png){width=1.2in}](https://bayes.wustl.edu/etj/articles/theory.1.pdf) 
+:::
+
+::: {.g-col-10}
+|  |  |
+|:----------|:------------------------------------------------------------| 
+|   **Název:** | Information Theory and Statistical Mechanics |
+|    **Autor:** | Jaynes, E. T. |
+|    **URL:**  |<https://bayes.wustl.edu/etj/articles/theory.1.pdf> |
+|    **Rok:**  | 2018 | 
+|    **Reference:**  | Physical Review. Series II. 106 (4): 620–630. | 
+:::
+
+
+
+::: {.g-col-2}
+[![](/images/pdf_icon.png){width=1.2in}](https://bayes.wustl.edu/etj/articles/stand.on.entropy.pdf) 
+:::
+
+::: {.g-col-10}
+|  |  |
+|:----------|:------------------------------------------------------------| 
+|   **Název:** | WHERE DO WE STAND ON MAXIMUM ENTROPY? |
+|    **Autor:** | Jaynes, E. T. |
+|    **URL:**  |<https://bayes.wustl.edu/etj/articles/stand.on.entropy.pdf> |
+|    **Rok:**  | 1978. | 
+|    **Reference:**  | Maximum Entropy Formalism Conference, Massachusetts Institute of Technology, May 2-4, 1978 | 
+:::
+
+:::
 

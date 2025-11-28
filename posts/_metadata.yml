@@ -26,6 +26,8 @@ format:
       number-depth: 2
       include-in-header:
           - text: |
+              /* Color links */
+              #show link: set text(fill: rgb(0, 0, 255))          
               #show raw: set text(font: "Cascadia Code")
               #show raw.where(block: true): set block(
               fill: rgb("#f9f9f9ff"),

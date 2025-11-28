@@ -5,7 +5,7 @@ date: "2025-11-10"
 updated: "2025-11-23"
 description: "Definice stability fixních bodů na základě pohybové rovnice a jejich analýza pomocí pavoučích grafů"
 draft: false
-categories: ["Nelineární dynamika", "seance"]
+categories: ["Nelineární dynamika", "Seance"]
 # image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p6_nelinearni_dynamika/fixni_body.pdf) "
 
@@ -21,35 +21,43 @@ format:
 
 ## Fixní body v nelineární dynamice
 
-V případě jedno-dimenzionálního systému s diskrétním časem je jeho stav popsán posloupností stavů $\{x_i\}$ v diskrétních časových bodech $i=0,1,2,3,...$.
+V případě jedno-dimenzionálního systému s diskrétním časem je jeho stav popsán
+posloupností stavů $\{x_i\}$ v diskrétních časových bodech $i=0,1,2,3,\ldots$.
 
-Obecné vyjádření takovéto posloupnosti je definováno pomocí diferenční rovnice prvního řádu a její počáteční podmínkou. Diferenční rovnice vyjadřuje závislost následujícího stavu na jednom předchozím stavu:
+Obecné vyjádření takovéto posloupnosti je definováno pomocí diferenční rovnice
+prvního řádu a její počáteční podmínkou. Diferenční rovnice vyjadřuje závislost
+následujícího stavu na jednom předchozím stavu:
 
 $$
-x_{n+1} = f(x_n,A,B...)
+x_{n+1} = f(x_n,A,B,\ldots)
 $$ $$
 x_0=C
 $$
 
 kde
 
--   $f(x_n,A,B...)$ je pohybová rovnice systému
+-   $f(x_n,A,B,\ldots)$ je pohybová rovnice systému
 
 <!-- -->
 
--   $A,B,...$ jsou parametry pohybové rovnice a
+-   $A,B,\ldots$ jsou parametry pohybové rovnice a
 
 -   $C$ je počáteční stav v čase 0
 
+::: {.callout-tip title="Fixní bod" icon=false}
 Fixním bodem je hodnota $x^*$ splňující podminku:
 
 $$
-f(x^*,A,B...)=x^*
+f(x^*,A,B,\ldots)=x^*
 $$
 
-t.j. každé řešení diferenční rovnice, které nezmění hodnotu předchozího stavu $x_0$.
+t.j. každé řešení diferenční rovnice, které nezmění hodnotu předchozího stavu
+$x_0$.
 
-Obecně může existovat několik fixních bodů, jejich počet závisí na parametrech pohybové rovnice $(A,B,...)$
+Obecně může existovat několik fixních bodů, jejich počet závisí na parametrech
+pohybové rovnice $(A,B,\ldots)$
+
+:::
 
 ```{julia}
 #| label: konvergence
@@ -93,7 +101,10 @@ display(basegraph())
 
 ### Pavučinové diagramy pro různé počáteční hodnoty $x_0$
 
-Konvergence posloupnosti $\{x_i\}$ závisí na počáteční hodnotě $x_0$ a lze ji znázornit pomocí pavoučího grafu (cob webing), který zobrazuje posloupnost $\{x_i\}$ pomocí průsečíků s přímkou $y=x$ a jejich následnou projekcí na pohybovou funkci $f(x,A,B...)$.
+Konvergence posloupnosti $\{x_i\}$ závisí na počáteční hodnotě $x_0$ a lze ji
+znázornit pomocí pavoučího grafu (cob webing), který zobrazuje posloupnost
+$\{x_i\}$ pomocí průsečíků s přímkou $y=x$ a jejich následnou projekcí na
+pohybovou funkci $f(x,A,B,\ldots)$.
 
 Zde je Julia funkce, ktera tento graf popisuje:
 
@@ -145,11 +156,21 @@ cobweb(x0=1.75, n_cobs=5)
 cobweb(x0=0.05,  n_cobs=10)
 ```
 
-Obecně stabilita fixních bodů - stejně jako jejich počet - závisí na parametrech pohybové rovnice $A,B,...$. 
+### Stabilita fixního bodu
 
-Je ale možné odvodit zdali je daný fixní bod $x^*$ stabilní. Pokud je  splněna následující podmínka je fixni bod $x^*$ stabilní:
+::: {.callout-tip title="Stabilní fixní bod" icon=false}
+
+Fixni bod je stabilní pokud posloupnost stavů $\{x_i\}$ dokonverguje 
+z počáteční hodnoty $x_0$ "blízko" fixního bodu  $x_i^*$ zpět do tohoto fixního bodu.
+
+:::
+
+Obecně stabilita fixních bodů - stejně jako jejich počet - závisí na
+parametrech pohybové rovnice $A,B,\ldots$.
+
+Je ale možné odvodit zdali je daný fixní bod $x^*$ stabilní. Pokud je splněna
+následující podmínka je fixni bod $x^*$ stabilní:
 
 $$
-abs([\frac{\mathrm df(x)}{\mathrm dx}]_{x=x^*}) <1
-$$ 
-
+\left| \frac{\mathrm df(x)}{\mathrm dx} \right|_{x=x^*}<1
+$$

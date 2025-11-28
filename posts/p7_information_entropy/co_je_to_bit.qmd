@@ -1,0 +1,368 @@
+---
+title: "Informační entropie"
+date: "2025-11-24"
+updated: "2025-11-27"
+description: "Odvozeni co je to bit a Shannonova definice informační entropie"
+draft: false
+categories: ["Informační entropie", "Seance"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p7_information_entropy/co_je_to_bit.pdf) "
+
+html-math-method: katex
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "co_je_to_bit"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Jak lze definovat bit
+
+Bit je obecně bran jako jednotka informace mající jen 2 hodnoty 0/1 (ano-ne).
+Když Claude Shannon odvozoval pojem "množství/objem informací" jedním z
+požadavků bylo aby se objem informací zvětšoval s zvětšující se délkou zprávy.
+Na zjištění obsahu zprávy se v našem pojetí můžeme dívat jako na zjišťování
+výsledku nějakého pokusu (přenosu konkrétní zprávy), který může nabývat jednoho
+výsledku (obsahu zprávy) z předem daného počtu všech možných výsledků pokusu
+(všech možných zpráv). ## Hádání výsledku pokusu při shodných
+pravděpodobnostech všech výsledků
+
+Jednoduchý příklad (z prostředí ilegálních skořápkářů): 
+
+  - mějme 5 kelímků a 3 barevné kuličky červenou, zelenou a modrou (označené písmeny R,G,B). 
+  - pokusem nechť je umístění těchto kuliček náhodně pod jakýkoliv kelimek 
+  - pod jedním kelímkem může být i vice kuliček 
+  - ne všechny kuličky musí být umístěny 
+  - *všechny rozmístění mají shodnou pravděpodobnost (skořápkář nepreferuje žádnou konfiguraci)*
+  - pokus (t.j. rozložení kuliček pod kelímky) provede jedna osoba 
+  - druhá osoba se snaží zjistit výsledku pomocí kladení otázek na které lze odpovědet pouze **ano-ne**
+
+  -   Našim cílem je zjistit kolik takovýchto otázek je potřeba k zjištění výsledku (rozložení kuliček pod kelímky) ?
+
+Například toto je jeden z možných výsledků:
+
+| kelímek 0 | kelímek 1 | kelímek 2 | kelímek 3 | kelímek 4 |
+|----------|----------|----------|----------|----------|
+|          | R,B      |          | G        |          |
+
+
+Triviální řešeni je ptát se na každý jednotlivý možný výsledek separátně, například na tuto otázku dostaneme odpověď **ne**:
+
+  - Je červená kulička v kelímku 1 a zelena s modrou v kelímku 4 ?
+
+nebo (na tuto otázku dostaneme pro náš příklad kýženou odpověď **ano**  ):
+
+  - Je červená a modrou kulička v kelímku + a zelena s modrou v kelímku 3 ?
+
+Triviální řešení bude (v nejhorším případě) vyžadovat $5^3=125$ otázek.
+
+K nalezení postupu zaručujícího minimální počet kladených otázek zaveďme následující "kódování" možných rozložení:
+
+|  Pořadí \
+ řešení   | n(R) | n(G) | n(B) | 
+|:----:|----------|----------|----------|----------|
+|  1   | 0 | 0 | 0 | 
+|  2   | 1 | 0 | 0 | 
+|  3   | 2 | 0 | 0 | 
+|  4   | 3 | 0 | 0 | 
+|  5   | 4 | 0 | 0 | 
+|  6   | 0 | 1 | 0 | 
+|  7   | 0 | 2 | 0 | 
+|     | ... | ... | ... | 
+|  121   | 4 | 4 | 0 | 
+|  122   | 4 | 4 | 1 | 
+|  123   | 4 | 4 | 2 | 
+|  124   | 4 | 4 | 3 | 
+|  125   | 4 | 4 | 4 | 
+
+kde pořadí lze počítat jako: $n(B)\cdot 5^2+n(G)\cdot 5^1+n(R)\cdot 5^0+1$ 
+
+Náš příklad v tomto kódování zobrazí takto (s pořadím:  $1\cdot5^2+3\cdot5^1+1\cdot5^0+1 = 25+15+1+1= 42$ :
+
+|  Pořadí \
+ řešení   | n(R) | n(G) | n(B) | 
+|:----:|----------|----------|----------|----------|
+|     | ... | ... | ... | 
+|  42   | 1 | 3 | 1 | 
+|     | ... | ... | ... | 
+
+A pokud se s osobou realizující rozmístění kuliček dohodneme na tomto kódováni pořadí řešení lze otázky klást následujícím způsobem:
+
+  - Má hledané rozmístění kuliček pořadí mezi 1 a (jednou polovinou celkového počtu možností, tj.) 63  ?
+
+Pokud bude odpověď na první otázku **ne** druhá otázka bude znít:
+
+  - Má hledané rozmístění kuliček pořadí mezi 64 a (jednou polovinou intervalu $<64,125>$ tj.) 98  ?
+
+Pokud bude odpověď na první otázku **ano** druhá otázka bude znít:
+
+  - Má hledané rozmístění kuliček pořadí mezi 1 a (jednou polovinou intervalu $<1,63>$ tj.) 32  ?
+
+A takto jde v dalších otázkách zmenšovat délku intervalu kde se nachází hledané řešení, až se tento interval zúží na 
+pořadí hledaného řešení. 
+
+Kolik otázek bude nutno položit ? Každá otázka zmenšuje interval možných řešeni
+na jednu polovinu. Při posledni otázce musí být délka dosaženého intervalu
+rovna (nejvíce) 1. Obecně pokud bude existovat $N$ možných výsledků pak je
+třeba $Q$ otázek tak aby bylo splněno
+
+$$
+N \cdot \overbrace{\frac{\mathrm 1}{\mathrm 2} \cdot \frac{\mathrm 1}{\mathrm 2} \ldots \cdot \frac{\mathrm 1}{\mathrm 2}}^{Q členů  \frac{\mathrm 1}{\mathrm 2} }=N\cdot \left(\frac{1}{2}\right)^Q =1
+$$
+
+Pokud použijeme funkci $log_2()$ (logaritmus o základu 2, tj. $log_2(2)=1$ )
+pak Q lze řešit následovně:
+
+$$
+\begin{align}
+\left(\frac{1}{2}\right)^Q =\frac{1}{N} \\
+Q\cdot log_2\left(\frac{1}{2}\right) =log_2\left(\frac{1}{N}\right) \\
+Q\cdot \left(-log_2\left({2}\right)\right) =-log_2\left({N}\right) \\
+Q=log_2\left({N}\right)  
+\end{align}
+$$
+
+Jednotkou Q je při použití logaritmu o základu 2 je **[bit]** (nejmenší jednotka informace ). 
+
+Jednotka měření závisí na základu logaritmu použitého pro výpočet entropie.
+Pokud by se použil logaritmus o jiném základě $m$, veličina Q by se jen
+vynásobila faktorem $\frac{1}{log_m(2)}$, jednotkou Q by pak nebyl **bit**, ale
+např. „přirozená jednotka“ **nat** (pro přirozený logaritmus o zakladu $e$)
+nebo nebo v desítkových číslicích nazývaných **dits** nebo **hartleys** (pro
+desítkový logaritmus).
+
+Protože předpokládáme všechny, že všechna rozmístění mají shodnou
+pravděpodobnost, je pravděpodobnost jedné konkretní konfigurace rovna
+$p_1=\frac{1}{N}$. Vzorec pro Q lze pak (poněkud uměle) přepsat jako:
+
+$$
+Q=log_2\left({N}\right)=\sum_{i=1}^N{\frac{1}{N}\cdot log_2(N)}=-\sum_{i=1}^N{\frac{1}{N}\cdot log_2\left(\frac{1}{N}\right)}=-\sum_{i=1}^N{p_1\cdot log_2(p_1)}
+$$
+
+
+## Hádání výsledku při pokusu s dvojnásobným počtem stavů
+
+Pokud budeme předchozí příklad modifikovat tak, aby opakovat aby se počet
+možných stavů zdvojnasobil, t.j. počet možných kombinací dvou výsledků je
+$N_2=N\cdot 2$. Počet otázek $Q_2$ , které zjišťují vysledek pro pokusů s
+dvojnásobkem stavů je roven:
+
+$$
+Q_2=log_2({N_2})=log_2({N \cdot 2})=log_2(N) +log_2(2)  =log_2(N) +1 = Q+1
+$$
+
+
+Pro zjištění výsledku pokus s dvojnásobkem stavů tedy potřebujeme Q+1 otázek,
+kde Q je počet otázek původního pokusu. Objem informací potřebných pro zjištění
+výsledku se tedy zvětšil o jeden bit.
+
+
+## Hádání výsledku při vícenásobném  pokusu 
+
+Pokud budeme pokus opakovat K krát za sebou (tak že jednotlivé pokusy mají
+shodnou pravděpodobnost výsledků a zároveň jsou oba pokusy na sobě nezávislé) a
+pak zjišťovat výsledný stav po k pokusech najednou, pak počet možných kombinací
+dvou výsledků je $N_K=N^K$. Pravděpodobnost jednoho stavu je
+$p_2=\frac{1}{N^K}=p_1^K$, kde $p_1$ pravděpodobnost z původního pokusu. Počet
+otázek $Q(K)$ , které najednou zjišťují vysledek obou pokusů je roven:
+
+$$
+\begin{align}
+Q(K)=log_2({N_K})=log_2(N^K)=K\cdot log_2(N)  =K \cdot Q
+\end{align}
+$$
+
+Objem  informací potřebných pro zjištění výsledku  K krát opakovaného pokusu se tedy zvětší K krát.
+
+## Hádání výsledku pokusu při různých pravděpodobnostech jednotlivých výsledků
+
+První příklad pracoval s předpokladem shodných pravděpodobností všech výsledků
+pokusu. Tento předpoklad často neni splněn. Příkladem je například pokus
+spočívající v "hádání" jednoho písmena za předpokladu, že písmeno je (náhodně)
+vybráno z anglického textu.
+
+
+
+| Letter |	Frequency |	Letter |	Frequency|
+|----|----|----|----|
+| a | 0.08167 |	n	| 0.06749 |
+| b | 0.01492 |	o	| 0.07507 |
+| c | 0.02782 |	p	| 0.01929 |
+| d | 0.04253 |	q	| 0.00095 |
+| e | 0.12702 |	r	| 0.05987 |
+| f | 0.02228 |	s	| 0.06327 |
+| g | 0.02015 |	t	| 0.09056 |
+| h | 0.06094 |	u	| 0.02758 |
+| i | 0.06966 |	v	| 0.00978 |
+| j | 0.00153 |	w	| 0.02360 |
+| k | 0.00772 |	x	| 0.00150 |
+| l | 0.04025 |	y	| 0.01974 |
+| m | 0.02406 |	z	| 0.00074 |
+
+: Relativní zastoupení písmen v anglickém textu
+
+Zdroj:<https://web.archive.org/web/20080708193159/http://pages.central.edu/emp/LintonT/classes/spring01/cryptography/letterfreq.html>
+
+Kladení otázek algoritmem z prvního příkladu bude fungovat, ale nalezené Q
+nebude optimální (bude třeba více otázek než je třeba). 
+
+Důvodem je rozdílné zastoupeni různých písmen, například písmena **e** či **a**
+jsou v anglickém textu řádově častější než např. **z** či **q**.
+Tento případ řeší definice  informační entropie odvozená Claudem Shannonem.
+
+# Shannonova informační entropie
+
+V zásadním článku **„A Mathematical Theory of Communication** publikovaném v
+[The Bell System Technical Journal,Vol. 27, pp. 379–423, 623–656, July,
+October,
+1948](https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf)
+Claude Shannon odvodil vzorec pro informační entropii pro případ s různými
+pravděpodobnostmi (a pro spojitý případ atd.).
+
+::: {.callout-tip title="Shanonova informační entropie" icon=false}
+
+Informační entropie reprezentující množství informace obsažené pro systémy s
+různými pravděpodobnostmi stavů je rovna:
+
+$$
+Q=-\sum_{i=1}^N{p_i\cdot log_2(p_i)}
+$$
+
+kde
+
+$p_i$ je pravděpodobnost i-tého výsledku $i\in<1,N>$ a platí $\sum_{i=1}^N{p_i}=1$
+
+:::
+
+Pěkný popis významu této publikace lze najít např. v článku [The Essential
+Message: Claude Shannon and the Making of Information Theory (Erico Marui
+Guizzo)](https://files.core.ac.uk/download/4404094.pdf)
+
+
+# Příklady výpočtů informační entropie
+
+Obecná funkce pro výpočet  informační entropie v jazyce Julia:
+
+```{.julia include="entropy.jl" }
+```
+
+```{julia}
+#| echo: false
+#| output: false
+include("entropy.jl")
+```
+
+## Písmeno z anglické abecedy
+
+Jaká je entropie jednoho písmena náhodně vybraného z anglickeho  textu ?
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+
+#array of english characters
+eng_alphabet = collect('a':'z')
+#array of character probabilities
+#! format: off 
+p=[
+#=a=#	0.08167,	#=b=#0.01492,	#=c=#	0.02782,	#=d=#0.04253,
+#=e=#	0.12702,	#=f=#0.02228,	#=g=#	0.02015,	#=h=#0.06094,
+#=i=#	0.06966,	#=j=#0.00153,	#=k=#	0.00772,	#=l=#0.04025,
+#=m=#	0.02406,	#=n=#0.06749,	#=o=#	0.07507,	#=p=#0.01929,
+#=q=#	0.00095,	#=r=#0.05987, #=s=#	0.06327,	#=t=#0.09056,
+#=u=#	0.02758,	#=v=#0.00978,	#=w=#	0.02360,	#=x=#0.00150,
+#=y=#	0.01974,	#=z=#0.00074
+]
+#! format: on 
+# calculate inf entropy
+Q=entropy(p, verbose = true);
+```
+
+Písmeno z anglického textu nese cca 4,17 bitu informace. Pokud nahodne vybereme
+100 pismen z anglického textu, pak informační entropie tohoto souboru by byla
+rovna:
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+Q_english = 100 * Q
+println("Q_english=$Q_english")
+
+```
+
+Pokud naopak nahodne vybereme 100 pismen (tak aby zastoupeni všech pismen bylo
+shodne), pak počet kombinací $N_{100}=26^{100}$ a informační entropie by byla
+rovna $Q_random=log_2(26^{100})=100 \cdot log_2(26)$
+println("Q_random=$Q_random")
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+Q_random=100*log2(26)
+rat=:(Q_english/Q_random)
+println("$(rat) = $(eval(rat))")
+```
+
+Informační entropie písmen z anglického textu je tedy asi jen 88% entropie
+náhodného textu. Samozřejmě pokud začneme analyzovat sekvence písmen ze
+slov,pak již sekvence není náhodná, a vysledkem by bylo zjištění, ze informační
+obsah sekvencí písmen ze slov je výrazně menší než by odpovídalo i počtu
+možných kombinací náhodně vybíraných dle frekvenční tabulky anglických písmen.
+
+## Entropie součtu počtu ok při házení 2 kostkami 
+
+Napřed vygenerujeme všechny možné kombinace hodů s 2 kostkami a jejich soucet: 
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+
+# all combinations of two dice
+combinations = [(d1, d2, d1 + d2) for d1 in 1:6, d2 in 1:6]
+```
+
+Výpočet četností součtů ok:
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+
+using StatsBase
+
+# get array of sums d1+d2 
+sum2dices = getindex.(combinations, 3)
+# Count occurrences
+counts_dict = countmap(sum2dices)
+# Extract unique values of sum2dices and their counts as arrays
+sum2dices = collect(keys(counts_dict))
+counts = collect(values(counts_dict))
+# Get sorting permutation
+perm = sortperm(sum2dices)
+# Apply permutation
+sum2dices = sum2dices[perm]
+counts = counts[perm]
+
+println("Unique values: ", sum2dices)
+println("Counts:        ", counts)
+
+```
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+
+#calculate probabilities
+p = counts ./ sum(counts)
+println("Probabilities:\n", round.(p, digits=2))
+# calculate inf entropy
+Q = entropy(p, verbose=true);
+
+```
