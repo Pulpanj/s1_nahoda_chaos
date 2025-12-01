@@ -3,29 +3,27 @@ project:
 
 
 engine: julia
-# engines: ['julia','jupyter']
-
-
-execute:
-  freeze: auto  # re-render only when source changes
-  # cache: true
 
 # julia:
 #   key: value
 
 # The currently available options are:
+# exeflags: An array of strings which are appended to the julia command that starts the worker process. 
+# For example, a notebook is run with --project=@. by default 
+# (the environment in the directory where the notebook is stored) 
+# but this could be overridden by setting exeflags: ["--project=/some/directory/"].
+# env: An array of strings where each string specifies one environment 
+# variable that is passed to the worker process. For example, env: ["SOMEVAR=SOMEVALUE"].
 
-# exeflags: An array of strings which are appended to the julia command that starts the worker process. For example, a notebook is run with --project=@. by default (the environment in the directory where the notebook is stored) but this could be overridden by setting exeflags: ["--project=/some/directory/"].
-# env: An array of strings where each string specifies one environment variable that is passed to the worker process. For example, env: ["SOMEVAR=SOMEVALUE"].
+
+execute:
+  freeze: auto  # re-render only when source changes
+  cache: true
 
 filters:
   - pandoc-ext/list-table
   - include-code-files
 
-
-# author: 
-#   name: "Jarda Půlpán"
-#   email: "pulpanj@volny.cz"
 lang: cs
 date-format: iso
 
@@ -34,30 +32,6 @@ website:
   site-url: http://www.pulpanj.me.cz/blogs/u3v/s1_nahoda_chaos/ # you must change this appropriately for RSS feeds to work properly
   title: "U3V_1> Náhoda, nelinearita, chaos, komplexita"
   open-graph: true
-  # navbar:
-
-  # margin-header: |
-  #   ![Logo image](/images/pdf-icon.jpg)
-  #   #toc
-
-  # sidebar:
-  #   - title: "cheese"
-  #     style: "docked"
-  #     sidebar-position: right
-  #     background: dark
-  #     contents: 
-  #       - text: "Blog"
-  #         href: index.qmd
-  #       - text: "O čem je kurz"
-  #         href: ocem.qmd        
-
-  #   - title: "badger"
-  #     contents:
-  #       - text: "------"
-  #       - text: "------"
-  #       - text: "------"
-  #       - index.qmd
-  #       # navigation items
 
   page-navigation: true
   back-to-top-navigation: true
@@ -84,12 +58,8 @@ website:
       - icon: github
         href: https://github.com/Pulpanj/s1_nahoda_chaos
       - icon: envelope
-        href: email:pulpanj@volny.cz
-    #   - icon: rss
-    #     href: index.xml
-    # left:
-    #   - stuff/item1.qmd
-    #   - stuff/item2.qmd
+        href: "mailto:pulpanj@volny.cz"
+        aria-label: "Email"
 
   page-footer:
     border: true
@@ -130,11 +100,6 @@ website:
 
 
 format:
-  # typst:
-  #   toc: true
-  #   number-sections: true
-  #   toc-depth: 4       # Optional: controls heading levels shown
-  #   number-depth: 4
   html:
     toc: true
     number-sections: false

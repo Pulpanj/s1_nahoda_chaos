@@ -11,7 +11,7 @@ toc: false
 
 
 ::: {.g-col-2}
-[![](/images/pdf_icon.png){width=1.2in}](https://math.dartmouth.edu/~prob/prob/prob.pdf) 
+[![](/images/stats_full.png){width=1.2in}](https://math.dartmouth.edu/~prob/prob/prob.pdf) 
 :::
 
 ::: {.g-col-10}
@@ -19,7 +19,8 @@ toc: false
 |:----------|:------------------------------------------------------------| 
 |   **Název:** | Grinstead and Snell’s Introduction to Probability |
 |    **Autor:** | harles M. Grinstead, J. Laurie Snell. |
-|    **URL:**  |<https://math.dartmouth.edu/~prob/prob/prob.pdf> |
+|    **PDF download:** |<https://math.dartmouth.edu/~prob/prob/prob.pdf> |
+|   **URL:**  | on line version: <https://stats.libretexts.org/Bookshelves/Probability_Theory/Introductory_Probability_(Grinstead_and_Snell)> |
 |    **Rok:**  | 2006 | 
 :::
 

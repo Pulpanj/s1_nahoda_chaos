@@ -26,6 +26,7 @@ format:
       number-depth: 2
       include-in-header:
           - text: |
+              #set table(stroke: 0.5pt + black) 
               /* Color links */
               #show link: set text(fill: rgb(0, 0, 255))          
               #show raw: set text(font: "Cascadia Code")
@@ -67,22 +68,13 @@ format:
     smooth-scroll: true
     anchor-sections: true
     code-block-border-left: "#0b4edeff" 
-    #"#2561f7ff"
     code-block-bg: "#fafaf1ff"
-    # code-block-bg: "#fafafaff"
-    # highlight-style: /resources/jptango.theme
     # highlight-style: tango
-    highlight-style: ./jptango.theme
-    # highlight-style: tango
+    highlight-style: ../../resources/jptango.theme
     code-line-numbers: true
     code-overflow: wrap
     code-annotations: hover
     code-fold: true
-    # code-tools: 
-    #   source: true
-    #   caption: Source
-    #   toggle: false
-  # ipynb: default
 css: /resources/styles.css        
 
 format-links:

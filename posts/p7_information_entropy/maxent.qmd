@@ -4,7 +4,7 @@ date: "2025-11-24"
 updated: "2025-11-28"
 description: "Princip maximální informační entropie a ukázky MAXENT výpočtů"
 draft: false
-categories: ["Informační entropie", "Seance"]
+categories: ["Informační entropie", "Přednáška6"]
 # image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p7_information_entropy/maxent.pdf) "
 
@@ -26,13 +26,13 @@ format:
 include("entropy.jl")
 ```
 
-
 # Entropie pokusu s 2 možnými výsledky
 
 Jak se mění entropie pokud pokus/zpráva muže mit jen 2 možné výsledky, které
 mají pravděpodobnosti $p_1,p_2$ (a kde $p_2=(1-p_1)$) ?
 
-Výpočet  entropie pro hodnoty $p1 \in<0,0.01,0.02,\ldots,1>$:
+Výpočet entropie pro hodnoty $p1 \in<0,0.01,0.02,\ldots,1>$ s použitím [funkce
+entropy](co_je_to_bit.qmd#fce_entropy){target="_blank" rel="noopener"}:
 
 ```{julia}
 #| echo: true
@@ -41,8 +41,8 @@ Výpočet  entropie pro hodnoty $p1 \in<0,0.01,0.02,\ldots,1>$:
 
 # entropie pro  p1 od 0 do 1
 p_Q = [
-  (p1, entropy([p1, 1 - p1], verbose=false))
-	for p1 in range(0, 1, step=0.01)
+    (p1, entropy([p1, 1 - p1], verbose=false))
+    for p1 in range(0, 1, step=0.01)
 ]
 ```
 
@@ -53,40 +53,43 @@ Graf závislost informační entropie na pravděpodobnosti prvního stavu $p_1$
 #| output: true
 #| code-fold: true
 
-using Plots, LaTeXStrings
+using Plots, LaTeXStrings, Plots.PlotMeasures
 
 gr_entropy = plot(
-	first.(p_Q), last.(p_Q),
-	linecolor = :red, legend = nothing, linewidth = 2,
-	ylabel = "Q", yticks = range(0, 1.2, step = 0.1), ylim = (0, 1.2),
-	xlabel = L"p_1", xticks = range(0, 1, step = 0.1),
-	framestyle = :origin, top_margin = 5Plots.mm,
-	grid = :on,
-	# minorgrid=true,
-	size = (900, 500), show = true,
+    first.(p_Q), last.(p_Q),
+    linecolor=:red, legend=nothing, linewidth=2,
+    ylabel="Q", yticks=range(0, 1.2, step=0.1), ylim=(0, 1.2),
+    xlabel=L"p_1", xticks=range(0, 1, step=0.1),
+    framestyle=:origin, top_margin=5Plots.mm,
+    grid=:on,
+    # minorgrid=true,
+    size=(900, 500), show=true,
 )
-plot!([0.5, 0.5], [0, 1], arrow = Plots.Arrow(:closed, :head, 4.5, 2.2), linecolor = :darkgrey)
+plot!([0.5, 0.5], [0, 1], arrow=Plots.Arrow(:closed, :head, 4.5, 2.2), linecolor=:darkgrey)
 
-scatter!([0.5], [1], mc = [:blue],
-	label = [L"Fixní bod $x_1^*$" L"Fixní bod $x_2^*$"], markersize = 4)
-annotate!(0.5, 1 + 0.15, Plots.text("Maximální entropie=1", :blue), show = false)
-annotate!(0.5, 1 + 0.05, Plots.text(L"pro $p_1=p_2=0.5$ ", :blue), show = false)
+scatter!([0.5], [1], mc=[:blue],
+    label=[L"Fixní bod $x_1^*$" L"Fixní bod $x_2^*$"], markersize=4)
+annotate!(0.5, 1 + 0.15, Plots.text("Maximální entropie=1", :blue), show=false)
+annotate!(0.5, 1 + 0.05, Plots.text(L"pro $p_1=p_2=0.5$ ", :blue), show=false)
 display(gr_entropy);
 ```
+
 # Princip Maximální Entropie
 
 Výsledek předchozího příkladu, kdy největší entropie nastává v případě, že jsou
-obě pravdepodobnosti shodné. To je stav kdy o systému nic nevíme a jediné 
-co lze tedy předpokládat je shodnost všech výsledků t.j.  $p_1=p_2=0.5$. 
+obě pravdepodobnosti shodné. To je stav kdy o systému nic nevíme a jediné co
+lze tedy předpokládat je shodnost všech výsledků t.j. $p_1=p_2=0.5$.
 
-Tato =uvaha  odkazuje  na mnohem obecnější princip. Neúplnost
-našich znalosti o systému umožňuje zdánlivě volně volit mezi všemi možnými
-stavy, nepravděpodobnější je ale stav mající nejvyšší entropii.
+Tato úvaha odkazuje na mnohem obecnější princip. Neúplnost našich znalosti o
+systému umožňuje zdánlivě volně volit mezi všemi možnými stavy,
+nepravděpodobnější je ale stav mající nejvyšší entropii.
 
-::: {.callout-tip title="Princip maximální entropie (MAXENT)" icon=false}
+::: {.callout-tip title="Princip maximální entropie (MAXENT)" icon="false"}
 
-Princip maximální entropie, že je nejpravděpodobnější rozdělení toho systému
-takové, které má nejvyšší možnou entropii za podmínek, které o systému známe.
+Princip maximální entropie říká, že je nejpravděpodobnější rozdělení toho
+systému takové, které má nejvyšší možnou entropii za podmínek, které o systému
+známe. 
+
 :::
 
 Princip maximální entropie se projevuje v mnoha oblastech, například:
@@ -98,3 +101,353 @@ termodynamické rovnováhy.
 - V informatice a teorii informace MAXENT princip znamená, že nejlepší odhad
 nebo model je ten, který přisuzuje nejvyšší možnou nejistotu.
 
+Pro mnoho systémů však pro pravděpodobnosti různých stavů existují omezující
+podmínky. V tomto případě stále platí princip maximální entropie, ale
+pravděpodobnosti stavů maximalizující entropii musí splňovat dané omezující
+podmínky. MAXENT pak představuje úlohu o vázaném extrému.
+
+# Příklad MAXENT s omezujícími podmínkami
+
+Mějme systém s 4 možnými stavy $p_1,p_2,p_3,p_4$, které jsou kromě podmínky
+
+$$
+\sum_{i=1}^4{p_i}=1
+$$
+
+musí splňovat ještě podmínku:
+
+$$
+p_4=\frac{p_1}{2}
+$$
+
+\
+t.j. pravděpodobnosti $p_4$ je vazana na $p_1$, což vede na podmínku $p_1 \cdot \frac{3}{2} \le 1$
+
+Informační entropii vypočteme jako:
+
+$$
+Q(p_1,p_2,p_3)=({p_1\cdot log_2(p_1)})+({p_2\cdot log_2(p_2)})++({p_3\cdot log_2(p_3)})+({\frac{p_1}{2}\cdot log_2(\frac{p_1}{2})})
+$$
+
+## Výpočet Q na mřížce bodů $p_1 \times p_2$
+
+```{julia}
+#| echo: false
+#| output: false
+include("entropy.jl")
+```
+
+Použijeme opět [funkci entropy](co_je_to_bit.qmd#fce_entropy){target="_blank"}
+
+```{julia}
+#| echo: true
+#| output: false  #asis
+#| code-fold: false
+
+grid_step = 0.001
+p1 = grid_step:grid_step:(2/3)
+p2 = grid_step:grid_step:1
+
+p3 = [((1 - 3 / 2 * pp1) > pp2) ?
+      1 - 3 * pp1 / 2 - pp2 : missing for pp1 in p1, pp2 in p2]
+# spocti Q pro mrizku p1 a p2
+Q = [((1 - 3 / 2 * pp1) > pp2) ?
+     entropy([pp1, pp2, max(1 - 3 * pp1 / 2 - pp2, 0), pp1 / 2]) :
+     missing
+     for pp1 in p1, pp2 in p2];
+
+```
+
+## Nalezení $Q_{max}$ na mřížce bodů $p_1 \times p_2$
+
+Prohledáním předpočtených polí lze zjistit oblast kde je entropie Q maximalní:
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+
+# najdi maximum v poli Q
+Q_max = maximum(skipmissing(Q))
+inds = findall(x -> x == Q_max, skipmissing(Q))[1]
+p1_max, p2_max = Tuple(inds)
+Q_max = Q[p1_max, p2_max]
+p3_max = p3[p1_max, p2_max]
+p1[p1_max]
+println("Pravděpodobnosti pro maximální Q : ")
+println("p1          : ", p1[p1_max])
+println("p2          : ", p2[p2_max])
+println("p3          : ", p3_max)
+println("p4          : ", p1[p1_max] / 2)
+println("Maximum Q   : ", Q_max)
+
+```
+
+## Zobrazení $Q_{max}$ na mřížce bodů $p_1 \times p_2$
+
+Hodnoty p3 a Q na spočtené mřížce bodů p1,p2 lze zobrazit jako teplotní mapy v následujících grafech:
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: true
+
+using Plots, LaTeXStrings, Plots.PlotMeasures
+h1 = heatmap(p1, p2, transpose(p3),
+    xlabel=L"$p_2$",
+    ylabel=L"$p_1$",
+    colorbar_title=L"p_3",
+    clims=(0, 1), colorbar_ticks=0:0.1:1,
+    color=:viridis, show=false,
+    title=L"$(p_1,p_2) \rightarrow p_3$",
+)
+
+h2 = heatmap(p1, p2, transpose(Q),
+    xlabel=L"$p_1$",
+    ylabel=L"$p_2$",
+    colorbar_title="Entropy Q",
+    clims=(0, 2), colorbar_ticks=0:0.2:2,
+    color=:viridis, show=false,
+    title=L" $(p_1,p_2) \rightarrow Q(p_1,p_2,p_3)$")
+
+plot!(
+    [p1[p1_max], p1[p1_max]], [0, p2[p2_max]],
+    arrow=Plots.Arrow(:closed, :head, 4.5, 2.2),
+    linecolor=:black,
+    label=L"$p_1$" * "=$(round(p1[p1_max],digits=2))",
+)
+
+plot!(
+    [0, p1[p1_max]], [p2[p2_max], p2[p2_max]],
+    arrow=Plots.Arrow(:closed, :head, 4.5, 2.2),
+    linecolor=:black,
+    label=L"$p_2$" * "=$(round(p2[p2_max],digits=2))",
+)
+annotate!(
+    p1[p1_max], p2[p2_max] + 0.05,
+    Plots.text(L"$Q_{max}$", :black, 10), show=false,
+)
+plot!(
+    [NaN], [NaN], linecolor=nothing,
+    label=L"$p_3$" * "=$(round(p3_max,digits=2))",
+)
+plot!(
+    [NaN], [NaN], linecolor=nothing,
+    label=L"$p_4$" * "=$(round(p1[p1_max]/2,digits=2))",
+)
+
+scatter!(
+    [p1[p1_max]], [p2[p2_max]],
+    mc=[:red], markersize=4,
+    label=L"$Q_{max}$" * "=$(round(Q_max,digits=2))",
+)
+
+plot(
+    h1, h2, layout=(1, 2), size=(900, 600),
+    framestyle=:origin,
+    left_margin=[5mm 5mm], bottom_margin=10px,
+)
+```
+
+Úloha nalezení maximální entropie za daných vazebních podmínek nemá v obecném
+případě analytické řešení. Naivní numerický přístup k nalezení maxima entropie
+na tomto jednoduchém příkladě zafungoval, ale pro větší problémy je nutno
+použít specializovaný optimalizační software.
+
+# Hledání maximální hodnoty entropie pomoci numerických metod
+
+V ekosystému jazyka Julie existuje pro řešení optimalizačních úloh package
+JuMP. V jejím prostředí lze jednoduše zadávat jak nelineární vazby tak i
+nelineární funkce jejich maximum chceme řešit.
+
+## Řešení MAXENT pro 4 stavy s omezující podmínkou
+
+Řešení predchoziho príkladu pomoci JuMP je srozumitelné:
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+
+using JuMP, NLopt
+model = Model(NLopt.Optimizer)
+set_optimizer_attribute(model, "algorithm", :LD_SLSQP)
+set_attribute(model, "xtol_rel", 1e-4)
+set_attribute(model, "constrtol_abs", 1e-8)
+@variable(model, 0 <= p[1:4] <= 1)
+set_start_value.(p, [0.1, 0.1, 0.1, 0.1])
+@NLobjective(model, Max,
+    -(p[1] * log2(p[1]) + p[2] * log2(p[2]) + p[3] * log2(p[3]) + p[4] * log2(p[4]))
+)
+@NLconstraint(model, (p[1] + p[2] + p[3] + p[4] == 1))
+@NLconstraint(model, p[4] == p[1] / 2)
+JuMP.optimize!(model)
+Q_max, p_max, ret =
+    objective_value(model), value.(p), raw_status(model)
+
+print(
+    """
+    solution              :
+    ========================
+    """,
+)
+for i in 1:length(p_max)
+    println("p[$i]     :$(p_max[i])")
+end
+println(
+    """
+    objective value       : $Q_max
+    solution status       : $ret
+    """,
+)
+
+```
+
+## Úloha o klokanech
+
+| Levoruký | Pravoruký | Pije pivo | Pravděpodobnost řádku |                         |
+|--------------|--------------|--------------|-------------------|--------------|
+| p1       | p2        | pije      | 0.75                  |                         |
+| p3       | p4        | nepije    | 0.25                  |                         |
+| 0.1      | 0.9       |           |                       | Pravděpodobnost sloupce |
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+
+using JuMP, NLopt
+model = Model(NLopt.Optimizer)
+set_optimizer_attribute(model, "algorithm", :LD_SLSQP)
+set_attribute(model, "xtol_rel", 1e-4)
+set_attribute(model, "constrtol_abs", 1e-8)
+@variable(model, 0 <= p[1:4] <= 1)
+set_start_value.(p, [0.1, 0.1, 0.1, 0.1])
+@NLobjective(model, Max,
+    -(p[1] * log2(p[1]) + p[2] * log2(p[2]) + p[3] * log2(p[3]) + p[4] * log2(p[4]))
+)
+@NLconstraint(model, (p[1] + p[2] + p[3] + p[4] == 1))
+@NLconstraint(model, p[1] + p[2] == 3 / 4)
+@NLconstraint(model, p[1] + p[3] == 1 / 10)
+JuMP.optimize!(model)
+Q_max, p_max, ret =
+    objective_value(model), value.(p), raw_status(model)
+
+print(
+    """
+    solution              :
+    ========================
+    """,
+)
+for i in 1:length(p_max)
+    println("p[$i]     :$(p_max[i])")
+end
+println(
+    """
+    objective value       : $Q_max
+    solution status       : $ret
+    """,
+)
+```
+
+## Čtyřstěnná kostka s omezujícími momentovými podmínkami
+
+Další příklad pracuje se systémem, který má 4 stavy (čtyřstěnná kostka ) s
+pravděpodobnostmi $p_1,p_2,p_3,p_4$ a každému stavu odpovídá nějaká energie
+$\epsilon_i, i\in (1..4)$ (t.j. počet ok).
+
+Pomocí principu maximální entropie lze vypočítat pravděpodobnosti těchto stavů
+(v rovnovážném stavu systému) za omezujících podmínek, kdy jsou známy momenty
+pozorované makroskopické veličiny $U$ (energie).
+
+m-tý moment $\mathbb{E}^m \langle U \rangle$ veličiny $U$ je definován jako:
+
+$$
+\mathbb{E}^m \langle U \rangle=\sum_{i=1}^4{\epsilon_i^{(m-1)} \cdot p_i}
+$$
+
+To znamená, že kromě  omezující podmínky: 
+$$
+\sum_{i=1}^4{p_i}=1
+$$
+
+musí $p_1,p_2,p_3,p_4$ splňovat ještě podmínky pro prvních M momentů veličiny $U$:
+$$
+\mathbb{E}^m \langle U \rangle=u_m   
+$$
+
+kde
+
+- $u_m$ je pozorovný (předem známý) m-tý moment veličiny $U$
+
+- $m$ je řád momentu veličiny $U$, $m\in \langle 2,M \rangle$  
+
+### Řešení pomoci package JuMP 
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+
+using JuMP, NLopt
+
+function entropy_by_moments(
+    # pole zadanych momentu 
+    Um::AbstractVector{<:Real}
+)
+
+    model = Model(NLopt.Optimizer)
+    set_optimizer_attribute(model, "algorithm", :LD_SLSQP)
+    set_attribute(model, "xtol_rel", 1e-4)
+    set_attribute(model, "constrtol_abs", 1e-8)
+    @variable(model, 0 <= p[1:4] <= 1)
+    set_start_value.(p, [0.1, 0.1, 0.1, 0.1])
+    @NLobjective(model, Max,
+        -(p[1] * log2(p[1]
+          ) + p[2] * log2(p[2]) + p[3] * log2(p[3]) + p[4] * log2(p[4]))
+    )
+    print(
+        """
+        ========================
+        vazby              :
+        ========================
+        """
+    )
+    for i in 1:length(Um)
+        @NLconstraint(model,
+            1^(i - 1) * p[1] + 2^(i - 1) * p[2]
+            + 3^(i - 1) * p[3] + 4^(i - 1) * p[4]
+            ==
+            Um[i]
+        )
+        println("u_$(i-1)=$(Um[i])")
+    end
+
+    JuMP.optimize!(model)
+    Q_max, p_max, ret =
+        objective_value(model), value.(p), raw_status(model)
+
+    print(
+        """
+        ========================
+        solution              :
+        ========================
+        """,
+    )
+    for i in 1:length(p_max)
+        println("p[$i]     :$(p_max[i])")
+    end
+    println(
+        """
+        objective value       : $Q_max
+        solution status       : $ret
+        """,
+    )
+end
+
+
+entropy_by_moments([1])
+entropy_by_moments([1, 3.16])
+entropy_by_moments([1, 3.16, 10.2])
+
+```

@@ -6,7 +6,7 @@ toc: false
 draft: false
 ---
 
-# Interni todo list blogu U3V
+# Interni to-do list blogu U3V
 
 ## Co vylepšit na strankách
 

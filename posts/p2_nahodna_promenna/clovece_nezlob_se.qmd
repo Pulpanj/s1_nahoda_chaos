@@ -1,0 +1,294 @@
+---
+title: "Člověče nezlob se"
+date: "2025-11-10"
+updated: "2025-11-23"
+description: "Analýza pořadí házení kostkou: kdy, poprvé padne 6-ka ?"
+draft: false
+categories: ["Náhodná proměnná", "Seminář2"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p2_nahodna_promenna/clovece_nezlob_se.pdf) "
+
+html-math-method: katex
+engine: python
+
+format:
+    typst:
+        output-file: "clovece_nezlob_se"
+        output-ext: "pdf"
+---
+
+# Člověče nezlob se - pravidlo pro postup z domečku 
+
+Hráč může z "domečku" postoupit na první pole, až když hodí hrací kostkou 6-ku.
+Pokud mu nepadne musi čekat na další kolo.
+
+Jak dlouho čeká - kolikrát musi hodit kostkou nez postoupi z domečku? 
+Doba čekání  je náhodná veličina s nekonečně mnoho hodnotami.
+
+# Pořadí hodu kdy padla prvni 6-ka jako náhodná proměnná 
+
+## Pravděpodobnost, že 6-ka padne v k-tém hodu 
+
+Jaká je pravděpodobnost 6-ky v k-tém hodu:
+
+* 1. hod  $\frac{1}{6}$ : hned 6-ka padla $p1=\frac{1}{6}$
+* 2. hod  $\frac{5}{6}\cdot\frac{1}{6}$ : v předchozím hodu 6-ka nepadla $p1=\frac{5}{6}$  a pak padla $p2=1\frac{1}{6}$
+* 3. hod  $\frac{5}{6}\cdot\frac{5}{6}\cdot\frac{1}{6}$ : ve dvou předchozích hodech 6-ka nepadla $p1 \cdot p2 =\frac{5}{6} \cdot \frac{5}{6}$  a pak padla $p3=1\frac{1}{6}$
+* ...
+* k-tý hod  $\frac{5}{6}\ldots\frac{5}{6}\cdot\frac{1}{6}$  kde je $(k-1)$ členů $\frac{5}{6}$ (vyjadřujících, že v $(k-1)$ předchozích hodů 6-ka nikdy nepadla )
+
+
+Pravděpodobnost  prvni 6-ky v hodu k je tedy:
+$$
+p_k = \frac{1}{6} \cdot \left(\frac{5}{6}\right)^{i-1}
+$$
+
+
+**Kód pro výpočet pravděpodobností 6-ky v k-tém hodu**
+
+```{julia}
+#| output: false
+#| echo: true
+#| code-fold: false
+
+using DataFrames, PrettyTables, LaTeXStrings
+
+N_max = 50
+p_i = Vector{Float64}(undef, N_max)
+cum_p_i = Vector{Float64}(undef, N_max)
+
+cum_p_i[1] = 0
+for i in 1:N_max
+    p_i[i] = (5 / 6)^(i - 1) / 6
+    cum_p_i[i] = p_i[i] + ((i > 1) ? cum_p_i[i-1] : 0)
+end
+
+```
+
+<!-- {{< pagebreak >}} -->
+
+```{julia}
+#| echo: false
+#| output: asis
+
+println("**Tabulka pravděpodobností 6-ky v k-tém hodu**\n")
+
+df = DataFrame(k=collect(1:1:N_max), p_i=p_i, cum_p_i=cum_p_i)
+# Create a "separator row" with "..." in each column
+sep = DataFrame(k=["..."], p_i=["..."], cum_p_i=["..."])
+row_subset = vcat(first(df, 10), sep, last(df, 10))
+
+pretty_table(
+    row_subset; backend=:markdown,
+    formatters=[
+        fmt__printf("%d", [1]), fmt__printf("%4.5f", [2, 3])
+    ],
+    alignment=[:l, :c, :c],
+    column_labels=[
+        L"$i$", L"$p(i)$", "Kumulativní <br> součet " * L"$p(i)$"
+    ],
+    show_row_number_column=false,
+)
+```
+
+
+
+## Náhodná veličina K: pořadí hodu kdy, poprvé padne 6-ka 
+
+Nechť $K$ označuje pořadí hodu kdy, prvně padla 6-ka.  
+
+$K$ je náhodná veličina nabyvajici hodnot 1,2,..., mající střední hodnotu
+označovanou $\mathbb{E}[K]$.
+
+$$
+\mathbb{E}[K] = \sum_{i=1}^{\infty} \frac{1}{6} \cdot i \cdot \left(\frac{5}{6}\right)^{i-1}
+$$
+
+## Aproximace  $\mathbb{E}[K]$
+
+**Kód pro výpočet aproximace střední hodnoty $\mathbb{E}[K]$ pomocí prvních $N_max$ členů posloupnosti $p(i)$**
+```{julia}
+#| output: false
+#| echo: true
+#| code-fold: false
+EK_i = Vector{Float64}(undef, N_max)
+
+cum_i_p_i = 0
+for i in 1:N_max
+    cum_i_p_i = cum_i_p_i + i * p_i[i]
+    EK_i[i] = cum_i_p_i
+end
+```
+
+```{julia}
+#| echo: false
+#| output: asis
+
+println("**Tabulka k-tá aproximace  \$\\mathbb{E}[K]\$ **\n")
+
+df.EK_i = EK_i
+
+# Create a "separator row" with "..." in each column
+sep = DataFrame(k=["..."], p_i=["..."], cum_p_i=["..."], EK_i=["..."])
+row_subset = vcat(first(df, 10), sep, last(df, 10))
+
+pretty_table(
+    select(row_subset, [:k, :p_i, :EK_i]);
+    backend=:markdown,
+    formatters=[
+        fmt__printf("%d", [1]), fmt__printf("%4.5f", [2, 3, 4])
+    ],
+    alignment=[:l, :c, :c],
+    column_labels=[
+        L"$k$", L"$p(k)$", "k-tá aproximace <br>" * L"$\mathbb{E}[K]$"
+    ],
+    show_row_number_column=false,
+)
+```
+
+
+```{julia}
+#| code-fold: true
+
+using DataFrames, Plots, LaTeXStrings, Plots.PlotMeasures
+
+dfg = first(df, 25)
+x = 1:nrow(dfg)
+
+
+# create a second axis sharing x
+# Second y-axis: bar plot of P(i)
+bar(
+    x, dfg[!, "p_i"],
+    color=:skyblue,
+    alpha=0.5,
+    ylims=[0, 0.18],
+    yticks=0:0.03:0.18,
+    ylabel="p(i)",
+    label="p(i)",
+    title="Konvergence střední hodnoty E[K] z prvních i hodnot",
+    legend=:bottomright,
+)
+
+
+plot!(
+    twinx(),  # Create a second y-axis
+    x, dfg[!, "EK_i"],
+    color=:red,
+    xlabel="i-th aproximace",
+    ylims=[0, 6],
+    yticks=0:1:10,
+    xticks=0:5:nrow(dfg),
+    ylabel=L"$\mathbb{E}[K]$",
+    label=L"$\mathbb{E}[K]$",
+    legend=:top,
+    left_margin=20mm,
+    top_margin=15mm,
+    # bottom_margin=15mm,
+    right_margin=20mm,
+    size=(900, 600),
+    # framestyle=:box,
+    grid=true,
+    minorgrid=true
+)
+
+```
+
+# Odvozeni střední hodnoty $\mathbb{E}[K]$ náhodné veličiny K
+
+## Příprava 1: součet geometrické řady 
+
+Konečná geometrická řada:
+$$
+\sum_{i=1}^{k} q^i
+$$
+
+Tato řada má první člen $q$, kvocient $q$, a obsahuje $k$ členů. Odvození je
+jednoduché a elegantní.
+
+1. Zapiš řadu:
+$$
+S = q + q^2 + q^3 + \dots + q^k
+$$
+
+2. Vynásob obě strany kvocientem $q$:
+$$
+qS = q^2 + q^3 + \dots + q^{k+1}
+$$
+
+3. Odečti druhou rovnici od první:
+$$
+S - qS = q - q^{k+1}
+$$
+
+4. Vyjádři $S$:
+$$
+S(1 - q) = q(1 - q^k) \quad \Rightarrow \quad S = \frac{q(1 - q^k)}{1 - q}
+$$
+
+__✅ Výsledek:__
+$$
+\sum_{i=1}^{k} q^i = \frac{q(1 - q^k)}{1 - q}, \quad \text{pro } q \ne 1
+$$
+
+__📊 Nekonečná geometrická řada:__
+
+A pokud  $q \lt 1$ konverguje i nekonečná geometrická řada 
+
+$$
+\sum_{i=1}^{\infty} q^i = \frac{q}{1 - q}, \quad \text{pro } |q| < 1
+$$
+
+## Příprava 2: součet  řady s členy $i \cdot q^i$
+
+Součet řady ve tvaru:
+
+$$
+\sum_{i=1}^{\infty} i \cdot q^i
+$$
+
+1. Lze odvodit z derivace geometrické řady:
+
+$$
+\sum_{i=0}^{\infty} q^i = \frac{1}{1 - q}
+$$
+
+2. Když tuto řadu zderivujeme podle $q$, dostaneme právě:
+
+$$
+\sum_{i=1}^{\infty} i \cdot q^{i-1} = \frac{1}{(1 - q)^2}
+$$
+
+3. A když ji vynásobíme $q$, dostaneme vzorec:
+
+$$
+\sum_{i=1}^{\infty} i \cdot q^i = \frac{q}{(1 - q)^2}
+$$
+
+_Tento vzorec platí pouze pro$|q| < 1$, tedy když se jedná o konvergentní geometrickou řadu._
+
+## Střední hodnota  $\mathbb{E}[K]$  
+
+Pro geometrické rozdělení (počítané od $i = 1$):
+
+$$
+\begin{align}
+\mathbb{E}[X]  &= \sum_{i=1}^{\infty} i \cdot p \cdot (1 - p)^{i - 1} 
+    &= p \cdot \frac{1}{q} \cdot  \sum_{i=1}^{\infty} i  \cdot (q)^{i} = p \cdot \frac{1}{q} \cdot \frac{q}{(1 - q)^2}
+    = \frac{1}{p}
+\end{align}
+$$
+
+Kde:
+
+- $q=(1 - p)$
+
+V našem případě:
+$p = \frac{1}{6}$
+
+__📊Takže střední hodnota pořadí hodu do první 6-ky je:__
+
+$$
+\mathbb{E}[K] =6
+$$ 
+
