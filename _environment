@@ -1,7 +1,7 @@
 JULIA_PROJECT=D:/ajps/quarto/u3v/s1_nahoda_chaos
 JULIA_CONDAPKG_BACKEND = Null
 JULIA_PYTHONCALL_EXE = d:\\ajps\\quarto\\.venv\\Scripts\\python.exe
-
+# QUARTO_CACHE_DIR=_cache
 # <!-- ENV["JULIA_CONDAPKG_BACKEND"] = "Null"
 # ENV["JULIA_PYTHONCALL_EXE"] = "/path/to/python"  # optional
 # ENV["JULIA_PYTHONCALL_EXE"] = "@PyCall"  # optional

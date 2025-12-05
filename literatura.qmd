@@ -88,5 +88,22 @@ toc: false
 |    **Reference:**  | Maximum Entropy Formalism Conference, Massachusetts Institute of Technology, May 2-4, 1978 | 
 :::
 
+
+
+::: {.g-col-2}
+[![](/images/alex_bellos_can_you_solve.jpg){width=1.2in}](https://us.amazon.com/Can-You-Solve-Problems-Perplexing/dp/161519388X/ref=sr_1_5?dib=eyJ2IjoiMSJ9.8OHr6xeTfuQuWaE9x0Gq0fFnr_1Lg6Ow22-38c30T6S18dBQlQ5ASORF8XHIzFU99KoeT4eBUUqwa43Icw8LUXxADlyMYRWoUIhkH-jALR6YxZa1pF1ALmHRzARleDiJ2gdnJTtL_x8yXMnKgZncGxxJmeLBmAI4I-zPg3o92xJo3GvkS1zIkMdeHseDcTPgGU-EFF7tKBEeS7YdZOpDRLOwejt-ASM1xZx494f4gpg.7h_L-EBzycJ3rklEp48gnvM6wXJ6F3Ia4VQxeIMcaBY&dib_tag=se&qid=1764975563&refinements=p_27%3ABello+Alex&s=books&sr=1-5) 
 :::
+
+::: {.g-col-10}
+|  |  |
+|:----------|:------------------------------------------------------------| 
+|   **Název:** | Can You Solve My Problems? |
+|    **Autor:** | Alex Bellos |
+|    **URL:**  |[Amazon](https://us.amazon.com/Can-You-Solve-Problems-Perplexing/dp/161519388X/ref=sr_1_5?dib=eyJ2IjoiMSJ9.8OHr6xeTfuQuWaE9x0Gq0fFnr_1Lg6Ow22-38c30T6S18dBQlQ5ASORF8XHIzFU99KoeT4eBUUqwa43Icw8LUXxADlyMYRWoUIhkH-jALR6YxZa1pF1ALmHRzARleDiJ2gdnJTtL_x8yXMnKgZncGxxJmeLBmAI4I-zPg3o92xJo3GvkS1zIkMdeHseDcTPgGU-EFF7tKBEeS7YdZOpDRLOwejt-ASM1xZx494f4gpg.7h_L-EBzycJ3rklEp48gnvM6wXJ6F3Ia4VQxeIMcaBY&dib_tag=se&qid=1764975563&refinements=p_27%3ABello+Alex&s=books&sr=1-5) |
+|    **Rok:**  | 2017. | 
+|    **Reference:**  | Alex Bellos Puzzle Books | 
+:::
+
+:::
+
 

@@ -4,9 +4,9 @@ date: "2025-11-24"
 updated: "2025-11-28"
 description: "Princip maximální informační entropie a ukázky MAXENT výpočtů"
 draft: false
-categories: ["Informační entropie", "Přednáška6"]
+categories: ["Informační entropie", "Přednáška 8"]
 # image: "image.jpg"
-pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p7_information_entropy/maxent.pdf) "
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p8_information_entropy/maxent.pdf) "
 
 html-math-method: katex
 engine: julia
@@ -262,7 +262,7 @@ nelineární funkce jejich maximum chceme řešit.
 
 ## Řešení MAXENT pro 4 stavy s omezující podmínkou
 
-Řešení predchoziho príkladu pomoci JuMP je srozumitelné:
+Řešení predchoziho příkladu pomoci JuMP je srozumitelné:
 
 ```{julia}
 #| echo: true

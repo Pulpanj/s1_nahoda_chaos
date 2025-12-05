@@ -1,0 +1,165 @@
+---
+title: "N kostek a jejich součet"
+format: html
+# lang: en,cs
+editor:
+    render-on-save: false
+---
+
+*Ukradeno z výstupů LLM Copilot*
+
+**Jak dokázat,že to konverguje k normálnímu rozložení ??**
+
+### Vzorec pro počet kombinací vedoucích k součtu $K$ při hodu $N$ kostkami:
+
+$$
+\text{Počet kombinací} = \sum_{i=0}^{\left\lfloor \frac{K - N}{6} \right\rfloor} (-1)^i \binom{N}{i} \binom{K - 6i - 1}{N - 1}
+$$
+
+A pravděpodobnost je pak:
+
+$$
+P(K) = \frac{1}{6^N} \sum_{i=0}^{\left\lfloor \frac{K - N}{6} \right\rfloor} (-1)^i \binom{N}{i} \binom{K - 6i - 1}{N - 1}
+$$
+
+---
+
+### 🔍 Co jednotlivé části znamenají:
+
+- $\binom{N}{i}$: počet způsobů, jak vybrat $i$ kostek, které „překročí“ maximální hodnotu.
+- $\binom{K - 6i - 1}{N - 1}$: počet způsobů, jak rozdělit součet mezi $N$ kostek s omezením.
+- $(-1)^i$: střídání znamének kvůli inkluzi a exkluzi.
+- $\left\lfloor \frac{K - N}{6} \right\rfloor$: maximální počet „překročení“, které je možné.
+
+
+---
+
+```{python}
+
+from math import comb, floor
+
+def dice_sum_combinations(N, K):
+    """
+    Vypočítá počet kombinací vedoucích k součtu K při hodu N šestistěnnými kostkami
+    pomocí principu inkluze a exkluze.
+
+    Parametry:
+    - N: počet kostek
+    - K: požadovaný součet
+
+    Návratová hodnota:
+    - počet platných kombinací (celých čísel 1–6), které dávají součet K
+    """
+    total = 0
+    max_i = floor((K - N) / 6)
+    for i in range(max_i + 1):
+        sign = (-1) ** i
+        term = comb(N, i) * comb(K - 6 * i - 1, N - 1)
+        total += sign * term
+    return total
+
+# Ukázka použití: počet kombinací pro 3 kostky a součet 12
+N = 25
+K = 120
+result = dice_sum_combinations(N, K)
+print(f"Počet kombinací pro {N} kostky a součet {K} je: {result}")
+
+```
+
+```{python}
+#| echo: false
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from IPython.display import Markdown
+
+def df_dice_sum_combinations(N=5,print_table=False):
+    # generuj graf pravdepodobnosti pro N kostek
+    min_sum=N
+    max_sum=N*6
+    result=np.zeros(max_sum-min_sum+1)
+
+    for K in range(min_sum,max_sum+1):
+        # print(K,dice_sum_combinations(N, K))
+        result[K-min_sum]=dice_sum_combinations(N, K)
+    # display(result).markdown()
+
+    scores_df = pd.DataFrame(result, columns=["Počet kombinací"]).reset_index(names='K')
+    scores_df['K']=scores_df['K']+min_sum
+    scores_df['Pravděpodobnost']=scores_df['Počet kombinací']/6**N
+    if N<6 and print_table:
+        display(scores_df.style.set_caption('Pravděpodobnost počtu kombinací pro N='+str(N)))
+        # Markdown(scores_df.to_html())
+ 
+    return scores_df
+df_dice_sum_combinations(3,print_table=True);
+```
+
+
+```{python}
+import matplotlib.pyplot as plt
+
+ncols=3
+nrows=3
+Nlist=[2,3,5,10,20,30,50,100,200]
+fig = plt.figure(
+    layout='constrained',
+     figsize=(12, 10)
+     )
+for i in range(nrows):
+    for j in range(ncols):
+        N=Nlist[i*3+j]
+        ax=plt.subplot2grid((nrows, ncols), (i, j))
+        df=df_dice_sum_combinations(N)
+        ax.bar(df['K'], df['Pravděpodobnost'], color='skyblue',label='N='+str(N))
+        ax.legend()
+        # ax.text(0.5, 0.5, "ax%d" % (i+1), va="center", ha="center")
+        ax.tick_params(labelbottom=True, labelleft=True)
+
+plt.show()
+```
+---
+
+## 🧠 Základní princip inkluze a exkluze
+
+Princip **inkluze a exkluze** je klasická technika v kombinatorice, která se používá k **počítání počtu prvků v sjednocení množin**, když se některé prvky mohou vyskytovat ve více množinách zároveň. V kontextu **počítání kombinací součtů kostek** se používá k **odstranění neplatných kombinací**, které překračují maximální hodnotu kostky.
+
+Představme si dvě množiny:
+- $A$: prvky splňující podmínku 1
+- $B$: prvky splňující podmínku 2
+
+Pak platí:
+
+$$
+|A \cup B| = |A| + |B| - |A \cap B|
+$$
+
+Tedy:
+- **Inkluze**: sečteme všechny jednotlivé případy.
+- **Exkluze**: odečteme případy, které se počítaly vícekrát (např. jsou v obou množinách).
+
+---
+
+## 📐 Aplikace na součty kostek
+
+Při výpočtu počtu kombinací součtu $K$ při hodu $N$ kostkami, kde každá kostka má hodnotu 1–6, chceme spočítat počet celočíselných řešení rovnice:
+
+$$
+x_1 + x_2 + \dots + x_N = K, \quad \text{kde } 1 \leq x_i \leq 6
+$$
+
+Ale bez omezení by řešení zahrnovala i případy, kde $x_i > 6$. Proto použijeme **inkluzi a exkluzi**, abychom tyto neplatné případy odečetli.
+
+---
+
+## 🔢 Jak to funguje ve vzorci
+
+Vzorec:
+
+$$
+\sum_{i=0}^{\left\lfloor \frac{K - N}{6} \right\rfloor} (-1)^i \binom{N}{i} \binom{K - 6i - 1}{N - 1}
+$$
+
+- **Inkluze**: první člen (pro $i = 0$) zahrnuje všechny kombinace bez omezení.
+- **Exkluze**: další členy (pro $i > 0$) odečítají případy, kde jedna nebo více kostek překročily hodnotu 6.
+- **Střídání znamének**: zajišťuje správné přičítání a odečítání překrývajících se případů.

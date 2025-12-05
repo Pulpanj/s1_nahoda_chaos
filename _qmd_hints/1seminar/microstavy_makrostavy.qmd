@@ -1,0 +1,62 @@
+---
+title: "microstavy_makrostavy"
+format: html
+# lang: en,cs
+editor:
+    render-on-save: false
+---
+
+# U3V Mikrostav x Makrostav
+
+Mikrostav
+: přesný popis stavu všech jednotlivých částic v systému.
+
+-   V případe, že jednotlivé částice nabývají spojitých stavu je mikrostavem detailní informace o poloze a hybnosti každé jednotlivé částice v systému
+
+-   v případě, že jednotlivé částice nabývají jen diskrétních stavů je mikrostavem popis stavu každé jednotlivé částice
+
+- Všechny mikrostavy systemu, který si s okolím nemůže vyměňovat ani energii (termodynamicky tzv. izolovaného systému), tvoří tzv. mikrokanonický soubor.
+
+
+Makrostav
+: popis systemu jen  i  základě veličin pozorovatelných na systému jako celku
+
+    
+- pokud je systém dostatečně velký, pak drobné fluktuace od rovnovážné hodnoty makroskopické veličiny  (téměř) nepozorujeme a pro naše uvažování jsou podstatné pouze mikrostavy odpovídající rovnovážnému stavu
+
+### Seznam mikrostavu a jim odpovidajiciho makrostavu
+```{python}
+import pandas as pd
+import numpy as np
+microstav=list([])
+macrostav=list([])
+for i in range(1,7):
+    for j in range(1,7):
+        microstav.append((i,j))
+        macrostav.append(i+j)
+macrostav
+df=pd.DataFrame(zip(microstav,macrostav), columns=['Microstav', 'Macrostav'])
+df
+```
+
+### Pravděpodobnosti makrostavů
+```{python}
+result = df.groupby(['Macrostav']).agg(
+Počet_microstavů=('Macrostav', 'count')
+# avg_population=('population', 'mean')
+).reset_index()
+result['Pravděpodobnost'] = result['Počet_microstavů'] / 36
+result['Kumulativní pravděpodobnost']=result['Pravděpodobnost'].cumsum()
+result
+```
+
+
+### Pravděpodobnosti makrostavů
+```{python}
+import matplotlib.pyplot as plt
+ax = result.plot.bar(x='Macrostav', y='Pravděpodobnost', rot=0, color='skyblue', title="Součet 2 kostek ")
+plt.xlabel("Součet")
+plt.ylabel("Pravděpodobnost makrostavu ")
+# ax.bar_label(ax.containers[0])
+plt.show()
+```

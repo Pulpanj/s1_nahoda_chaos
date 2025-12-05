@@ -1,0 +1,505 @@
+---
+title: "Optimalizační metody"
+date: "2025-11-30"
+updated: "2025-12-03"
+description: "Jak maximalizovat dostřel z děla a ušetřit barvu na bazén"
+draft: false
+categories: ["Optimalizace", "Přednáška 9"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p9_optimalizace/optimalizace.pdf)"
+
+# html-math-method: katex
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "optimalizace"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Jak dostřelit co nejdál
+
+## Popis zadání
+
+Mějme dělo, ktere střílí náboje o hmotnosti $m$ díky energii $E$ (kterou dodává
+nálož děla). Díky tomu je náboj vystřelen rychlostí $v$. . Pro jednoduchost
+předpokládáme, že náboj není brzděn vzduchem, a že gravitační pole je
+konstantní (odstranění prvního předpokladu by vedlo k realistickému popisu
+střely balistickou křivkou, nehomogenní gravitační pole by spíše vedlo k
+analýze vypouštění družic).
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: true
+#| fig-cap:  "Parametry výstřelu z děla"
+#| tbl-cap-location: top # bottom margin
+
+
+
+using Plots, LaTeXStrings, Plots.PlotMeasures
+
+strela = plot(
+	x -> -(x - 0.5)^2 + 0.25, 0, 1,
+	linecolor = :black, legend = nothing, linewidth = 2,
+	ylabel = L"y", yticks = range(0, 0.28, step = 0.05),
+	ylim = (-0.01, 0.28),
+	xlabel = L"x", xticks = range(0, 1, step = 0.1),
+	top_margin = 5Plots.mm,
+	grid = :on, minorgrid = true,
+	size = (900, 500), show = true,
+)
+plot!([0.0, 0.1], [0, 0.1],
+	arrow = Plots.Arrow(:closed, :head, 4.5, 2.2), linecolor = :red,
+)
+annotate!(0.11, 0.11,
+	Plots.text(L"v", :red), show = false,
+)
+plot!([0.0, 0.1], [0, 0],
+	arrow = Plots.Arrow(:closed, :head, 4.5, 2.2), linecolor = :green,
+)
+annotate!(0.1, 0.01, Plots.text(L"v_x", :green), show = false)
+
+plot!([0.0, 0], [0, 0.1],
+	arrow = Plots.Arrow(:closed, :head, 4.5, 2.2), linecolor = :blue,
+)
+annotate!(0.0, 0.11, Plots.text(L"v_x", :blue), show = false)
+
+
+scatter!([1], [0], mc = [:green], markersize = 4)
+
+plot!([1.0, 1], [0.01, 0.25],
+	arrow = Plots.Arrow(:closed, :tail, 4.5, 2.2), linecolor = :gray,
+)
+annotate!(0.98, 0.26, Plots.text(L"R(v_x,v_y)", :red), show = false)
+annotate!(0.03, 0.007, Plots.text(L"$\varphi$ ", :black), show = false)
+display(strela);
+```
+
+### Cíl úlohy
+
+Naším ukolem je najít takový úhel děla, aby ve vzdálenost $R$ dopadu náboje
+byla co nejdále od místa výstřelu (0,0). Protože rychlost výstřelu $v$ je
+vektor ve směru $\varphi$ lze jej rozložit na složky $(v_x,v_y)$, kde $$
+v_x=v\cdot sin(\varphi) $$
+
+$$ v_y=v \cdot cos(\varphi) 
+$$
+
+Lze tedy hledat složky  $(v_x,v_y)$, a ty jednoznačně definují úhel děla  $\varphi$
+
+
+Hledaná vzdálenost dopadu je rovna
+
+$$
+\begin{equation}
+R(v_x,v_y)=v_x \cdot t
+\end{equation}
+$$
+
+kde $t$ je doba letu střely. Tu lze odvodit jako okamžik, kdy je výška letu $y$ opět rovna 0.
+
+#### Doba letu střely
+
+Pohyb ve směru $y$ je složen ze dvou složek:
+
+-   rovnoměrný pohyb počáteční rychlostí $v_y$, který za doby $t$ projde drahou $Y_0=v_y \cdot t$
+-   a pohybem daným gravitačním zrychlením $g$, který za čas 
+$t$ představuje dráhu $Y_g=-\frac{1}{2} \cdot g \cdot t_2$
+
+Řešením rovnice
+
+$$
+Y_0+Y_g=0
+$$
+
+dostaneme dobu letu střely
+
+$$
+t=\frac{2 \cdot v_y}{g}
+$$
+
+
+a odtud 
+$$ 
+\begin{equation}
+R(v_x,v_y)=v_x \cdot t = \frac{2 }{g} \cdot v_x \cdot v_y
+\end{equation}
+$$ {#eq-rvxvy}
+
+
+#### Kinetická energie 
+Kinetická energie střely při výstřelu je rovna:
+
+$$
+\begin{equation}
+E=\frac{1}{2}\cdot m \cdot v^2=\frac{1}{2} \cdot m \cdot (v_x^2+v_y^2)
+\end{equation}
+$$
+
+## Maximální dolet jako optimalizace funkce
+
+Nalezení optimálního směru výstřelu zaručujícího maximální dolet je pak řešením
+optimalizační úlohy:
+
+-   najít $v_x^*,v_y^*$ takové, pro které funkce  $R(v_x^*,v_y^*)$ nabývá  maxima.
+-   za splnění vazebni podmínky $E=\frac{1}{2} \cdot m \cdot ({v_x^*}^2+{v_y^*}^2)$
+
+
+
+### Eliminace $v_y$
+
+Z vazební podmínky vychází $v_y$ jako
+
+$$
+\begin{equation}
+v_y=\sqrt{\frac{2 \cdot E}{m}-v_x^2}
+\end{equation}
+$$
+
+a když $v_y$ dosadíme do $R(v_x,v_y)$ dostaneme:
+
+$$
+\begin{equation}
+R(v_x)=v_x \cdot t=\frac{2 \cdot v_x}{g} \cdot \sqrt{\frac{2 \cdot E}{m}-v_x^2}
+\end{equation}
+$$
+
+### Derivace doletu 
+
+Derivace pomocí  pravidla o derivaci součinu funkcí $(f(x).g(x))^{'}=f(x)^{'}.g(x))+f(x).g(x)^{'}$:
+
+$$ 
+\begin{equation}
+\frac{dR(v_x)}{dv_x} = \frac{2}{g} \sqrt{\frac{2E}{m} - v_x^2}  + 
+\frac{2v_x}{g} \cdot \frac{1}{2\sqrt{\frac{2E}{m} - v_x^2}} \cdot (-2v_x) 
+\end{equation}
+$$
+
+A po zjednodušení
+
+$$ 
+\begin{equation}
+\frac{dR(v_x)}{dv_x} = \frac{2}{g} \sqrt{\frac{2E}{m} - v_x^2} - \frac{2 v_x^2}{g \sqrt{\frac{2E}{m} - v_x^2}} 
+\end{equation}
+$$
+
+#### Nalezení maxima
+
+V maximu funkce $R(v_x^*)$ je hodnota její derivace rovna 0:
+
+$$
+\begin{equation}
+\frac{dR(v_x)}{dv_x}\Big|_{v_x=v_x^*}=
+\frac{2}{g} \sqrt{\frac{2E}{m} - (v_x^*)^2} - \frac{2 (v_x^*)^2}{g \sqrt{\frac{2E}{m} - (v_x^*)^2}} = 0 
+\end{equation}
+$$
+
+Vynásobením  $g \sqrt{\frac{2E}{m} - (v_x^*)^2}$:
+
+dostáváme 
+$$
+2 \left(\frac{2E}{m} - (v_x^*)^2 \right) - 2 (v_x^*)^2 = 0 
+$$
+
+$$ 
+\frac{4E}{m} - 4 {(v_x^*)^2} = 0 
+$$
+
+$$ 
+{v_x^*}^2 = \frac{E}{m} 
+$$
+
+Hodnota $v_x^*$ je tedy rovna:
+
+$$ 
+\begin{equation}
+v_x^* =  \sqrt{\frac{E}{m}} 
+\end{equation}
+$$
+
+a $v_y$ pak vychází:
+
+$$
+\begin{equation}
+v_y^*=\sqrt{\frac{2 \cdot E}{m}-(v_x^*)^2}=v_x^*
+\end{equation}
+$$
+
+## Závislost maximálního dostřelu na energii $E$
+
+Jestliže do rovnice [-@eq-rvxvy] dosadíme $v_x^*$ a $v_y^*$ můžeme maximální
+dostřel vyjádřit jen pomocí energie $E$, hmotnosti $m$ (a případně $g$) jako
+volných parametrů zadání.
+
+
+$$
+\begin{equation}
+R^*(E)=\frac{2 }{g} \cdot v_x^* \cdot v_y^*=\frac{2 }{g} \cdot \frac{E}{M}
+\end{equation}
+$$
+
+## Vyřešení symbolické derivace pomoci Symbolics.jl
+
+V jazyce Julia je package **Symbolics.jl** která umožňuje některé nahoře
+uvedené symbolické manipulace provádět programově.
+
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+
+using Symbolics, Latexify, Plots, LaTeXStrings
+
+@variables v_x g E m
+R = (2 * v_x / g) * sqrt((2 * E / m) - v_x^2)
+# derivace
+dR = Symbolics.derivative(R, v_x)
+println("Derivace dR/dv_x = ", dR)
+simplyfied_dR = simplify(dR)
+println("Derivace dR/dv_x = ", simplyfied_dR)
+latex_eq = latexify(simplyfied_dR)
+println(latex_eq)
+```
+
+t.j. můžeme zobrazovat rovnici jako Quarto jako markdown:
+```{julia}
+#| echo: fenced
+#| output: asis
+#| code-fold: false
+
+latex_eq = latexify(simplyfied_dR)
+println("\n\$\$\n" * latex_eq * "\$\$\n")
+```
+
+# Úloha o ušetřené barvě - optimalizace s více proměnnými
+
+Mějme za úkol natřít obdélníkový bazén pomocí sudu barvy, který umožňuje
+vymalovat $S$ čtverečních metrů stěn bazénu. Zadáním optimalizace je nalézt
+rozměry bazénu $x,y,h$ (délka,šířka,hloubka) tak aby objem bazénu byl co
+největší při použití barvy jen ze sudu pro plochu $S$.
+
+Chceme tedy nalézt maximum funkce
+$$
+\begin{equation}
+V(x,y,h)=x \cdot y \cdot  h
+\end{equation}
+$${#eq-volume}
+
+
+Kde  $x,y,h$ jsou omezeny plochou $S$
+
+
+$$
+\begin{equation}
+S=2 \cdot (x \cdot h + y \cdot h) + x \cdot y
+\end{equation}
+$$
+
+V tomto případě jde eliminovat jen jednu proměnnou (např. $h$):
+
+$$
+\begin{equation}
+h= \frac{S - x \cdot y}{2 \cdot (x + y)} 
+\end{equation}
+$${#eq-h}
+
+A objem lze tedy vyjádřit pomocí proměnných $x,y$ jako
+
+
+$$
+\begin{equation}
+V(x,y)=x \cdot y \cdot \frac{S - x \cdot y}{2 \cdot (x + y)} 
+\end{equation}
+$$
+
+Pro vyhledání maxima $V(x,y)$ je nyní nutno vyřešit dvě rovnice parciálních derivací:
+
+
+$$
+\begin{equation}
+\frac{\partial V(x,y)}{\partial x} \Big|_{x=x^*}= 0
+\end{equation}
+$${#eq-diffx}
+
+$$
+\begin{equation}
+\frac{\partial V(x,y)}{\partial y} \Big|_{y=y^*}= 0
+\end{equation}
+$$ {#eq-diffy}
+
+
+kde $x^*,y^*$ jsou hodnoty  šířky a délky, při kterých bude $V(x,y)$ maximálni. 
+
+## Odvození parciálních derivací 
+
+Zaveďme $N=x y(S-xy)$ and $D=2(x+y)$ dostaneme:
+
+$$
+\frac{\partial V}{\partial x}=\frac{N_x D - N D_x}{D^2}.
+$$
+
+Vypočtěme derivace:
+
+$$
+N_x = yS - 2xy^2,\qquad D_x = 2.
+$$
+
+Dosadíme a zjednodušíme:
+
+$$
+\frac{\partial V}{\partial x}
+= \frac{(yS - 2xy^2)\,2(x+y) - (xyS - x^2y^2)\,2}{4(x+y)^2}
+= \frac{(yS - 2xy^2)(x+y) - (xyS - x^2y^2)}{2(x+y)^2}.
+$$
+
+Dostaneme výraz pro parciální derivaci:
+
+
+$$
+\begin{equation}
+\frac{\partial V}{\partial x}
+= \frac{y^2\big(S - x^2 - 2xy\big)}{2(x+y)^2}
+= \frac{y^2\big(S - x(x+2y)\big)}{2(x+y)^2}\
+\end{equation}
+$$
+
+a analogicky:
+
+$$
+\begin{equation}
+\frac{\partial V}{\partial y}
+= \frac{x^2\big(S - y^2 - 2xy\big)}{2(x+y)^2}
+= \frac{x^2\big(S - y(y+2x)\big)}{2(x+y)^2}\
+\end{equation}
+$$
+
+
+
+
+
+## Nalezení rozměrů pro maximální objem
+
+Hodnoty $(x^*,y^*)$ lze získat řešením rovnic  [-@eq-diffx] a [-@eq-diffy], kde jmenovatelé musí být rovny 0: 
+
+$$
+\begin{align} 
+({y^*})^2\big(S - {x^*}^2 - 2  \cdot {x^*} \cdot {y^*}\big)=0 \\
+{x^*}^2\big(S - {y^*}^2 - 2 \cdot {x^*} \cdot {y^*}\big)=0
+\end{align}
+$$
+
+A pokud ${x^*}>0,{y^*}>0$ platí:
+$$
+\begin{align} 
+S - {x^*}^2 - 2 \cdot {x^*} \cdot {y^*} = 0 
+\end{align}
+$${#eq-one}
+
+$$
+\begin{equation}
+S - {y^*}^2 - 2 \cdot {x^*} \cdot {y^*} = 0
+\end{equation}
+$${#eq-two}
+
+Odečtení rovnic [-@eq-one] a [-@eq-two]: 
+$$
+\begin{align} 
+{y^*}^2 - {x^*}^2 = 0 \\
+y^* = x^*
+\end{align} 
+$$
+
+Dosazením $y^*=x^*$, do [-@eq-one]:
+
+$$
+\begin{align} 
+S - x^2 - 2x^2 = S - 3x^2 = 0 \\
+x^2 = \frac{S}{3}
+x=\sqrt{\frac{S}{3}}=y 
+\end{align}
+$${#eq-xstar}
+
+A dosazením do [-@eq-h] dostaneme optimální výšku bazénu $h^*$:
+
+$$
+\begin{align} 
+h^*= \frac{S - x^* \cdot y^*}{2 \cdot (x^* + y^*)} =\frac{S - \frac{S}{3}} {4 \sqrt{\frac{1}{3}}} \\
+h^*=\frac{S}{6}  \cdot \sqrt{3}
+\end{align} 
+$${#eq-hmax}
+
+## Maximální objem $V^*$ jako funkce plochy stěn bazénu S
+
+Maximální objem bazénu získáme dosazením $x^*,y^*,h^*$ do [-@eq-volume]:
+
+$$
+V^*=x^*  \cdot y^*  \cdot h^*= \frac{S}{18}  \cdot  \sqrt{3}
+$$
+
+Maximální objem tedy závisí na ploše stěn lineárně.
+
+#### Grafická kontrola řešení 
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: true
+#| fig-cap:  "Objem bazénu v závislosti na x (kde y=x) "
+
+# kontrola reseni
+# pro x=y, S=1 
+
+using Plots, LaTeXStrings, Plots.PlotMeasures
+
+x_max = sqrt(1 / 3)
+# h_max = (1 - x_max^2) / (2 * x_max)
+h_max = 1 / 6 * sqrt(3)
+V_max = x_max^2 * h_max
+
+V = (x) -> x^2 * (1 - x^2) / 4 / x
+bazen = plot(
+    x -> V(x), 0, 1,
+    linecolor=:red, linewidth=2,
+    ylabel=L"V(x,y=x)", yticks=range(0, 0.1, step=0.01),
+    ylim=(0, 0.1),
+    xlabel=L"x", xticks=range(0, 1, step=0.1),
+    framestyle=:origin,
+    label="V(x,y), kde (x=y)",
+    left_margin=[5mm 5mm], bottom_margin=10px,
+    grid=:on, minorgrid=true,
+    size=(900, 500), show=true,
+    legend=:inside,
+)
+scatter!([x_max], [V(x_max)], mc=[:green], markersize=4, 
+    label=L"x^*=y^* \sqrt{ \frac{1}{3}}="* "$(round(x_max,digits=3))"
+    )
+scatter!(
+    [x_max], [V(x_max)], mc=[:green], markersize=4,
+    label=L"h^*=\frac{1}{6} \cdot \sqrt{3}=" * "$(round(h_max,digits=3))"
+)
+scatter!(
+    [x_max], [V(x_max)], mc=[:green], markersize=4,
+    label=L"V^*= \frac{S}{18}  \cdot  \sqrt{3}=" * "$(round(V_max,digits=3))"
+)
+```
+
+# Shrnutí
+
+::: {.callout-tip title="Postup optimalizace" icon=false color=green}
+
+1. definice proměnných problemu
+1. definice funkce proměnných problému, pro kterou  chceme najít maximum
+1. identifikace vazeb problému (omezení) a jejich parametrů
+1. z vazeb nalézt řešení některých proměnných jako  funkci parametrů vazeb a zbylých proměnných
+1. podle počtu vazeb nahradit ve funkci stejný počet proměnných jejich funkčními vztahy z řešení vazeb
+1. odvodit sadu parciálních derivací dle všech zbylých proměnných 
+1. vyřešit sadu rovnic daných sadou parciálních derivací=0
+1. dopočítat proměnné vyjádřené z vazeb
+1. zanalyzovat zavislost optimálního řešení na parametrech vazeb
+
+:::

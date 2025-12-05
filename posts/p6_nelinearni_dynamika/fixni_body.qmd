@@ -4,7 +4,7 @@ date: "2025-11-10"
 updated: "2025-11-23"
 description: "Definice stability fixních bodů na základě pohybové rovnice a jejich analýza pomocí pavoučích grafů"
 draft: false
-categories: ["Nelineární dynamika", "Přednáška5"]
+categories: ["Nelineární dynamika", "Přednáška 5"]
 # image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p6_nelinearni_dynamika/fixni_body.pdf) "
 

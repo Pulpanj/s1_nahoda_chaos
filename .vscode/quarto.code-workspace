@@ -471,6 +471,7 @@
 			"**/.pkl": true,
 			"**/.xls": true
 		},
-		"git.ignoreLimitWarning": true
+		"git.ignoreLimitWarning": true,
+		"editor.detectIndentation": false
 	}
 }

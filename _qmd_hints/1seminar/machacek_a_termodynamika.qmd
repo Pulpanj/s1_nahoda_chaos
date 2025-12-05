@@ -1,0 +1,103 @@
+---
+title: "Hra Machacek a termodynamika"
+format: html
+# lang: en,cs
+editor:
+    render-on-save: false
+---
+
+# [Hra Machacek](https://cs.wikipedia.org/wiki/Mach%C3%A1%C4%8Dek_(kostkov%C3%A1_hra))
+
+## Pravidla hry 
+Hráč A hodí dvěma kostkami, ale výsledek ukryje před hráčem B, který je na řadě. Svůj výsledek mu pouze oznámí. Hráč B má nyní dvě možnosti:
+
+- V případě pochybností může hráče A požádat o odkrytí vržených kostek. Pokud hráč A blafoval, hráč B získává bod a začíná nové kolo. Odpovídá-li oznámený výsledek hodnotě na kostkách, pak prohrává hráč požadující jejich odhalení.
+
+- V případě, že hráč B výsledku věří, převezme kostky s tím, že nyní musí na kostkách hodit vyšší hodnotu, než oznámil předchozí hráč. Může se však stát, že se mu to nepodaří. V takovém případě se pouze snaží předstírat, že předchozího hráče přehodil.  
+
+Hodnoty se počítají následovně:
+
+ - Ze dvou různých hodnot se vždy vyšší číslo hlásí v řádu desítek a nižší v řádu jednotek (např.: 4 a 5 = 54).
+- Dvě stejná čísla jsou vyšší hodnota než 65 a hlásí se jako indiáni (v některých verzích duby). (např.: 3 a 3 = tři indiáni).
+- 2 a 1 nebo 1 a 2 je nejvyšší hodnota ve hře a hlásí se jako macháček. Macháček lze přehodit zase jen macháčkem.
+
+### Pořadí hodnot hodů 
+
+```{python}
+import pandas as pd
+import numpy as np
+skore=list([31,32,41,42,43,51,52,53,54,61,62,63,64,65,11,22,33,44,55,66,21])
+skore_jmena=list([
+    31,32,41,42,43,51,52,53,54,61,62,63,64,65,'1 indian','2 indiani',
+    '3 indiani','4 indiani','5 indianů','6 indianů','Macháček'
+    ])
+tabulka_skore=pd.DataFrame(
+    zip(skore,skore_jmena)
+    , columns=['Macrostav', 'Název skóre']
+    )    
+tabulka_skore=tabulka_skore.reset_index(names='Pořadí skóre')
+tabulka_skore
+```
+
+### Seznam mikrostavu a jim odpovídajícího makrostavu
+
+```{python}
+import pandas as pd
+import numpy as np
+microstav=list([])
+macrostav=list([])
+for i in range(1,7):
+    for j in range(1,7):
+        microstav.append((i,j))
+        x=max(i,j)
+        macrostav.append(max(i,j)*10+min(i,j))
+
+df=pd.DataFrame(
+    zip(microstav,macrostav)
+    , columns=['Microstav', 'Macrostav']
+    )
+result = pd.merge(df, tabulka_skore, on="Macrostav")
+result
+```
+
+### Pravděpodobnosti makrostavů
+```{python}
+result = df.groupby(['Macrostav']).agg(
+Počet_microstavů=('Macrostav', 'count')
+# avg_population=('population', 'mean')
+).reset_index()
+result['Pravděpodobnost'] = result['Počet_microstavů'] / 36
+result = pd.merge(result, tabulka_skore, 
+        on="Macrostav").sort_values(by='Pořadí skóre')
+result['Kumulativní pravděpodobnost']=result['Pravděpodobnost'].cumsum()
+result
+```
+
+Závěr
+: Pokud hráč před námi hlásí víc než 54 je lepší mu nevěřit !
+
+
+
+### Kumulativní pravděpodobnosti makrostavů
+```{python}
+#| echo: false
+import matplotlib.pyplot as plt
+ax = result.plot.bar(x='Macrostav', 
+    y='Kumulativní pravděpodobnost', 
+    rot=0, color='skyblue', title="Setříděné hodnoty hodů 2 kostek ve hře Macháček"
+    )
+plt.xlabel("Součet")
+plt.ylabel("Kumulativní pravděpodobnost")
+# ax.bar_label(ax.containers[0])
+# Add a horizontal reference line at y=18
+reference_y = 0.5
+ax.axhline(y=reference_y, color='red', linestyle='--', 
+    linewidth=1.5, label=f'Reference Line (y={reference_y})')
+plt.show()
+```
+
+<!-- ::: {.callout-note} -->
+## Jak ovlivňuje pravidlo o možnosti přehodit macháčka v dalším hodu ???
+
+Podobný problém nemám vyřešen v analýze klasické hry v kostky (viz. [http://www.pulpanj.me.cz/hricky/dicegame.htm](http://www.pulpanj.me.cz/hricky/dicegame.htm), kde jsem neuvažoval možnost dat stranou jen část kostek tvořících skóre.
+<!-- ::: -->

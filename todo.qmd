@@ -14,6 +14,9 @@ draft: false
 -   ~~literatura doplnit~~
 -   linky do literatury doplnit do postu
 -   pridat policka newly added a pole pro logicke razeni do seznamu postu
+-   cross reference option (popisky schemat a cislovani)
+-   zlepsit cislovani rovni
+-   pridat seznamy obrazku kodu a tabulek
 -   post fixni body
     -   pavouci diagram doplnit sipky
     -   ~~doplnit definici stabilniho bodu~~
@@ -22,18 +25,18 @@ draft: false
 ## Náměty ze seancí
 
 -   Optimalizace
-    -   muz s pletivem
-    -   max. objem pri minimalnim povrchu
-    -   delka docurani
+    -   ~~muz s pletivem~~ (viz bazen)
+    -   max. objem pri minimalnim povrchu (viz bazen, ale jak popsat kouli ?)
+    -   ~~delka docurani~~ dostrel dela
     -   spojnice 4 mest
     -   zachrana tonouciho (+optika)
     -   priklad Lagrangeovy multiplikatory
     -   Menealova uloha (bubliny)
 -   Kombinatorika
     -   soucet hodu k kostek
-    -   doba cekani na prvni sestku
+    -   ~~doba cekani na prvni sestku~~
     -   pravdepodobnost alespon jedne 6-ky pri hodu k kostkami (Demetre)
-    -   uloha se satnarkou
+    -   uloha se satnarkou akloubouky
 -   Bayes rule
     -   TV sourtez s 3 dvermi
 -   Statistika
@@ -41,12 +44,12 @@ draft: false
     -   Poisonovo rozdeleni priklad s vanocnim testem (limita bernouliho)
     -   vymirani slechtickych jmen
     -   zakon velkych cisel
-    -   nahodna prochazka
-        -   pravdepodobnost navratu
-        -   pocet zmen znamenka
 -   Markovovy retezce
     -   model psu a blech
     -   pravdepodobnosti stavu
+    -   nahodna prochazka
+        -   pravdepodobnost navratu
+        -   pocet zmen znamenka
 -   Dynamika
     -   Linearni dynamika s diskretnim casem
     -   Nelinearni dynamika s diskretnim casem
@@ -59,10 +62,13 @@ draft: false
         -   stabilita stabilnich bodu
         -   pohybova rovnice kmitani
         -   vynucene kmity
+    krivky
+        retezovka <https://en.wikipedia.org/wiki/Catenary>
+        brachystoida  <https://cs.wikipedia.org/wiki/Brachistochrona>
 -   Informacni entropie
     -   ~~odvozeni bitu pro shodne pravdepodobnosti~~
     -   odvozeni bitu pro neshodne pravdepodobnosti
-    -   problem o klokanech
+    -   ~~problem o klokanech~~
     -   3-stenna kostka a heatmap entropie/energie
     -   4-stenna kostka a zadane momenty
 -   Matematika

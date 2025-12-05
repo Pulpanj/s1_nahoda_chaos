@@ -1,0 +1,213 @@
+---
+title: "Untitled"
+format: html
+---
+
+
+<!-- 
+
+``{python}
+#| tbl-cap: "Tabulka pravděpodobností 6-ky v k-tém hodu"
+#| label: tbl-pk
+import pandas as pd
+
+k=list([])
+pk=list([])
+kmax=100
+for kk in range(1,kmax+1):
+    k.append(kk)
+    p=(5/6)**(kk-1)/6
+    pk.append(p)
+# print(pk)
+df=pd.DataFrame(
+    zip(k,pk)
+    , columns=['k', 'P(k)']
+    )
+df.set_index('k', inplace=True)    
+df['Sum(P(k))']=df['P(k)'].cumsum()
+
+# Define a list of indices to filter
+list_to_print = list(range(1,11))+[20,30,40,50,80,100]
+df[df.index.isin(list_to_print)]
+```
+
+```{julia}
+
+```
+
+
+### Náhodná veličina K: pořadí hodu kdy, poprvé padne 6-ka 
+
+Nechť $K$ označuje pořadí hodu kdy, prvně padla 6-ka.  
+
+$K$ je náhodná veličina nabyvajici hodnot 1,2,..., mající střední hodnotu
+označovanou $\mathbb{E}[K]$.
+
+$$
+\mathbb{E}[K] = \sum_{i=1}^{\infty} \frac{1}{6} \cdot i \cdot \left(\frac{5}{6}\right)^{i-1}
+$$
+
+Tento součet odpovídá očekávané hodnotě geometrického rozdělení s
+pravděpodobností úspěchu $p = \frac{1}{6}$.
+
+```{python}
+#| tbl-cap: "Tabulka aproximace střední hodnoty pomocí prvních 1..i možných hodnot"
+#| label: tbl-eki
+import pandas as pd
+
+i=list([])
+pi=list([])
+SumP=list([])
+Ek=list([])
+Nmax=100
+
+sumPi=0.
+Eki=0.
+for ii in range(1,Nmax+1):
+    i.append(ii)
+    p=(5/6)**(ii-1)/6
+    pi.append(p)
+    sumPi=sumPi+p
+    SumP.append(sumPi)
+    Eki=Eki+p*ii
+    Ek.append(Eki)
+df=pd.DataFrame(
+    zip(i,pi,SumP,Ek)
+    , columns=['i','P(i)', 'Sum(P(i))', 'E[K] i-th aproximace']
+    )
+df.set_index('i', inplace=True)        
+# Define a list of indices to print
+list_to_print = list(range(1,11))+[20,30,40,50,80,100]
+df[df.index.isin(list_to_print)]
+```
+
+```{python}
+#| code-fold: true
+#| code-summary: "Show code"
+#| fig-cap: "Aproximace střední hodnoty E[k] pomocí prvních 1..i možných hodnot"
+#| fig-scap: "Aproximace střední hodnoty Ek[K]"
+import matplotlib.pyplot as plt
+dfg=df.head(50)
+ax1 = dfg.plot.line(
+    # x='i', 
+    y='E[K] i-th aproximace', 
+    rot=0, color='red', title="Konvergence střední hodnoty E[K] z prvních 1..i hodnot"
+    )
+plt.xlabel("i")
+x=list(range(0,81,10))
+plt.xticks(x)
+plt.grid()
+plt.ylabel("E[K] i-th aproximace")
+
+# Create the second y-axis
+ax2 = ax1.twinx()
+ax2.set_ylabel('P(i)/Sum(P(i))', color='skyblue')
+ax2.tick_params(axis='y', labelcolor='skyblue')
+
+ax2.bar(x=dfg.index,height= dfg['P(i)'], color='skyblue', alpha=0.5,label='P(i)')
+legend1 = ax1.legend(loc='center right')
+ax1.add_artist(legend1)
+legend2 = ax2.legend(loc='center')
+ax2.add_artist(legend2)
+
+plt.show()
+```
+
+## Střední hodnota $\mathbb{E}[K]$ náhodné veličiny pořadí hodu s první 6-kou
+
+#### Příprava 1: součet geometrické řady 
+
+Konečná geometrická řada:
+$$
+\sum_{i=1}^{k} q^i
+$$
+
+Tato řada má první člen $q$, kvocient $q$, a obsahuje $k$ členů. Odvození je jednoduché a elegantní.
+
+1. Zapiš řadu:
+$$
+S = q + q^2 + q^3 + \dots + q^k
+$$
+
+2. Vynásob obě strany kvocientem $q$:
+$$
+qS = q^2 + q^3 + \dots + q^{k+1}
+$$
+
+3. Odečti druhou rovnici od první:
+$$
+S - qS = q - q^{k+1}
+$$
+
+4. Vyjádři $S$:
+$$
+S(1 - q) = q(1 - q^k) \quad \Rightarrow \quad S = \frac{q(1 - q^k)}{1 - q}
+$$
+
+__✅ Výsledek:__
+$$
+\sum_{i=1}^{k} q^i = \frac{q(1 - q^k)}{1 - q}, \quad \text{pro } q \ne 1
+$$
+
+__📊 Nekonečná geometrická řada:__
+
+A pokud  $q \lt 1$ konverguje i nekonečná geometrická řada 
+
+$$
+\sum_{i=1}^{\infty} q^i = \frac{q}{1 - q}, \quad \text{pro } |q| < 1
+$$
+
+#### Příprava 2: součet  řady s členy $i \cdot q^i$
+
+Součet řady ve tvaru:
+
+$$
+\sum_{i=1}^{\infty} i \cdot q^i
+$$
+
+1. Lze odvodit z derivace geometrické řady:
+
+$$
+\sum_{i=0}^{\infty} q^i = \frac{1}{1 - q}
+$$
+
+2. Když tuto řadu zderivujeme podle $q$, dostaneme právě:
+
+$$
+\sum_{i=1}^{\infty} i \cdot q^{i-1} = \frac{1}{(1 - q)^2}
+$$
+
+3. A když ji vynásobíme $q$, dostaneme vzorec:
+
+$$
+\sum_{i=1}^{\infty} i \cdot q^i = \frac{q}{(1 - q)^2}
+$$
+
+_Tento vzorec platí pouze pro$|q| < 1$, tedy když se jedná o konvergentní geometrickou řadu._
+
+#### Střední hodnota geometrického rozdělení 
+
+Pro geometrické rozdělení (počítané od $i = 1$):
+
+$$
+\begin{align}
+\mathbb{E}[X]  &= \sum_{i=1}^{\infty} i \cdot p \cdot (1 - p)^{i - 1} 
+    &= p \cdot \frac{1}{q} \cdot  \sum_{i=1}^{\infty} i  \cdot (q)^{i} = p \cdot \frac{1}{q} \cdot \frac{q}{(1 - q)^2}
+    = \frac{1}{p}
+\end{align}
+$$
+
+Kde:
+
+- $q=(1 - p)$
+
+V našem případě:
+- $p = \frac{1}{6}$
+
+__📊Takže střední hodnota pořadí hodu do první 6-ky je:__
+
+$$
+\mathbb{E}[K] =6
+$$ 
+
+-->

@@ -1,0 +1,12 @@
+---
+title: Zajímavé odkazy 
+toc: false
+
+---
+
+# Odkazy nasbírané cestou
+
+- Simulace pohybu 3 těles 
+  - [N-Body Simulator](https://trisolarchaos.com/?pr=O_6(0.6)&n=3&s=3.0&so=0.00&im=rk4&dt=2.00e-5&rt=1.0e-6&at=1.0e-8&bs=0.10&sf=0&sv=0&cm=free&kt=1&st=1&ag=0&tl=1500&cp=2.5150,1.5090,2.5150&ct=0.0000,0.0000,0.1418){target="_blank"}
+krasna animace pohybu 3 těles  na základě Newtonovske mechaniky, článek popisující simulace je [ZDE](https://arxiv.org/html/2508.08568v1#S3){target="_blank"}
+

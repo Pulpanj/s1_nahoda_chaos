@@ -1,0 +1,78 @@
+---
+title: "Psy a Blechy"
+format: html
+# lang: en,cs
+editor:
+    render-on-save: false
+---
+
+
+```{python}
+import random
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Parametry simulace
+num_particles = 100       # Počet částic
+num_steps = 20000        # Počet časových kroků
+num_simulations = 10      # Počet simulací
+
+# DataFrame pro uložení výsledků všech simulací
+all_data = []
+fig = plt.figure(
+    layout='constrained',
+     figsize=(12, 10)
+     )
+# Proveď více simulací
+for sim in range(num_simulations):
+    left_side = num_particles
+    right_side = 0
+    differences=[]
+    
+    for step in range(num_steps):
+        difference=(left_side - right_side)
+        all_data.append({
+            'Simulace': f'Simulace {sim+1}',
+            'Časový krok': step,
+        # differences.append((left_side - right_side/2))
+            'Rozdíl': difference
+        })
+        differences.append(difference)
+        if random.random()*num_particles < left_side:
+            left_side -= 1
+            right_side += 1
+        else:
+            right_side -= 1
+            left_side += 1
+
+   # Vykreslení jedné simulace
+    plt.plot(range(num_steps), differences, label=f'Simulace {sim+1}', linewidth=1)
+
+plt.title('Simulace rozdílu počtu částic mezi stranami')
+plt.xlabel('Časový krok')
+plt.ylabel('Rozdíl (levá - pravá)')
+# plt.legend(label='hh' )
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
+# Vytvoř DataFrame ze všech simulací
+df = pd.DataFrame(all_data)
+df
+```
+
+
+```{python}
+display(df.describe())
+histogram=df.hist(column='Rozdíl',bins=num_particles*2)
+```
+
+
+**K čemu konverguje distribuce ?***
+
+```{python}
+subset=df.loc[df['Časový krok']>num_steps//2]
+display(subset.describe())
+histogram=subset.hist(column='Rozdíl',bins=num_particles*2)
+```

@@ -1,0 +1,146 @@
+---
+title: "Člověče nezlob se"
+date: "2025-11-10"
+updated: "2025-11-23"
+description: "Analýza pořadí házení kostkou: kdy, poprvé padne 6-ka ?"
+draft: false
+categories: ["Náhodná proměnná", "Seminář2"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p2_nahodna_promenna/clovece_nezlob_se.pdf) "
+
+html-math-method: katex
+engine: python
+
+format:
+    typst:
+        output-file: "clovece_nezlob_se"
+        output-ext: "pdf"
+
+---
+
+# Člověče nezlob se - pravidlo pro postup z domečku 
+
+Hráč může z "domečku" postoupit na první pole, až když hodí hrací kostkou 6-ku.
+Pokud mu nepadne musi čekat na další kolo.
+
+Jak dlouho čeká - kolikrát musi hodit kostkou nez postoupi z domečku? 
+Doba čekání  je náhodná veličina s nekonečně mnoho hodnotami.
+
+# Pořadí hodu kdy padla prvni 6-ka jako náhodná proměnná 
+
+### Pravděpodobnost, že 6-ka padne v k-tém hodu 
+
+Jaká je pravděpodobnost 6-ky v k-tém hodu:
+
+* 1. hod  $\frac{1}{6}$ : hned 6-ka padla $p1=\frac{1}{6}$
+* 2. hod  $\frac{5}{6}\cdot\frac{1}{6}$ : v předchozím hodu 6-ka nepadla $p1=\frac{5}{6}$  a pak padla $p2=1\frac{1}{6}$
+* 3. hod  $\frac{5}{6}\cdot\frac{5}{6}\cdot\frac{1}{6}$ : ve dvou předchozích hodech 6-ka nepadla $p1 \cdot p2 =\frac{5}{6} \cdot \frac{5}{6}$  a pak padla $p3=1\frac{1}{6}$
+* ...
+* k-tý hod  $\frac{5}{6}\ldots\frac{5}{6}\cdot\frac{1}{6}$  kde je $(k-1)$ členů $\frac{5}{6}$ (vyjadřujících, že v $(k-1)$ předchozích hodů 6-ka nikdy nepadla )
+
+
+
+```{julia}
+#| tbl-cap: "Tabulka pravděpodobností 6-ky v k-tém hodu"
+
+using DataFrames, DataFramesMeta, MarkdownTables, Random, Distributions
+
+
+data = DataFrame(x=sin.(0:pi/6:4pi))
+markdown_table(data)
+```
+
+
+```{julia}
+#| tbl-cap-location: top
+## | tbl-cap: "hut hura"
+
+using DataFrames, PrettyTables
+# using PrettyTables.Formatters  # <-- this brings in tf_html_* constants
+
+df = DataFrame(Name=["Alice", "Bob"], Age=[25, 30], Score=[88, 92])
+
+df = DataFrame(:a => [1, 2, 3], :b => [4, 5, 6])
+
+# HTML backend allows more styling
+hl_lt5 = HtmlHighlighter(
+    (data, i, j) -> data[i, j] < 5,
+    ["color" => "blue"],
+)
+
+pretty_table(df, backend=:html,
+    highlighters=[hl_lt5],
+    alignment=[:l, :c],
+    column_labels=["Col. 1", "Merged Column"],
+    show_row_number_column=true,
+    # row_number_column_header=true,
+    # row_names_header="xRow",
+    title="Table Title",
+    subtitle="Table Subtitle",
+    # footnotes=[(:column_label, 1, 2) => "Footnote in column label", (:data, 2, 2) => "Footnote in data"],
+)
+
+# first_line_column_label = ["color" => "BurlyWood", "font-weight" => "bold"]
+
+
+# 3. Available formatters
+# tf_markdown → Markdown tables with borders
+
+# tf_unicode → Unicode box‑drawing borders (nice in terminal)
+
+# tf_html_classic → HTML table with borders
+
+# tf_html_minimalist → HTML table with minimal styling
+
+```
+
+
+```{julia}
+data = [
+    10.0 6.5
+    3.0 3.0
+    0.1 1.0
+]
+
+row_labels = [
+    "Atmospheric drag"
+    "Gravity gradient"
+    "Solar radiation pressure"
+]
+
+column_labels = [
+    [MultiColumn(2, "Value", :c)],
+    [
+        "Torque [10⁻⁶ Nm]",
+        "Angular Momentum [10⁻³ Nms]"
+    ]
+]
+
+hl_p = HtmlHighlighter(
+    (data, i, j) -> (j == 1) && (data[i, j] > 1),
+    ["color" => "blue"]
+)
+
+hl_v = HtmlHighlighter(
+    (data, i, j) -> (j == 2) && (data[i, j] > 3),
+    ["color" => "red"]
+)
+
+pretty_table(
+    data;
+    backend=:html,
+    column_labels,
+    merge_column_label_cells=:auto,
+    row_labels,
+    highlighters=[hl_p, hl_v],
+    stubhead_label="Effect",
+    style=HtmlTableStyle(;
+        first_line_merged_column_label=["color" => "BurlyWood", "font-weight" => "bold"],
+        column_label=["color" => "DarkGrey", "background" => "blue"],
+        stubhead_label=["color" => "blue", "font-weight" => "bold"],
+        summary_row_label=["color" => "red", "font-weight" => "bold"]
+    ),
+    summary_row_labels=["Total"],
+    summary_rows=[(data, i) -> sum(data[:, i])],
+)
+```

@@ -1,0 +1,21 @@
+---
+title: "Optimalizační metody"
+date: "2025-11-30"
+updated: "2025-12-03"
+description: "Jak maximalizovat dostřel z dela a ušetřit barvu"
+draft: false
+categories: ["Optimalizace", "Přednáška9"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p9_optimalizace/maxent_optimalizace.pdf) "
+
+html-math-method: katex
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "maxent_optimalizace"
+        output-ext: "pdf"
+        engine: typst
+---
