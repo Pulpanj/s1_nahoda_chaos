@@ -1,0 +1,86 @@
+---
+title: "Psy a Blechy"
+date: "2025-10-06"
+updated: "2025-12-06"
+description: "O skákání blech mezi 2 psy aneb Ehrenfestův model"
+draft: false
+categories: ["Mikrostav","Makrostav", "Přednáška 1", "Co to připomíná?" ]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p1_mikro_makro_stavy/psy_a_blechy.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "psy_a_blechy"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Model psů a blech
+
+```{dot}
+//| file: psy_a_blechy.dot
+//| fig-width: 4.2
+//| fig-height: 6.3
+``` 
+
+Popsaný model vyvoje počtu blech na pravém psu se nazývá Ehrenfestův (urnový)  model
+
+```{julia}
+using Random, Plots, Plots.PlotMeasures
+
+function onerun(; num_particles=10, left_side=10, num_steps=100)
+    R = Vector{Int}(undef, num_steps + 1)
+    right_side = num_particles - left_side
+
+    for n in 1:(num_steps+1)
+        R[n] = (left_side - right_side) / 2
+        if rand() * num_particles < left_side
+            left_side -= 1
+            right_side += 1
+        else
+            right_side -= 1
+            left_side += 1
+        end
+    end
+    return R
+end
+num_steps = 40
+R = onerun(num_particles=10, left_side=0, num_steps=num_steps)
+println(R)
+```
+
+```{julia}
+using Plots, LaTeXStrings, Plots.PlotMeasures
+# Parametry simulace
+num_simulations = 15      # Počet simulací
+num_particles = 6       # Počet částic
+num_steps = 300        # Počet časových kroků
+# Nastavení grafu
+ylabels = Vector{String}(undef, 2 * num_simulations)
+for i in 1:num_simulations
+	ylabels[2*i-1] = "[#$(i)]"
+	ylabels[2*i] = "0"
+end;
+pl = plot(; size = (1200, 800), legend = :outerright, framestyle = :natural,
+	ylim = (-5, num_simulations * num_particles),
+	yticks = ((-(num_particles/2)):(num_particles/2):((num_simulations-1+0.5)*(num_particles)), ylabels),
+	ylabel = "R[n]=(Levá[n]-Pravá[n])/2",
+	xlabel = "n-časový krok", grid = :on, minorgrid = false,
+	left_margin = [5mm 5mm], bottom_margin = 5mm,
+	title = "$num_simulations simulaci s $num_steps čásovými kroky " *
+			"\n$num_particles částic, na počátku  jsou na levé straně ",
+)
+
+for Nsim in 1:num_simulations
+	left_side = num_particles
+	R = onerun(num_particles = num_particles, left_side = num_particles, num_steps = num_steps)
+	# println(R)
+	pl = plot!(1:(num_steps+1), R .+ num_particles * (Nsim - 1); label = "Simulace $Nsim", lw = 1, show = true)
+end
+pl
+```
+

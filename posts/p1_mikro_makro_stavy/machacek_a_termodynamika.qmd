@@ -1,0 +1,208 @@
+---
+title: "Hra Macháček a termodynamika"
+date: "2025-10-06"
+updated: "2025-12-06"
+description: "Hra s 2 kostkami a jak na ní lze ukázat co je to mikro a makro stav"
+draft: false
+categories: ["Mikrostav","Makrostav", "Přednáška 1", "Co to připomíná?" ]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p1_mikro_makro_stavy/machacek_a_termodynamika.pdf)"
+
+# html-math-method: katex
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "machacek_a_termodynamika"
+        output-ext: "pdf"
+        engine: typst
+---
+
+
+# Mikrostav x Makrostav
+
+## Mikrostav
+Přesný popis stavu všech jednotlivých částic v systému.
+
+- V případe, že jednotlivé částice nabývají spojitých stavu je mikrostavem
+detailní informace o poloze a hybnosti každé jednotlivé částice v systému
+
+- v případě, že jednotlivé částice nabývají jen diskrétních stavů je
+mikrostavem popis stavu každé jednotlivé částice
+
+- Všechny mikrostavy systemu, který si s okolím nemůže vyměňovat ani energii
+(termodynamicky tzv. izolovaného systému), tvoří tzv. mikrokanonický soubor.
+
+
+## Makrostav
+popis systemu jen  i  základě veličin pozorovatelných na systému jako celku
+
+    
+- pokud je systém dostatečně velký, pak drobné fluktuace od rovnovážné hodnoty
+makroskopické veličiny (téměř) nepozorujeme a pro naše uvažování jsou podstatné
+pouze mikrostavy odpovídající rovnovážnému stavu
+
+# Hra Macháček a termodynamika
+
+## Pravidla hry 
+
+Macháček je půvabná hra se 2 kostkami, kterou by asi neměli hrát lidé, kteří neradi lžou. 
+
+Detailní pravidla jsou např. na <https://cs.wikipedia.org/wiki/Mach%C3%A1%C4%8Dek_(kostkov%C3%A1_hra)>
+
+
+Hráč A hodí dvěma kostkami, ale výsledek ukryje před hráčem B, který je na řadě. Svůj výsledek mu pouze oznámí. Hráč B má nyní dvě možnosti:
+
+- V případě pochybností může hráče A požádat o odkrytí vržených kostek. Pokud hráč A blafoval, hráč B získává bod a začíná nové kolo. Odpovídá-li oznámený výsledek hodnotě na kostkách, pak prohrává hráč požadující jejich odhalení.
+
+- V případě, že hráč B výsledku věří, převezme kostky s tím, že nyní musí na kostkách hodit vyšší hodnotu, než oznámil předchozí hráč. Může se však stát, že se mu to nepodaří. V takovém případě se pouze snaží předstírat, že předchozího hráče přehodil.  
+
+Hodnoty se počítají následovně:
+
+ - Ze dvou různých hodnot se vždy vyšší číslo hlásí v řádu desítek a nižší v řádu jednotek (např.: 4 a 5 = 54).
+- Dvě stejná čísla jsou vyšší hodnota než 65 a hlásí se jako indiáni (v některých verzích duby). (např.: 3 a 3 = tři indiáni).
+- 2 a 1 nebo 1 a 2 je nejvyšší hodnota ve hře a hlásí se jako macháček. Macháček lze přehodit zase jen macháčkem.
+
+## Seznam mikrostavu a jim odpovídajícího makrostavu
+
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+
+using DataFrames, MarkdownTables, PrettyTables
+
+# generuj microstavy ze 2 kostek
+mikrostav = Array{Tuple{Int, Int}}(undef, 6, 6)
+stav = Array{Tuple{Tuple{Int, Int}, Int, Int, String}}(undef, 6, 6)
+skore_hodnota = [
+	31, 32, 41, 42, 43, 51, 52, 53, 54, 61, 62,
+	63, 64, 65, 11, 22, 33, 44, 55, 66, 21,
+]
+skore_jmeno = [
+	"31", "32", "41", "42", "43", "51", "52", "53", "54", "61", "62",
+	"63", "64", "65", "1 indian", "2 indiani", "3 indiani", "4 indiani",
+	"5 indianů", "6 indianů", "Macháček",
+]
+
+for i in 1:6
+	for j in 1:6
+		mikrostav[i, j] = (i, j)
+		score = max(i, j) * 10 + min(i, j)
+		# pozice score v poli skore_hodnota
+		iscore = findfirst(==(score), skore_hodnota)
+		stav[i, j] = (mikrostav[i, j], iscore, score, skore_jmeno[iscore])
+		# println(makrostav[i, j])
+
+	end
+end
+stavy = vec(stav)
+df_stavy = DataFrame(stavy, [:MikroStav, :Iscore, :Score, :MakroStav])
+
+column_labels = [
+	[MultiColumn(2, "Value", :c)],
+	[
+		"Torque [10⁻⁶ Nm]",
+		"Angular Momentum [10⁻³ Nms]",
+	],
+]
+pretty_table(
+	df_stavy, backend = :markdown,
+	column_labels = names(df_stavy),
+	alignment = :c, show_row_number_column = false;
+)
+```
+
+## Pravděpodobnosti makrostavů
+
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+
+using DuckDB
+
+df_scores = df_stavy[:, [:Iscore, :Score, :MakroStav]]
+con = DBInterface.connect(DuckDB.DB, ":memory:")
+DuckDB.register_data_frame(con, df_scores, "scores")
+# run a SQL query over the DataFrame
+sql = """
+	SELECT
+		Iscore,
+		MakroStav,
+		Pocet,
+		Pocet/36 as Prob,
+		SUM(Pocet) OVER 
+			(ORDER BY Iscore)/36 AS 'Cum_Prob'
+	FROM (
+		SELECT 
+			Iscore,
+			MakroStav,
+			COUNT(*) as Pocet,
+		FROM 
+			scores
+		GROUP BY 1,2
+		ORDER BY
+			Iscore
+	)
+"""
+result = DataFrame(DBInterface.execute(con, sql))
+
+pretty_table(
+	result, backend = :markdown,
+	alignment = :c,
+	formatters = [fmt__printf("%4.3f", [4, 5])],
+	show_row_number_column = false,
+	column_labels = names(result),
+)
+```
+
+## Graf kumulativní pravděpodobnosti makrostavů
+
+
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+
+using DataFrames, Plots, LaTeXStrings, Plots.PlotMeasures
+
+bar(
+	result.MakroStav,
+	result.Cum_Prob,
+	label = "Kumulativní pravděpodobnost",
+	color = :skyblue, legend = :topleft,
+	xlabel = "Skore předchozího hráče",
+	xticks =  xticks = (0.5:1:length(skore_jmeno), skore_jmeno) ,
+	ylabel = "Kumulativní pravděpodobnost",
+	title = "Setříděné hodnoty hodů 2 kostek ve hře Macháček",
+	xrotation = 90,
+	grid = :on, minorgrid = false,
+	size = (900, 600),
+	left_margin = [5mm 5mm], bottom_margin = 30mm)
+#  horizontal reference  y = 0.5
+hline!(
+	[0.5], color = :red, linestyle = :dash,
+	linewidth = 1.5, label = "Pravděpodobnost=0.5",
+)
+```
+
+
+
+## Závěr
+: Pokud hráč před námi hlásí víc než 54 je lepší mu nevěřit !
+
+
+
+::: {.callout-tip title="Zahrnutí posledniho hodu po Macháčkovi" icon=false color=green}
+
+
+Jak ovlivňuje pravidlo o možnosti přehodit macháčka v dalším hodu ???
+
+Podobný problém nemám vyřešen v analýze klasické hry v kostky (viz.
+[http://www.pulpanj.me.cz/hricky/dicegame.htm](http://www.pulpanj.me.cz/hricky/dicegame.htm),
+kde jsem neuvažoval možnost dat stranou jen část kostek tvořících skóre. 
+
+:::

@@ -1,0 +1,161 @@
+digraph TEST {
+    rankdir = TB;
+    node [fontsize=24];
+    graph [compound = true; border = 2;fontsize=24];
+    
+    subgraph cluster_overall {
+        subgraph row2 {
+            subgraph cluster_3 {
+                label = "n=3 \nR[3]=1 tažena blecha #8 ->R[3]=2";
+                B3 [label = <<table  border="0" cellspacing="0" cellborder="0" >
+                    <tr><td port='b' >Pravý pes</td></tr>
+                    <tr><td port='a1'> </td></tr>
+                    <tr><td port='a2'> </td></tr>
+                    <tr><td port='a3'> </td></tr>
+                    <tr><td port='a4'>4</td></tr>
+                    <tr><td port='a5'> </td></tr>
+                    <tr><td port='a6'> </td></tr>
+                    <tr><td port='a7'> </td></tr>
+                    <tr><td port='a8'>8 </td></tr>
+                    <tr><td port='a9'> </td></tr>
+                    <tr><td port='a10'> </td></tr>
+                    </table>>;position = "0,0!";];
+                A3 [label = <<table  border="0" cellspacing="0" cellborder="0" >
+                    <tr><td port='a'>Levý pes</td></tr>
+                    <tr><td port='a1'>1</td></tr>
+                    <tr><td port='a2'>2</td></tr>
+                    <tr><td port='a3'>3</td></tr>
+                    <tr><td port='a4'>.</td></tr>
+                    <tr><td port='a5'>5</td></tr>
+                    <tr><td port='a6'>6</td></tr>
+                    <tr><td port='a7'>7</td></tr>
+                    <tr><td port='a8'>(8)</td></tr>
+                    <tr><td port='a9'>9</td></tr>
+                    <tr><td port='a10'>10</td></tr>
+                    </table>>;];
+                    A3:a->B3:b[style=invis];
+                    A3:a8->B3:a8 [label="blecha #8"];
+                subgraph {
+                    rank = same;
+                    B3;
+                    A3;
+                }
+            }
+            subgraph cluster_2 {
+                label = "n=2 \nR[2]=2 tažena blecha #2 ->R[3]=1";
+                B2 [label = <<table  border="0" cellspacing="0" cellborder="0" >
+                    <tr><td port='b' >Pravý pes</td></tr>
+                    <tr><td port='a1'> </td></tr>
+                    <tr><td port='a2'>(2) </td></tr>
+                    <tr><td port='a3'> </td></tr>
+                    <tr><td port='a4'>4 </td></tr>
+                    <tr><td port='a5'> </td></tr>
+                    <tr><td port='a6'> </td></tr>
+                    <tr><td port='a7'> </td></tr>
+                    <tr><td port='a8'> </td></tr>
+                    <tr><td port='a9'> </td></tr>
+                    <tr><td port='a10'> </td></tr>
+                    </table>>;position = "0,0!";];
+                A2 [label = <<table  border="0" cellspacing="0" cellborder="0" >
+                    <tr><td port='a'>Levý pes</td></tr>
+                    <tr><td port='a1'>1</td></tr>
+                    <tr><td port='a2'>2</td></tr>
+                    <tr><td port='a3'>3</td></tr>
+                    <tr><td port='a4'>.</td></tr>
+                    <tr><td port='a5'>5</td></tr>
+                    <tr><td port='a6'>6</td></tr>
+                    <tr><td port='a7'>7</td></tr>
+                    <tr><td port='a8'>8</td></tr>
+                    <tr><td port='a9'>9</td></tr>
+                    <tr><td port='a10'>10</td></tr>
+                    </table>>;];
+                    A2:a->B2:b[style=invis];
+                    B2:a2->A2:a2 [label="blecha #2"];
+                subgraph {
+                    rank = same;
+                    A2;
+                    B2;
+                }
+            }
+            
+            label = "row2";
+        }
+        subgraph row1 {
+            subgraph cluster_1 {
+                label = "n=1 \nR[1]=1 tažená blecha #4 R[2]=2";
+                B1 [label = <<table  border="0" cellspacing="0" cellborder="0" >
+                    <tr><td port='b' >Pravý pes</td></tr>
+                    <tr><td port='a1'> </td></tr>
+                    <tr><td port='a2'>2</td></tr>
+                    <tr><td port='a3'> </td></tr>
+                    <tr><td port='a4'>4</td></tr>
+                    <tr><td port='a5'> </td></tr>
+                    <tr><td port='a6'> </td></tr>
+                    <tr><td port='a7'> </td></tr>
+                    <tr><td port='a8'> </td></tr>
+                    <tr><td port='a9'> </td></tr>
+                    <tr><td port='a10'> </td></tr>
+                    </table>>;position = "0,0!";];
+                A1 [label = <<table  border="0" cellspacing="0" cellborder="0" >
+                    <tr><td port='a'>Levý pes</td></tr>
+                    <tr><td port='a1'>1</td></tr>
+                    <tr><td port='a2'>.</td></tr>
+                    <tr><td port='a3'>3</td></tr>
+                    <tr><td port='a4'>(4)</td></tr>
+                    <tr><td port='a5'>5</td></tr>
+                    <tr><td port='a6'>6</td></tr>
+                    <tr><td port='a7'>7</td></tr>
+                    <tr><td port='a8'>8</td></tr>
+                    <tr><td port='a9'>9</td></tr>
+                    <tr><td port='a10'>10</td></tr>
+                    </table>>;];
+                    A1:a4->B1:a4 [style=invis];
+                    A1:a4->B1:a4 [label="blecha #4"];
+                subgraph {
+                    rank = same;
+                    A1;
+                    B1;
+                }
+            }
+            subgraph cluster_0 { 
+                label = "n=0 \nR[0]=0 tažená blecha #2 ->R[1]:1";
+                B0 [label = <<table  border="0" cellspacing="0" cellborder="0" >
+                    <tr><td port='b' >Pravý pes</td></tr>
+                    <tr><td port='a1'> </td></tr>
+                    <tr><td port='a2'>2</td></tr>
+                    <tr><td port='a3'> </td></tr>
+                    <tr><td port='a4'> </td></tr>
+                    <tr><td port='a5'> </td></tr>
+                    <tr><td port='a6'> </td></tr>
+                    <tr><td port='a7'> </td></tr>
+                    <tr><td port='a8'> </td></tr>
+                    <tr><td port='a9'> </td></tr>
+                    <tr><td port='a10'> </td></tr>
+                    </table>>;position = "0,0!";];
+                A0 [label = <<table  border="0" cellspacing="0" cellborder="0" >
+                    <tr><td port='a'>Levý pes</td></tr>
+                    <tr><td port='a1'>1</td></tr>
+                    <tr><td port='a2'>(2)</td></tr>
+                    <tr><td port='a3'>3</td></tr>
+                    <tr><td port='a4'>4</td></tr>
+                    <tr><td port='a5'>5</td></tr>
+                    <tr><td port='a6'>6</td></tr>
+                    <tr><td port='a7'>7</td></tr>
+                    <tr><td port='a8'>8</td></tr>
+                    <tr><td port='a9'>9</td></tr>
+                    <tr><td port='a10'>10</td></tr>
+                    </table>>;];
+                    A0:a->B0:b[style=invis];
+                    A0:a2->B0:a2 [label="blecha #2"];
+                subgraph {
+                    rank = same;
+                    A0;
+                    B0;
+                }
+            }
+            A0->A2 [style=invis];
+            A1->A3 [style=invis];
+        }
+    }
+    label = "První čtyři mikro-stavy a jejich přechody při tažení blech";
+}

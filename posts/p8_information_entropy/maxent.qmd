@@ -4,7 +4,7 @@ date: "2025-11-24"
 updated: "2025-11-28"
 description: "Princip maximální informační entropie a ukázky MAXENT výpočtů"
 draft: false
-categories: ["Informační entropie", "Přednáška 8"]
+categories: ["Informační entropie", "Přednáška 8", "MAXENT"]
 # image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p8_information_entropy/maxent.pdf) "
 

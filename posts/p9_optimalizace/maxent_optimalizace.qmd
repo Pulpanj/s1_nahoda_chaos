@@ -1,10 +1,10 @@
 ---
-title: "Optimalizační metody"
-date: "2025-11-30"
-updated: "2025-12-03"
-description: "Jak maximalizovat dostřel z dela a ušetřit barvu"
+title: "Řešení MAXENT principu pomocí optimalizace"
+date: "2025-12-0a"
+updated: "2025-12-0ř"
+description: "Analytická řešení MAXENT s kostkami pomocí optimalizace"
 draft: false
-categories: ["Optimalizace", "Přednáška9"]
+categories: ["Optimalizace","Informační entropie", "Přednáška 9", "MAXENT"]
 # image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p9_optimalizace/maxent_optimalizace.pdf) "
 
@@ -19,3 +19,4 @@ format:
         output-ext: "pdf"
         engine: typst
 ---
+
