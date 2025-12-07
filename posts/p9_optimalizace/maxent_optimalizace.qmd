@@ -1,7 +1,7 @@
 ---
 title: "Řešení MAXENT principu pomocí optimalizace"
-date: "2025-12-0a"
-updated: "2025-12-0ř"
+date: "2025-12-01"
+updated: "2025-12-07"
 description: "Analytická řešení MAXENT s kostkami pomocí optimalizace"
 draft: false
 categories: ["Optimalizace","Informační entropie", "Přednáška 9", "MAXENT"]
@@ -20,3 +20,4 @@ format:
         engine: typst
 ---
 
+# Řešení MAXENT principu pomocí optimalizace

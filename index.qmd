@@ -11,11 +11,11 @@ listing:
   contents: posts
   feed: false
   sort: 
+    - date desc
     - updated desc
-    - date asc
     - title asc
     - description
-  sort-ui: [updated, date,title,description,categories  ]
+  sort-ui: [date,updated,title,description,categories  ]
   field-types:
     updated: date
     date: date

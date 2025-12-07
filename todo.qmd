@@ -69,6 +69,7 @@ draft: false
     -   ~~odvozeni bitu pro shodne pravdepodobnosti~~
     -   odvozeni bitu pro neshodne pravdepodobnosti
     -   ~~problem o klokanech~~
+    -   uloha o vazeni 12 minci 1 falesna (ma ruznou vahu) kolik vazeni na dvojrammene vaze ji najde ?
     -   3-stenna kostka a heatmap entropie/energie
     -   4-stenna kostka a zadane momenty
 -   Matematika

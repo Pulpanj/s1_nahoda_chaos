@@ -1,0 +1,158 @@
+---
+title: "Odvození mutiplicity součtu po hodu N kostkami"
+date: "2025-10-09"
+updated: "2025-12-06"
+description: "Obecný vzorec pro multiplicitu součtu ok po hodu N kostkami"
+draft: false
+categories: ["Mikrostav","Makrostav", "Přednáška 1", "Co to připomíná?" ]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p1_mikro_makro_stavy/soucet_n_kostek_odvozeni.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "soucet_n_kostek_odvozeni"
+        output-ext: "pdf"
+        engine: typst
+---
+
+
+
+# Vzorec pro počet kombinací vedoucích k součtu $K$ při hodu $N$ kostkami:
+*Ukradeno z výstupů LLM Copilot*
+
+
+
+$$
+\begin{equation}
+O_K= \sum_{i=0}^{\left\lfloor \frac{K - N}{6} \right\rfloor} (-1)^i \binom{N}{i} \binom{K - 6i - 1}{N - 1}
+\end{equation}
+$${#eq-O_K}
+
+
+A pravděpodobnost je pak:
+
+
+
+$$
+\begin{equation}
+P(K) = \frac{1}{6^N} \sum_{i=0}^{\left\lfloor \frac{K - N}{6} \right\rfloor} (-1)^i \binom{N}{i} \binom{K - 6i - 1}{N - 1}
+\end{equation}
+$$
+
+
+
+## Test kód
+
+
+```{julia}
+#| echo: false
+#| output: false
+include("dice_multiplicity.jl")
+```
+
+
+```{julia}
+#| code-fold: false
+using Combinatorics   # for binomial coefficients (binomial)
+
+function dice_sum_combinations(N::Int, K::Int)
+	"""
+	Vypočítá počet kombinací vedoucích k součtu K při hodu N 
+	šestistěnnými kostkami pomocí principu inkluze a exkluze.
+
+	Parametry:
+	- N: počet kostek
+	- K: požadovaný součet
+
+	Návratová hodnota:
+	- počet platných kombinací (celých čísel 1–6), které dávají součet K
+	"""
+	total = 0
+	max_i = floor(Int, (K - N) / 6)   # floor to integer
+	for i in 0:max_i
+		sign = (-1)^i
+		term = binomial(N, i) * binomial(K - 6*i - 1, N - 1)
+		total += sign * term
+	end
+	return total
+end
+
+```
+
+```{julia}
+#| code-fold: true
+# Ukázka použití: počet kombinací pro25 kostek a součet 20
+N = 5
+K = 20
+result = dice_sum_combinations(N, K)
+println("Počet kombinací pro $N kostky a součet $K:")
+println("vzorec: $result")
+mikrostav = hod_kostkami(N)
+makrostav = sum_ok(mikrostav)
+mult = multiplicita(makrostav)
+println("sumací: $(mult[K-N+1,2])")
+```
+---
+
+# Odvozeni vzorce pro počet kombinací $O_K$ pro součet $K$ při hodu $N$ kostkami
+
+## Co jednotlivé části  vzorce [-@eq-O_K] znamenají:
+
+- $\binom{N}{i}$: počet způsobů, jak vybrat $i$ kostek, které „překročí“ maximální hodnotu.
+- $\binom{K - 6i - 1}{N - 1}$: počet způsobů, jak rozdělit součet mezi $N$ kostek s omezením.
+- $(-1)^i$: střídání znamének kvůli inkluzi a exkluzi.
+- $\left\lfloor \frac{K - N}{6} \right\rfloor$: maximální počet „překročení“, které je možné.
+
+
+##  Základní princip inkluze a exkluze
+
+Princip **inkluze a exkluze** je klasická technika v kombinatorice, která se používá k **počítání počtu prvků v sjednocení množin**, když se některé prvky mohou vyskytovat ve více množinách zároveň. V kontextu **počítání kombinací součtů kostek** se používá k **odstranění neplatných kombinací**, které překračují maximální hodnotu kostky.
+
+Představme si dvě množiny:
+- $A$: prvky splňující podmínku 1
+- $B$: prvky splňující podmínku 2
+
+Pak platí:
+
+<!-- $$ -->
+|A \cup B| = |A| + |B| - |A \cap B|
+<!-- $$ -->
+
+Tedy:
+- **Inkluze**: sečteme všechny jednotlivé případy.
+- **Exkluze**: odečteme případy, které se počítaly vícekrát (např. jsou v obou množinách).
+
+
+##  Aplikace na součty kostek
+
+Při výpočtu počtu kombinací součtu $K$ při hodu $N$ kostkami, kde každá kostka má hodnotu 1–6, chceme spočítat počet celočíselných řešení rovnice:
+
+$$
+x_1 + x_2 + \dots + x_N = K, \quad \text{kde } 1 \leq x_i \leq 6
+$$
+
+Ale bez omezení by řešení zahrnovala i případy, kde $x_i > 6$. Proto použijeme **inkluzi a exkluzi**, abychom tyto neplatné případy odečetli.
+
+
+##  Jak to funguje ve vzorci
+
+Vzorec:
+
+$$
+\sum_{i=0}^{\left\lfloor \frac{K - N}{6} \right\rfloor} (-1)^i \binom{N}{i} \binom{K - 6i - 1}{N - 1}
+$$
+
+- **Inkluze**: první člen (pro $i = 0$) zahrnuje všechny kombinace bez omezení.
+- **Exkluze**: další členy (pro $i > 0$) odečítají případy, kde jedna nebo více kostek překročily hodnotu 6.
+- **Střídání znamének**: zajišťuje správné přičítání a odečítání překrývajících se případů.
+
+
+::: {.callout-tip title="Otázka" icon=false color=green}
+
+**Jak dokázat,že $P(K) konverguje k normálnímu rozložení ??**
+
+:::

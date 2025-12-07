@@ -1,10 +1,10 @@
 ---
 title: "Hra Macháček a termodynamika"
-date: "2025-10-06"
+date: "2025-10-08"
 updated: "2025-12-06"
 description: "Hra s 2 kostkami a jak na ní lze ukázat co je to mikro a makro stav"
 draft: false
-categories: ["Mikrostav","Makrostav", "Přednáška 1", "Co to připomíná?" ]
+categories: ["Mikrostav","Makrostav", "Přednáška 1", "Hádanka" ]
 # image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p1_mikro_makro_stavy/machacek_a_termodynamika.pdf)"
 
@@ -21,28 +21,6 @@ format:
 ---
 
 
-# Mikrostav x Makrostav
-
-## Mikrostav
-Přesný popis stavu všech jednotlivých částic v systému.
-
-- V případe, že jednotlivé částice nabývají spojitých stavu je mikrostavem
-detailní informace o poloze a hybnosti každé jednotlivé částice v systému
-
-- v případě, že jednotlivé částice nabývají jen diskrétních stavů je
-mikrostavem popis stavu každé jednotlivé částice
-
-- Všechny mikrostavy systemu, který si s okolím nemůže vyměňovat ani energii
-(termodynamicky tzv. izolovaného systému), tvoří tzv. mikrokanonický soubor.
-
-
-## Makrostav
-popis systemu jen  i  základě veličin pozorovatelných na systému jako celku
-
-    
-- pokud je systém dostatečně velký, pak drobné fluktuace od rovnovážné hodnoty
-makroskopické veličiny (téměř) nepozorujeme a pro naše uvažování jsou podstatné
-pouze mikrostavy odpovídající rovnovážnému stavu
 
 # Hra Macháček a termodynamika
 

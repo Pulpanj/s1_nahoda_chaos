@@ -1,0 +1,124 @@
+---
+title: "Mikrostav a makrostav"
+date: "2025-10-06"
+updated: "2025-12-04"
+description: "O skákání blech mezi 2 psy aneb Ehrenfestův model"
+draft: false
+categories: ["Mikrostav","Makrostav", "Přednáška 1" ]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p1_mikro_makro_stavy/psy_a_blechy.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "psy_a_blechy"
+        output-ext: "pdf"
+        engine: typst
+---
+
+
+# U3V Mikrostav x Makrostav
+
+Mikrostav
+: přesný popis stavu všech jednotlivých částic v systému.
+
+-   V případe, že jednotlivé částice nabývají spojitých stavu je mikrostavem detailní informace o poloze a hybnosti každé jednotlivé částice v systému
+
+-   v případě, že jednotlivé částice nabývají jen diskrétních stavů je mikrostavem popis stavu každé jednotlivé částice
+
+- Všechny mikrostavy systemu, který si s okolím nemůže vyměňovat ani energii (termodynamicky tzv. izolovaného systému), tvoří tzv. mikrokanonický soubor.
+
+
+Makrostav
+: popis systemu jen  i  základě veličin pozorovatelných na systému jako celku
+
+    
+- pokud je systém dostatečně velký, pak drobné fluktuace od rovnovážné hodnoty makroskopické veličiny  (téměř) nepozorujeme a pro naše uvažování jsou podstatné pouze mikrostavy odpovídající rovnovážnému stavu
+
+## Seznam mikrostavu a jim odpovidajiciho makrostavu
+
+Nejjednodušší ukázkou výčtu mikrostavu a jim odpovidajici množině makrostavu je
+hod sadou kostek a analýze součtu jejich ok. Pokud házíme $N$ kostkamije
+počet možných mikrostavů (variant všech možný výsledných kombinací  $N$ kostek) roven
+
+
+$$
+\begin{equation}
+O=6^N
+\end{equation}
+$$
+
+Všechny mikrostavy mají v případě "spravedlivých" kostek shodnou pravděpodobnost $p=\frac{1}{O}$. 
+
+Počet různých, námi pozorovanych makrostavů (tj. počet různých součtů $s$  ok na 4N4 kostkách, $s \in (N,6N)$ ) je roven:
+
+$$
+\begin{equation}
+M=6  \cdot N
+\end{equation}
+$$
+
+leč jejich pravděpodobnost již není shodná. Počet ruzných mikrostavů $O_K$, které vedou k jednomu makrostavu $K$ se nazývá **multiplicita makrostavu**. Platí:
+
+
+$$
+\begin{equation}
+O=\sum_{K=1}^M{O_K}
+\end{equation}
+$$
+
+
+```{.julia include="dice_multiplicity.jl" }
+```
+
+```{julia}
+#| echo: false
+#| output: false
+include("dice_multiplicity.jl")
+```
+
+```{julia}
+# kombinace pro 2 kostky
+mikrostav = hod_kostkami(2)
+makrostav = sum_ok(mikrostav)
+O = length(mikrostav)
+for i in 1:6:O
+	println("Mikrostavy:", mikrostav[i:(i+5)])
+	println("Makrostavy:", makrostav[i:(i+5)])
+end
+
+mult = multiplicita(makrostav)
+```
+
+## Grafy multiplicity součtu pro hod N kostkami
+```{julia}
+#| fig-cap:  "Multiplicita makrostavů (součtu ok) pro N kostek"
+
+using Plots, LaTeXStrings, Plots.PlotMeasures
+
+function plot_mult(N)
+    xstep = floor(N / 2 + 1)
+    mult = multiplicita(sum_ok(hod_kostkami(N)))
+    # # Plot as bar chart
+    p = bar(mult[:, 1], mult[:, 2],
+        xlabel=nothing,ylabel=nothing,
+        xlim=(N - 1, 6 * N + 1), xticks=N:xstep:6N,
+        title="N=$N",   label=nothing
+    )
+    return p
+end
+
+plots = [plot_mult(i) for i in 2:10]
+# Arrange them in a 3x3 grid
+plot(plots...,
+    layout=(3, 3),
+    size=(900, 600),
+    left_margin=[5mm 5mm],
+)
+
+```
+
+
