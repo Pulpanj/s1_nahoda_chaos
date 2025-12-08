@@ -4,7 +4,7 @@ date: "2025-12-01"
 updated: "2025-12-07"
 description: "Analytická řešení MAXENT s kostkami pomocí optimalizace"
 draft: false
-categories: ["Optimalizace","Informační entropie", "Přednáška 9", "MAXENT"]
+categories: ["Optimalizace","Informační entropie", "Přednáška 9", "MAXENT", "Odvození"]
 # image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p9_optimalizace/maxent_optimalizace.pdf) "
 
@@ -122,7 +122,7 @@ $$
 \frac{\partial}{\partial p_j}\, \big(p_i \cdot log_2(p_i) \big)\\
     -\frac{\partial}{\partial p_j}\, \big( p_{N-1}(p_1,\dots,p_{N-2}) \cdot log_2(p_{N-1}(p_1,\dots,p_{N-2}))
     \big) \\
-    -\frac{\partial}{\partial p_j}\, \big( p_(p_1,\dots,p_{N-2}) \cdot log_2(p_N(p_1,\dots,p_{N-2}))\big)
+    -\frac{\partial}{\partial p_j}\, \big( p_N(p_1,\dots,p_{N-2}) \cdot log_2(p_N(p_1,\dots,p_{N-2}))\big)
 \end{align}
 $$
 
@@ -383,9 +383,9 @@ println("entropy (bits) = ", -sum(p .* (log.(p) ./ log(2))))
 ```
 
 
-## Grafy rovnovážné pravděpodobnosti pro falešnou kostku
+## Grafy rovnovážných pravděpodobností pro falešnou kostku
 
-Jak se mění rovnovážné pravděpodobnosti $p_i$, kde  $i\in (1,6)$, pokud házíme falešnou kostkou, t.j. kostkou, která nemá pozorovaný průměr počtu ok roven 3,5, ale nějaké hodnotě $U$,  kde $U \in (1,6)$
+Jak se mění rovnovážné  pravděpodobnosti $p_i^*$, kde  $i\in (1,6)$, pokud házíme falešnou kostkou, t.j. kostkou, která nemá pozorovaný průměr počtu ok roven 3,5, ale nějaké hodnotě $U$,  kde $U \in (1,6)$ ?
 
 
 ```{julia}
@@ -393,33 +393,33 @@ using Plots, LaTeXStrings, Plots.PlotMeasures
 
 N_steps = 101
 u = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-U = collect(range(1, stop=6, length=N_steps))
+U = collect(range(1, stop = 6, length = N_steps))
 
 results = Array{Real}(undef, 0, 6)
 
 for UU in U
-    p, β = maxent_mean(u, UU)
-    results = vcat(results, transpose(p))
+	p, β = maxent_mean(u, UU)
+	results = vcat(results, transpose(p))
 end
 
 function plot_ith(i)
-    p = plot(U, results[:, i], show=false,
-        xlim=(1, 6), xticks=1:6,
-        # title="N=$N",   
-        label=latexstring("p_{$i}"),
-        # title=L"Graf s x_{ $(i+1) }",
-        ylabel=latexstring("p_{$i}"),
-        # color=:red,
-    )
-    return p
+	p = plot(U, results[:, i], show = false,
+		xlim = (1, 6), xticks = 1:6,
+		# title="N=$N",   
+		label = latexstring("p_{$i}^*"),
+		# title=L"Graf s x_{ $(i+1) }",
+		ylabel = latexstring("p_{$i}^*"),
+		# color=:red,
+	)
+	return p
 end
 
 plots = [plot_ith(i) for i in 1:length(u)]
 #  2x3 grid
 plot(plots...,
-    layout=(2, 3), size=(900, 600),
-    xlabel="U - střední počet ok",
-    linecolor=[:red :purple :orange :green :pink :blue],
-    left_margin=[5mm 5mm],
+	layout = (2, 3), size = (900, 600),
+	xlabel = "U - střední počet ok",
+	linecolor = [:red :purple :orange :green :brown :blue],
+	left_margin = [5mm 5mm],
 )
 ```

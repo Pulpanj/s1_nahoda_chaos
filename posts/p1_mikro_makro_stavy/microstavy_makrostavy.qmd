@@ -2,7 +2,7 @@
 title: "Mikrostav a makrostav"
 date: "2025-10-06"
 updated: "2025-12-04"
-description: "O skákání blech mezi 2 psy aneb Ehrenfestův model"
+description: "Jak mnoho je mikrostavů (které nelze pozorovat) a jaká je multiplicita pozorovaného makrostavu"
 draft: false
 categories: ["Mikrostav","Makrostav", "Přednáška 1" ]
 # image: "image.jpg"
