@@ -21,3 +21,405 @@ format:
 ---
 
 # Řešení MAXENT principu pomocí optimalizace
+
+[MAXENT princip](../p8_information_entropy/maxent.qmd) je obecným principem
+popisujícím jak se chovají systémy v rovnovážném stavu. Nalezení
+pravděpodobností jednotlivých mikrostavů při daném pozorovaném makrostavu je možno
+provádět nejen numericky ale i metodami optimalizace.
+
+
+## MAXENT jako optimalizační úloha 
+Mějme systém který muže nabývat N mikrostavů a každý mikrostav je svázán s
+"energií" ${\epsilon}_i$, pro všechny stavy $i \in (1,N)$
+
+Pravděpodobnosti stavů $p_i$ kromě normalizační podmínky:
+
+$$
+\begin{equation}
+\sum_{i=1}^N{p_i}=1
+\end{equation}
+$${#eq-one}
+
+musí splňovat i podmínku (vazbu) pro pozorovanou veličinu  (makrostav) $U$:
+
+$$
+\begin{equation}
+\sum_{i=1}^N{p_i  \cdot {\epsilon}_i}=U
+\end{equation}
+$${#eq-meanU}
+
+V rovnovážném stavu bude systém maximální entropii: 
+
+$$
+Q=-\sum_{i=1}^N{p_i\cdot log_2(p_i)}=max
+$$
+
+## Vyloučení proměnných daných vazbami
+
+A rovnice [-@eq-one] lze vyjádřit $p_{N-1}$ jako:
+
+
+$$
+\begin{equation}
+p_{N-1}(p_1,...,p_{N-2})=1-\sum_{i=1}^{N-2}{p_i}-p_N(p_1,..,p_{N-2})
+\end{equation}
+$$
+
+A z rovnice [-@eq-meanU] lze vyjádřit $p_{N-1}$ jako: 
+
+
+$$
+\begin{align}
+ p_{N}  \cdot {\epsilon}_N  
+ =U-\sum_{i=1}^{N-1}{p_i \cdot {\epsilon}_i}  \\
+p_{N}  \cdot {\epsilon}_N 
+= U-\sum_{i=1}^{N-2}{p_i \cdot {\epsilon}_i} -  \big( 1-\sum_{i=1}^{N-2} {p_i}-p_N \big) \cdot  {\epsilon}_{N-1} \\
+\\
+\\
+p_{N}  \cdot {\epsilon}_N 
+= U- {\epsilon}_{N-1}+p_N \cdot {\epsilon}_{N-1} -
+\sum_{i=1}^{N-2}{p_i \cdot ({\epsilon}_i} + {\epsilon}_{N-1}) 
+\end{align}
+$$
+
+
+$$
+\begin{equation}
+p_{N}  \cdot ({\epsilon}_N- {\epsilon}_{N-1})
+= U- {\epsilon}_{N-1} -
+\sum_{i=1}^{N-2}{p_i \cdot ({\epsilon}_i} + {\epsilon}_{N-1}) 
+\end{equation}
+$$
+
+$$
+\begin{equation}
+p_{N}(p_1,...,p_{N-2})
+=\frac{\big( U- {\epsilon}_{N-1} -\sum_{i=1}^{N-2}{p_i \cdot ({\epsilon}_i} + {\epsilon}_{N-1}) \big)
+}
+{({\epsilon}_N- {\epsilon}_{N-1})} 
+\end{equation}
+$$
+
+
+## Entropie po dosazení vazeb 
+
+$$
+\begin{align}
+Q(p_1,...,p_{n-2})=-\sum_{i=1}^{N-2}{p_i\cdot log_2(p_i)} \\
+    - p_{N-1}(p_1,...,p_{N-2})  \cdot log_2 \big(p_{N-1}(p_1,...,p_{N-2}) \big) \\
+    - p_{N}(p_1,...,p_{N-2})  \cdot log_2 \big(p_{N}(p_1,...,p_{N-2}) \big)
+\end{align}
+$$
+
+
+
+
+## Parciální derivace
+
+$$
+\begin{align}
+\frac{\partial}{\partial p_j}\, Q(p_1,\dots,p_{N-2})=
+\frac{\partial}{\partial p_j}\, \big(p_i \cdot log_2(p_i) \big)\\
+    -\frac{\partial}{\partial p_j}\, \big( p_{N-1}(p_1,\dots,p_{N-2}) \cdot log_2(p_{N-1}(p_1,\dots,p_{N-2}))
+    \big) \\
+    -\frac{\partial}{\partial p_j}\, \big( p_(p_1,\dots,p_{N-2}) \cdot log_2(p_N(p_1,\dots,p_{N-2}))\big)
+\end{align}
+$$
+
+První člen parcialni derivace vypočtený pomoci Symbolics.jl:
+
+```{julia}
+#| echo: true
+#| output: false
+#| code-fold: false
+
+using Symbolics, Latexify, LaTeXStrings
+
+@variables p_j
+Q = -p_j * log(2, p_j)
+# derivace
+dQ_p_j = Symbolics.derivative(Q, p_j)
+println("partial QR/dp_j = ", dQ_p_j)
+S_dQ_p_j = simplify(dQ_p_j)
+println("Derivace dR/dv_x = ", S_dQ_p_j)
+latex_eq = latexify(dQ_p_j)
+println("\n\$\$\n" * latex_eq * "\$\$\n")
+```
+
+
+$$
+\begin{equation}
+\frac{-1 - \log\left( \mathtt{p\_j} \right)}{\log\left( 2 \right)}
+\end{equation}
+$$
+
+
+Parciální derivace dle $p_{N-1}$ a $p_{N}$ použijeme vzorec pro derivaci
+složené funkce \(y(\cdot)\):
+
+$$
+\frac{d}{dx}\big[-y\log_2 y\big] = -y'(x)\left(\log_2 y + \frac{1}{\ln 2}\right).
+$$
+
+Odkud vychází konstantni derivace $p_{N-1}(p_1,\dots,p_{N-2})$ a
+$p_{N}(p_1,\dots,p_{N-2})$ dle $p_j$:
+
+$$
+\begin{align}
+\frac{\partial}{\partial p_j}\, p_N(p_1,\dots,p_{N-2})=
+\frac{
+    ({\epsilon}_j + {\epsilon}_{N-1})
+    } {
+        ({\epsilon}_N- {\epsilon}_{N-1})
+        }
+\end{align}
+$$
+
+
+$$
+\begin{align}
+\frac{\partial}{\partial p_j}\, p_{N-1}(p_1,\dots,p_{N-2})=
+    -1-\frac{\partial}{\partial p_j}\, p_N(p_1,\dots,p_{N-2}) \\
+= -1- \frac{
+    ({\epsilon}_j + {\epsilon}_{N-1})
+    } {
+        ({\epsilon}_N- {\epsilon}_{N-1})
+        }
+\end{align}
+$$
+
+Dosazením do parciální derivace pro $Q(p_1,...,p_{n-2})$ dle $p_j$ dostaneme:
+
+
+$$
+\begin{align}
+\frac{\partial}{\partial p_j}\, Q(p_1,\dots,p_{N-2})=
+    -\left(\log_2 p_j + \frac{1}{\ln 2}\right) \\
+        % PN-1
+    - \left( 
+        1- \frac{
+            ({\epsilon}_j + {\epsilon}_{N-1})
+            } 
+            {
+            ({\epsilon}_N- {\epsilon}_{N-1})
+            }    
+    \right)
+    \cdot  
+    \left( 
+        log_2 \left(
+            1-\sum_{i=1}^{N-2}{p_i}-
+            {
+                \frac{
+                        U- {\epsilon}_{N-1} -\sum_{i=1}^{N-2}{p_i \cdot ({\epsilon}_i} + {\epsilon}_{N-1}) 
+                    }
+                    {
+                        ({\epsilon}_N- {\epsilon}_{N-1})
+                    } 
+            }
+            \right)
+            +\frac{1}{\ln 2}
+    \right) \\
+        % PN
+    -  \frac{
+            ({\epsilon}_j + {\epsilon}_{N-1})
+            } 
+            {
+            ({\epsilon}_N- {\epsilon}_{N-1})
+            }    
+    % \right)
+    \cdot  
+    \left( 
+        log_2 \left(
+            % 1-\sum_{i=1}^{N-2}{p_i}-
+            {
+                \frac{
+                        U- {\epsilon}_{N-1} -\sum_{i=1}^{N-2}{p_i \cdot ({\epsilon}_i} + {\epsilon}_{N-1}) 
+                    }
+                    {
+                        ({\epsilon}_N- {\epsilon}_{N-1})
+                    } 
+            }
+            \right)
+            +\frac{1}{\ln 2}
+    \right) 
+\end{align}
+$$
+
+A nyní je třeba řešit soustavu rovnic řešících hodnoty pravděpodobností
+$(p_1,\dots,p_{N-2})$, které odpovídají maximální entropii:
+
+$$
+\begin{equation}
+\frac{\partial}{\partial p_j}\, Q(p_1,\dots,p_{N-2}) \Big|_{p_j=p_j^*}= 0 
+% \hspace{0.5cm} \quad \text{pro  }
+\end{equation}
+$$ 
+
+pro všechny $j \in (1,\dots,N-2)$.
+
+## Numerické řešení v jazyce Julia
+
+Následující algoritmus vrací numericky stabilní řešení s využitím algoritmu
+softmax a Newtonovy aktualizace s tlumením.
+
+```{julia}
+#| echo: true
+#| output: false
+#| code-fold: false
+using LinearAlgebra
+# Compute maximum-entropy probabilities with mean constraint sum(p_i u_i) = U
+function maxent_mean(u::AbstractVector{<:Real}, U::Real; tol = 1e-12, maxiter = 200)
+	u = collect(u)
+	n = length(u)
+	@assert U ≥ minimum(u) - 1e-14 && U ≤ maximum(u) + 1e-14 "U must lie in [min(u), max(u)]"
+
+	# Softmax with stability
+	function p_of_beta(β)
+		m = maximum(β .* u)
+		w = exp.(β .* u .- m)
+		w ./ sum(w)
+	end
+
+	# Target function and its derivative (variance)
+	function f_and_df(β)
+		p = p_of_beta(β)
+		μ = dot(u, p)
+		u2 = dot(u .^ 2, p)
+		varu = max(u2 - μ^2, 0.0)
+		(μ - U, varu)
+	end
+
+	# Initial guess: β=0 yields uniform; adjust direction
+	β = 0.0
+	# Optional: pick a direction towards U using a small step
+	δ = 1.0
+
+	for k in 1:maxiter
+		(res, der) = f_and_df(β)
+		if abs(res) < tol
+			p = p_of_beta(β)
+			return p, β
+		end
+		# If derivative is tiny, fall back to a small step
+		if der < 1e-18
+			β += sign(res) * δ
+		else
+			# Newton step with damping
+			step = -res / der
+			β += clamp(step, -5.0, 5.0)
+		end
+	end
+	p = p_of_beta(β)
+	return p, β
+end
+```
+
+Testy funkce **maxent_mean**:
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+println("test fair coin:")
+u = [0.0, 1.0]
+U = 0.5
+println("u[] = $u")
+println("U = $U")
+p, β = maxent_mean(u, U)
+println("β = $β")
+println("p = $p")
+println("mean = ", dot(u, p))
+println("entropy (bits) = ", -sum(p .* (log.(p) ./ log(2))))
+
+```
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+
+println("\nspravedlivá kostka")
+u = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+U = 3.5
+println("u[] = $u")
+println("U = $U")
+p, β = maxent_mean(u, U)
+println("β = $β")
+println("p = $p")
+println("mean = ", dot(u, p))
+println("entropy (bits) = ", -sum(p .* (log.(p) ./ log(2))))
+
+println("\ncinknuta kostka")
+u = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+U = 5.5
+println("u[] = $u")
+println("U = $U")
+p, β = maxent_mean(u, U)
+println("β = $β")
+println("p = $p")
+println("mean = ", dot(u, p))
+println("entropy (bits) = ", -sum(p .* (log.(p) ./ log(2))))
+
+
+```
+
+## Domací úkol s 9-ti stěnnou kostkou
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+println("\ncinknuta kostka")
+u = [0.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0]
+U = 1
+println("u[] = $u")
+println("U = $U")
+p, β = maxent_mean(u, U)
+println("β = $β")
+println("p = $p")
+println("mean = ", dot(u, p))
+println("entropy (bits) = ", -sum(p .* (log.(p) ./ log(2))))
+
+```
+
+
+## Grafy rovnovážné pravděpodobnosti pro falešnou kostku
+
+Jak se mění rovnovážné pravděpodobnosti $p_i$, kde  $i\in (1,6)$, pokud házíme falešnou kostkou, t.j. kostkou, která nemá pozorovaný průměr počtu ok roven 3,5, ale nějaké hodnotě $U$,  kde $U \in (1,6)$
+
+
+```{julia}
+using Plots, LaTeXStrings, Plots.PlotMeasures
+
+N_steps = 101
+u = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+U = collect(range(1, stop=6, length=N_steps))
+
+results = Array{Real}(undef, 0, 6)
+
+for UU in U
+    p, β = maxent_mean(u, UU)
+    results = vcat(results, transpose(p))
+end
+
+function plot_ith(i)
+    p = plot(U, results[:, i], show=false,
+        xlim=(1, 6), xticks=1:6,
+        # title="N=$N",   
+        label=latexstring("p_{$i}"),
+        # title=L"Graf s x_{ $(i+1) }",
+        ylabel=latexstring("p_{$i}"),
+        # color=:red,
+    )
+    return p
+end
+
+plots = [plot_ith(i) for i in 1:length(u)]
+#  2x3 grid
+plot(plots...,
+    layout=(2, 3), size=(900, 600),
+    xlabel="U - střední počet ok",
+    linecolor=[:red :purple :orange :green :pink :blue],
+    left_margin=[5mm 5mm],
+)
+```
