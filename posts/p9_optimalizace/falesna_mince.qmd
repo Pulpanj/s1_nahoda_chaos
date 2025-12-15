@@ -1,10 +1,10 @@
 ---
 title: "Hádanka o 12 mincích a co je to tribit"
 date: "2025-12-01"
-updated: "2025-12-07"
-description: "Analytická řešení MAXENT s kostkami pomocí optimalizace"
-draft: true
-categories: ["Informační entropie", "Přednáška 9", "Hádanka"]
+updated: "2025-12-10"
+description: "Hádanka o hledání falešné mince vážením na dvouramenné váze"
+draft: false
+categories: ["Informační entropie", "Seminář 9", "Hádanka"]
 # image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p9_optimalizace/falesna_mince.pdf) "
 
@@ -24,52 +24,48 @@ format:
 
 ## Zadání
 
-Mějme 12 mincí, mezi kterými je jedna falešná - její váha je odlišná od pravých mincí.
+Mějme 12 mincí, mezi kterými je jedna falešná - její váha je odlišná od pravých mincí 
+(nevíme jestli je lehčí nebo těžší).
 Dvouramenná váha umožňuje zjistit pouze to, že hmotnosti nejsou shodne.
 Kolik vážení je třeba pro nalezení falešné mince ?
 
+## Úvaha o počtu potřebných vážení založena na teorii informace  
+
+Analogicky postupu z [Informační entropie](../p8_information_entropy/co_je_to_bit.qmd) se pokusíme se zjistit kolik "otázek" bude třeba na zjištění jedne z 12 mincí (výsledek pokusu).  
+Každé vážení ma jeden ze 3 možných výsledků (shodná váha, těžší nebo lehčí jedno rameno váhy). 
+Budeme proto pracovat nikoliv s bitem, ale s jednotkou informace mající 3 hodnoty tzv. tribitem, kterému odpovídá použití logaritmu o základu 3 v vzorcích pro informační entropii.
+
+Kolik tribitů obsahue výsledk pokusu (1 falesna mince z 12 )?
+
+$$
+Q=-\sum_{i=1}^{12}{p_i\cdot log_3(p_i)}
+$$
+
+kde $p_i$ je pravděpodobnost, že i-tá mince  falešná, t.j. $p_i=1/12$. Dosazením do rovnice pro informační entropii dostaneme
+$$
+Q=-\sum_{i=1}^{12}{ \frac{1}{12} \cdot log_3(\frac{1}{12})}=log_3(12)=2.261
+$$
+
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+#| label:  "Logaritmus o základu 3 v jazyce julia "
+
+print(log(3,12))
+```
+
+Pro identifikaci falešné mince je tedy potřeba minimálně 3 vážení.
+
+
 ## Řešení
-
-Rozdělím mince na čtveřice mincí (A1,A2,A3,A4),(B1,B2,B3,B4),(C1,C2,C3,C4).
-Vážím (A1,A2,A3,A4) proti (B1,B2,B3,B4) [1.vážení]. 
-
-- Pokud se (A1,A2,A3,A4) a (B1,B2,B3,B4) rovnají: pak falešná mince je mezi (C1,C2,C3,C4)
-    - pak vážím C1 proti C2 [2.vážení]
-        - Pokud se C1 a C2 rovnají pak falešná mince je mezi C3,C4
-            - pak vážím C3 proti A1 [3.vážení]
-                - Pokud se C3 a A1 rovnají pak falešná mince je C4
-                - Pokud se C3 a A1 nerovnají pak falešná mince je C3
-        - Pokud se C1 a C2 nerovnají pak falešná mince je mezi C1,C2
-            - pak vážím C1 proti A1 [3.vážení]
-                - Pokud se C1 a A1 rovnají pak falešná mince je C2
-                - Pokud se C1 a A1 nerovnají pak falešná mince je C1
-    
-- Pokud se (A1,A2,A3,A4) a (B1,B2,B3,B4)  nerovnaji: pak falešná mince není mezi (C1,C2,C3,C4) 
-    - pak vážím A1,A2 proti B1,B2 [2.vážení]
-        - Pokud se A1,A2 proti B1,B2 rovnají pak falešná mince je mezi (A2,A3,B3,B4) 
-            - pak vážím A4 proti C1 [3.vážení]
-                - Pokud se A4 a C1 rovnají pak falešná mince je B4
-                - Pokud se A4 a C1 nerovnají pak falešná mince je A1
-        - Pokud se A1,A2,B1,B2 a A3,B3,C1,C2 nerovnají pak falešná mince je mezi (A1,A2,A3,B2) 
-        
-mám dvojici A4,B4.Pokud se váha nepřeváží na druhou stranu, mám trojici
-A1,A2,B3, jinak B1,B2,A3. U první trojice vezmu A1 proti A2. Když se rovnají,
-je to B3, když se váha převáží, je to A2, jinak A1.U druhé trojice obdobně.
-
-### Variants of the problem
-
-- **Známe, že falešná je těžší (nebo lehčí):** jednodušší varianta.
-- **Neznáme, zda je falešná těžší nebo lehčí:** „těžší“ varianta, ale stále řešitelná na 3 vážení.
-
----
-
-### Neznáme, zda je těžší nebo lehčí (řešení na 3 vážení)
 
 Označme mince 1–12. Používáme rovnoramenné váhy.
 
-#### První vážení
-- **Na misku vlevo:** 1, 2, 3, 4  
-- **Na misku vpravo:** 5, 6, 7, 8
+- První vážení
+    - **Na misku vlevo:** 1, 2, 3, 4  
+    - **Na misku vpravo:** 5, 6, 7, 8
 
 Výsledky a další postup:
 
@@ -97,132 +93,6 @@ Výsledky a další postup:
       - **Třetí vážení:** 3 vs 9.  
         - **3 těžší:** falešná je 3 (těžší); **vyváží se:** falešná je 5 (lehčí).
 
-Tento postup vždy identifikuje falešnou minci i její lehkost/těžkost ve 3 váženích.
+Tento postup vždy identifikuje falešnou minci i zdali je lehčí/těžší ve 3 váženích.
 
-
-```{julia}
-# Kandidát: mince + hypotéza (lehčí/těžší)
-struct Candidate
-	coin::Int
-	heavier::Bool
-end
-
-# Vytvoř všechny kandidáty: 12 mincí × 2 hypotézy
-function all_candidates(N::Int = 12)
-	[Candidate(i, h) for i in 1:N for h in (true, false)]
-end
-
-# Simulace vážení: levá vs pravá
-function weigh(cands::Vector{Candidate}, left::Vector{Int}, right::Vector{Int})
-	# levá miska těžší
-	heavier_left = [c for c in cands if (c.coin in left && c.heavier) || (c.coin in right && !c.heavier)]
-	# pravá miska těžší
-	heavier_right = [c for c in cands if (c.coin in right && c.heavier) || (c.coin in left && !c.heavier)]
-	# vyváží (falešná není na vahách)
-	balanced = [c for c in cands if !(c.coin in left || c.coin in right)]
-	return heavier_left, heavier_right, balanced
-end
-
-# Generátor všech 4-prvkových kombinací z 1:N (bez balíčků)
-function four_combinations(N::Int)
-	combos = Vector{Vector{Int}}()
-	for a in 1:(N-3), b in (a+1):(N-2), c in (b+1):(N-1), d in (c+1):N
-		push!(combos, [a, b, c, d])
-	end
-	return combos
-end
-
-# Rekurzivní kontrola strategie (existuje rozvržení do maxdepth, které vyřeší všechny větve?)
-function check_strategy(cands::Vector{Candidate}, depth::Int, maxdepth::Int)
-	if length(cands) ≤ 1
-		return true
-	elseif depth == maxdepth
-		return false
-	end
-
-	# Pozor: po filtrování může být nejvyšší číslo mince menší než 12,
-	# ale vážení vždy navrhujeme z množiny 1:12 (standardní zadání).
-	N = 12
-	allcoins = collect(1:N)
-
-	for left in four_combinations(N)       # vyzkoušíme 4 vs 4
-		# pravá miska: libovolných 4 z těch, co nejsou vlevo
-		rest = setdiff(allcoins, left)
-		if length(rest) < 4
-			continue
-		end
-		right = rest[1:4]                  # stačí fixně vzít první 4
-
-		hl, hr, bal = weigh(cands, left, right)
-
-		# pokud pro toto rozložení existuje řešení pro všechny 3 výsledky, máme strategii
-		if check_strategy(hl, depth+1, maxdepth) &&
-		   check_strategy(hr, depth+1, maxdepth) &&
-		   check_strategy(bal, depth+1, maxdepth)
-			return true
-		end
-	end
-	return false
-end
-
-# Spuštění
-cands = all_candidates(12)
-println("Existuje strategie na 3 vážení? ", check_strategy(cands, 0, 3))
-
-
-```
-
-
-```{julia}
-## Kandidát: mince + hypotéza (lehčí/těžší)
-struct Candidate
-    coin::Int
-    heavier::Bool
-end
-
-# Vytvoř všechny kandidáty: 12 mincí × 2 hypotézy
-function all_candidates(N=12)
-    [Candidate(i, h) for i in 1:N for h in (true, false)]
-end
-
-# Simulace vážení: levá vs pravá
-function weigh(cands::Vector{Candidate}, left::Vector{Int}, right::Vector{Int})
-    # Pokud je falešná v levé a těžší, nebo v pravé a lehčí → levá těžší
-    heavier_left = [c for c in cands if (c.coin in left && c.heavier) || (c.coin in right && !c.heavier)]
-    # Pokud je falešná v pravé a těžší, nebo v levé a lehčí → pravá těžší
-    heavier_right = [c for c in cands if (c.coin in right && c.heavier) || (c.coin in left && !c.heavier)]
-    # Pokud falešná není mezi váženými → vyváží se
-    balanced = [c for c in cands if !(c.coin in left || c.coin in right)]
-    return heavier_left, heavier_right, balanced
-end
-
-# Pomocná funkce pro tisk kandidátů
-function show_candidates(label, cands)
-    println(label, ": ", [(c.coin, c.heavier ? "těžší" : "lehčí") for c in cands])
-end
-
-# --- Simulace konkrétní strategie ---
-cands = all_candidates(12)
-
-println("Start: ", length(cands), " kandidátů")
-
-# 1. vážení: 1–4 vs 5–8
-hl, hr, bal = weigh(cands, collect(1:4), collect(5:8))
-show_candidates("Pokud levá těžší", hl)
-show_candidates("Pokud pravá těžší", hr)
-show_candidates("Pokud vyváží", bal)
-
-# 2. vážení (větev 'vyváží' → falešná mezi 9–12)
-hl2, hr2, bal2 = weigh(bal, [9,10,11], [1,2,3])  # 1–3 jsou jistě dobré
-show_candidates("Pokud levá těžší (9–11 těžší)", hl2)
-show_candidates("Pokud pravá těžší (9–11 lehčí)", hr2)
-show_candidates("Pokud vyváží (falešná je 12)", bal2)
-
-# 3. vážení (větev '9–11 kandidáti')
-hl3, hr3, bal3 = weigh(hl2, [9], [10])
-show_candidates("Pokud 9 těžší", hl3)
-show_candidates("Pokud 10 těžší", hr3)
-show_candidates("Pokud vyváží (falešná je 11)", bal3)
-
-```
 

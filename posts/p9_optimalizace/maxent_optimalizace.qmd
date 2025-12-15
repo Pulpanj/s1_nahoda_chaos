@@ -389,6 +389,11 @@ Jak se mění rovnovážné  pravděpodobnosti $p_i^*$, kde  $i\in (1,6)$, pokud
 
 
 ```{julia}
+#| echo: true
+#| output: true
+#| code-fold: true
+#| fig-cap: "Závislost pravděpodobností $p_i$ na U"
+
 using Plots, LaTeXStrings, Plots.PlotMeasures
 
 N_steps = 101
@@ -405,11 +410,8 @@ end
 function plot_ith(i)
 	p = plot(U, results[:, i], show = false,
 		xlim = (1, 6), xticks = 1:6,
-		# title="N=$N",   
 		label = latexstring("p_{$i}^*"),
-		# title=L"Graf s x_{ $(i+1) }",
 		ylabel = latexstring("p_{$i}^*"),
-		# color=:red,
 	)
 	return p
 end
@@ -417,6 +419,58 @@ end
 plots = [plot_ith(i) for i in 1:length(u)]
 #  2x3 grid
 plot(plots...,
+	layout = (2, 3), size = (900, 600),
+	xlabel = "U - střední počet ok",
+	linecolor = [:red :purple :orange :green :brown :blue],
+	left_margin = [5mm 5mm],
+)
+```
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: true
+#| fig-cap: "Závislost pravděpodobností $p_i$ na U"
+pall=plot()
+for i in 1:length(u)
+	pall = plot!(U, results[:, i], show = false,
+		xlim = (1, 6), xticks = 1:6,
+		label = latexstring("p_{$i}^*"),
+		ylabel = latexstring("p_i^*"),
+		xlabel = "Pozorovaný průměr hodů U",
+		legend = :inside,
+	)
+end;
+pall
+```
+
+### Graf poměrů pravděpodobnosti $p_{i+1}/p_i$
+
+Protože hody mají lineárně se zvětšující se skore (počet ok) jsou podíly pravděpodobnosti 
+$p_{(i+1)}^*/p_{i}^*$ ( $i \in(1,5)$ )
+konstantní (viz. <https://en.wikipedia.org/wiki/Boltzmann_distribution>).
+
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: true
+#| fig-cap: "Závislost poměrů pravděpodobností $p_{(i+1)}^*/p_{i}^*$ na U"
+ratios = results[2:(end-1), 2:end] ./ results[2:(end-1), 1:(end-1)]
+
+
+function rplot_ith(i)
+	p = plot(U[2:(end-1)], ratios[:, i], show = false,
+		xlim = (1, 6), xticks = 1:6,
+		label = latexstring("p_{$(i+1)}^*/p_{$i}^*"),
+		ylabel = latexstring("p_{$(i+1)}^*/p_{$i}^*"),
+	)
+	return p
+end
+
+rplots = [rplot_ith(i) for i in 1:(length(u)-1)]
+#  2x3 grid
+plot(rplots...,
 	layout = (2, 3), size = (900, 600),
 	xlabel = "U - střední počet ok",
 	linecolor = [:red :purple :orange :green :brown :blue],

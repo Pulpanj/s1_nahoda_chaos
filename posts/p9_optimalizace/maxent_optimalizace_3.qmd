@@ -1,8 +1,8 @@
 ---
-title: "Řešení MAXENT principu pomocí optimalizace pro 3 stavy"
+title: "Řešení MAXENT principu pomocí optimalizace pro 3 stavy s energiemi 0,1,2"
 date: "2025-12-01"
-updated: "2025-12-08"
-description: "MAXENT jen s 3 kostkami pomocí optimalizace"
+updated: "2025-12-14"
+description: "MAXENT pomocí optimalizace pro 3 stavy  s energiemi 0,1,2"
 draft: false
 categories: ["Optimalizace","Informační entropie", "Přednáška 9", "MAXENT", "Odvození"]
 # image: "image.jpg"
@@ -20,16 +20,16 @@ format:
         engine: typst
 ---
 
-# Pokus o řešení MAXENT principu pro syst0m s 3 stavy
+# Řešení MAXENT principu pro systém s 3 stavy s energiemi 0,1,2
 
 Mějme systém který muže nabývat 3 mikrostavů a každý mikrostav je svázán s
-"energií" ${\epsilon}_i$, pro všechny stavy $i \in (1,3)$
+"energií" ${\epsilon}_i=i$, pro všechny stavy $i \in (0,2)$
 
 Pravděpodobnosti stavů $p_i$ kromě normalizační podmínky:
 
 $$
 \begin{equation}
-\sum_{i=1}^3{p_i}=1
+\sum_{i=0}^2{p_i}=1
 \end{equation}
 $${#eq-one}
 
@@ -37,61 +37,52 @@ musí splňovat i podmínku (vazbu) pro pozorovanou veličinu  (makrostav) $U$:
 
 $$
 \begin{equation}
-\sum_{i=1}^3{p_i  \cdot {\epsilon}_i}=U
+\sum_{i=1}^3{p_i  \cdot i}=U
 \end{equation}
 $${#eq-meanU}
 
 V rovnovážném stavu bude systém maximální entropii: 
 
 $$
-Q=-\sum_{i=1}^3{p_i\cdot log_2(p_i)}=max
+Q=-\sum_{i=0}^2{p_i\cdot log_2(p_i)}=max
 $$
 
 ## Vyloučení proměnných daných vazbami
 
-A rovnice [-@eq-one] lze vyjádřit $p_{2}$ jako:
+A rovnice [-@eq-one] lze vyjádřit $p_{1}$ jako:
 
 
 $$
 \begin{equation}
-p_2(p_1)=1-p_1-p_3(p_2)
+p_1(p_0)=1-p_0-p_2(p_0)
 \end{equation}
 $$
 
-A z rovnice [-@eq-meanU] lze vyjádřit $p_{N-1}$ jako: 
+A z rovnice [-@eq-meanU] lze vyjádřit $p_{2}$ jako: 
 
 
 $$
 \begin{align}
- p_{3}  \cdot {\epsilon}_3  =
-   U - p_1  \cdot {\epsilon}_1 -p_2(p_1)  \cdot {\epsilon}_2 
+2 \cdot p_{2}(p_0)  =
+    U - 0 \cdot p_0 - 1   \cdot p_1(p_0) 
 \end{align}
 $$
 
-$$
-\begin{align}
-p_{3}  \cdot {\epsilon}_3  =
-U - p_1  \cdot {\epsilon}_1 - 
-\left( { 1-p_1-p_3 } \right) \cdot {\epsilon}_2 
-\end{align}
-$$
+
 
 $$
-\begin{equation}
-p_{N}  \cdot ({\epsilon}_3- {\epsilon}_{2})
-= U- {\epsilon}_{2} -
-{p_i \cdot ({\epsilon}_1} + {\epsilon}_{2}) 
-\end{equation}
+2  \cdot p_{2}(p_0)=U-p_1(p_0)=U-1+p_0+p_2(p_0)
 $$
 
 
 $$
-\begin{equation}
-p_{3}(p_1)
-=\frac{\big( {p_1 \cdot ({\epsilon}_1} + {\epsilon}_{2})\big)
-}
-{({\epsilon}_3- {\epsilon}_{3})} 
-\end{equation}
+p_{2}(p_0)=U-1+p_0
+$$
+
+a dosazením $p_2(p_0)$  do $p_1(p_0)$ dostaneme:
+
+$$
+p_1(p_0)=1-p_0-p_2(p_0)=1-p_0-(U-1+p_0)=2-U-2  \cdot p_0
 $$
 
 
@@ -99,176 +90,325 @@ $$
 
 $$
 \begin{align}
-Q(p_1)=-{p_1\cdot log_2(p_1)} \\
-    - p_{2}(p_1)  \cdot log_2 \big(p_{2}(p_1) \big) \\
-    - p_{3}(p_1)  \cdot log_2 \big(p_{3}(p_1) \big)
+Q(p_0)=-{p_0\cdot log_2(p_0)} \\
+    - p_{1}(p_0)  \cdot log_2 \big(p_{1}(p_0) \big) \\
+    - p_{2}(p_0)  \cdot log_2 \big(p_{2}(p_0) \big)\\
+    =-{p_0\cdot log_2(p_0)} \\
+    - (2-U-2 \cdot p_0) \cdot log_2(2-U-2 \cdot p_0)\\
+    - (U-1 + p_0) \cdot log_2(U-1 + p_0)
 \end{align}
 $$
 
 
 
 
-## Parciální derivace
+## Derivace $Q(p_0)$
 
 $$
 \begin{align}
-\frac{\partial}{\partial p_1}\, Q(p_1)=
-\frac{\partial}{\partial p_1}\, \big(p_1 \cdot log_2(p_1) \big)\\
-    -\frac{\partial}{\partial p_1}\, \big( p_{2}(p_1) \cdot log_2(p_{2}(p_1))
-    \big) \\
-    -\frac{\partial}{\partial p_1}\, \big(p_3(p_1) \cdot log_2(p_3(p_1))\big)
+\frac{dQ(p_0)}{dp_0}=
+{Q'(p_0) = -\log_2(p_0) + 2\log_2(2-U-2p_0) - \log_2(U-1+p_0)}
 \end{align}
 $$
 
 
+A maximum $Q(p_0)$ nastane pro $p_0$, které je řešením rovnice: 
+
 $$
-\begin{align}
-\frac{\partial}{\partial p_1}\, p_3(p_1)=
-\frac{
-    ({\epsilon}_1 + {\epsilon}_{2})
-    } {
-        ({\epsilon}_3- {\epsilon}_{2})
-        }
-\end{align}
+\frac{dQ(p_0)}{dp_0}=
+-\log_2(p_0) + 2\log_2(2-U-2p_0) - \log_2(U-1+p_0) = 0.
 $$
 
 
+## Řešení rovnice pro $\frac{dQ(p_0)}{dp_0}=0$
+
++ Převedení členů
 $$
-\begin{align}
-\frac{\partial}{\partial p_j1}\, p_{2}(p_1)=
-    -1-\frac{\partial}{\partial p_1}\, p_3(p_1) \\
-= -1- \frac{
-    ({\epsilon}_1 + {\epsilon}_{2})
-    } {
-        ({\epsilon}_3- {\epsilon}_{2})
-        }
-\end{align}
+2\log_2(2-U-2p_0) = \log_2(p_0) + \log_2(U-1+p_0).
+$$
+
++ Součet logaritmů
+$$
+2\log_2(2-U-2p_0) = \log_2\big(p_0(U-1+p_0)\big).
 $$
 
 
-Dosazením do parciální derivace pro $Q(p_1,...,p_{n-2})$ dle $p_j$ dostaneme:
-
++ Exponent obou stran
 
 $$
-\begin{align}
-\frac{\partial}{\partial p_1}\, Q(p_1)=
-    -\left(\log_2 p_1 + \frac{1}{\ln 2}\right) \\
-        % dP2
-    - \left( 
-        1- \frac{
-            ({\epsilon}_1 + {\epsilon}_{2})
-            } 
-            {
-            ({\epsilon}_3 - {\epsilon}_{2})
-            }    
-    \right)
-    \cdot  
-    \left( 
-        log_2 \left(
-            % P_2
-            1- p_1 
-            - \left( 
-            %   \frac{\big( {p_1 \cdot ({\epsilon}_1} + {\epsilon}_{2})\big)}
-              \frac{ {p_1 \cdot ({\epsilon}_1} + {\epsilon}_{2})}
-            %  {({\epsilon}_3- {\epsilon}_{3})} 
-             {({\epsilon}_3- {\epsilon}_{2})} 
-            \right)
-            \right)
-            +\frac{1}{\ln 2}
-    \right) \\
-    % dP3
-    -  \frac{
-            ({\epsilon}_1 + {\epsilon}_{2})
-            } 
-            {
-            ({\epsilon}_3- {\epsilon}_{2})
-            }    
-    % \right)
-    \cdot  
-    \left( 
-        log_2 \left(
-        %    P3
-        \frac{\ {p_1 \cdot ({\epsilon}_1} + {\epsilon}_{2}))}
-             {({\epsilon}_3- {\epsilon}_{2})} 
-            \right)
-            +\frac{1}{\ln 2}
-    \right) 
-\end{align}
+(2-U-2p_0)^2 = p_0(U-1+p_0).
+$$
+
++ Rozvoj obou stran
+$$
+(2-U)^2 - 4(2-U)p_0 + 4p_0^2 = p_0(U-1) + p_0^2.
 $$
 
 
-### Solving the stationarity condition for p1
++ Kvadratická rovnice pro $p_0$
 
-You corrected the derivative to:
 $$
-\frac{\partial}{\partial p_1} Q(p_1)=
-    -\left(\log_2 p_1 + \frac{1}{\ln 2}\right)
-    - \left( 
-        1- \frac{{\epsilon}_1 + {\epsilon}_{2}}{{\epsilon}_3 - {\epsilon}_{2}}
-    \right)
-\left( 
-        \log_2 \left(
-            1- p_1 
-            - \frac{p_1 {\epsilon}_1 + {\epsilon}_{2}}{{\epsilon}_3- {\epsilon}_{2}} 
-            \right)
-            +\frac{1}{\ln 2}
-    \right)
-    -  \frac{{\epsilon}_1 + {\epsilon}_{2}}{{\epsilon}_3- {\epsilon}_{2}}
-\left( 
-        \log_2 \left(
-        \frac{p_1 {\epsilon}_1 + {\epsilon}_{2}} {{\epsilon}_3- {\epsilon}_{2}} 
-            \right)
-            +\frac{1}{\ln 2}
-    \right).
+3p_0^2 + (3U-7)p_0 + (2-U)^2 = 0.
 $$
 
-Define
-$$
-\begin{align}
-a \coloneqq \frac{\epsilon_1+\epsilon_2}{\epsilon_3-\epsilon_2}, \\
-P_2(p_1) \coloneqq 1 - p_1 - \frac{p_1\epsilon_1+\epsilon_2}{\epsilon_3-\epsilon_2}, \\
-P_3(p_1) \coloneqq \frac{p_1\epsilon_1+\epsilon_2}{\epsilon_3-\epsilon_2}.
-\end{align}
-$$
++ Řešení kvadaricke rovnice
 
-Setting \(\frac{\partial Q}{\partial p_1}=0\) and multiplying both sides by \(-1\) gives:
 $$
-\big(\log_2 p_1 + \tfrac{1}{\ln 2}\big)
-    + (1-a)\big(\log_2 P_2 + \tfrac{1}{\ln 2}\big)
-    + a\big(\log_2 P_3 + \tfrac{1}{\ln 2}\big)=0.
-$$
-
-Group the constant terms:
-$$
-\log_2 p_1 + (1-a)\log_2 P_2 + a\log_2 P_3 + \frac{2}{\ln 2}=0.
-$$
-
-Combine the logarithms:
-$$
-\log_2\!\big(p_1\, P_2^{\,1-a}\, P_3^{\,a}\big) = -\frac{2}{\ln 2}.
-$$
-
-Exponentiate base 2 (using \(2^{c}=e^{c\ln 2}\)):
-$$
-p_1\, P_2^{\,1-a}\, P_3^{\,a} \;=\; e^{-2}.
+p_0 = \frac{-(3U-7) \pm \sqrt{(U^2 +6U+1}}{6}.
 $$
 
 
-### Explicit form in terms of ε parameters
 
-Let $d = \epsilon_3-\epsilon_2$ (so $a=(\epsilon_1+\epsilon_2)/d$). Then
+```{julia}
+#| echo: true
+#| output: false  #asis
+#| code-fold: false
+include("../p8_information_entropy/entropy.jl")
+
+function quadratic_roots(a::Real, b::Real, c::Real)
+	"""
+	quadratic_roots(a, b, c)
+
+	Solve the quadratic equation a*x^2 + b*x + c = 0.
+	Returns a tuple (r1, r2) of real or complex roots.
+	"""
+	Δ = b^2 - 4a * c
+	sqrtΔ = sqrt(Complex(Δ))   # ensures complex results if Δ < 0
+	r1 = (-b + sqrtΔ) / (2a)
+	r2 = (-b - sqrtΔ) / (2a)
+	return (r1, r2)
+end
+
+function get_p3(U)
+	p0_p, p0_m = real.(quadratic_roots(3, (3U - 7), (2 - U)^2))
+	p1_p, p1_m = 2 − U − 2 * p0_p, 2 − U − 2 * p0_m
+	p2_p, p2_m = U − 1 + p0_p, U − 1 + p0_m
+
+	if (p0_p > 1) || (p0_p < 0) || (p1_p > 1) ||
+        (p1_p < 0) || (p2_p > 1) || (p2_p < 0)
+		p0 = p0_m
+		p1 = p1_m
+		p2 = p2_m
+	else
+		p0 = p0_p
+		p1 = p1_p
+		p2 = p2_p
+	end
+
+
+	Q = entropy([p0, p1, p2])
+	return [p0, p1, p2], Q
+end
+
+println(get_p3(0))
+println(get_p3(0.5))
+println(get_p3(1))
+println(get_p3(2))
+
+```
+
+## Grafy závislosti $p_i^*$ na U 
+
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: true
+#| fig-cap: "Závislost pravděpodobností $p_i$ na U"
+
+using Plots, LaTeXStrings, Plots.PlotMeasures
+
+N_steps = 101
+U = collect(range(0, stop = 2, length = N_steps))
+
+results = Array{Real}(undef, 0, 3)
+
+for UU in U
+	p, Q = get_p3(UU)
+	results = vcat(results, transpose(p))
+end
+
+pall = plot()
+for i in 0:2
+	pall = plot!(U, results[:, begin+i], show = false,
+		xlim = (0, 2), xticks = 0:0.2:2,
+		label = latexstring("p_{$i}^*"),
+		ylabel = latexstring("p_i^*"),
+		xlabel = "Střední energie U",
+		legend = :top,
+		size = (900, 600),
+	)
+end;
+pall
+```
+
+## Geometrická posloupnost $p_0,p_1,p_2$
+
+Protože $p_1 = 2-U-2p_0$ a and $p_2 = U-1+p_0$ lze z podmínky pro maximalizaci entropie 
+
 $$
-P_2 = 1 - p_1\Big(1 + \frac{\epsilon_1}{d}\Big) - \frac{\epsilon_2}{d}, 
-\qquad
-P_3 = \frac{p_1\epsilon_1+\epsilon_2}{d}.
+(2-U-2p_0)^2 = p_0(U-1+p_0).
 $$
 
-The stationarity condition becomes the implicit equation in \(p_1\):
+odvodit
+
 $$
-p_1 \left(1 - p_1\Big(1 + \frac{\epsilon_1}{d}\Big) - \frac{\epsilon_2}{d}\right)^{1-a}
-\left(\frac{p_1\epsilon_1+\epsilon_2}{d}\right)^{a}
-= e^{-2}.
+p_1^2 = p_0 \cdot p_2,
+$$ 
+
+což znamená, ze pravděpodobnosti $p_0,p_1,p_2$ tvoří geometrickou posloupnost 
+
+$$
+\frac{p_1}{p_0} = \frac{p_2}{p_1}=r
 $$
 
-This generally does not admit a closed-form solution for \(p_1\) and is solved numerically.
+
+## Entropie jako funkce střední energie
+
+Pro 3 stavy s  energiemi $(0,1,2)$, jsou pravděpodobnosti rovny:
+
+$$
+p_i=\frac{r^i}{Z},\quad Z=1+r+r^2,\quad r>0,
+$$
+
+with the mean constraint
+
+$$
+U=\sum_{i=0}^2 i\,p_i=\frac{r+2r^2}{1+r+r^2}.
+$$
+
+The entropy in base 2 is
+
+$$
+Q(U) = -\sum_{i=0}^2 p_i \log_2 p_i= -U \cdot log_2(r) + log_2(1+r+r^2).
+$$
+
+
+## Entropie jako funkce $r(U)$
+
+$$
+Q(U) = -U  \cdot log_2 r(U) + log_2\!\big(1+r(U)+r(U)^2\big),
+$$
+
+
+kde $r(U)$ je Gibbsův poměr daný řešením vazby:
+
+$$
+U = \frac{r+2r^2}{1+r+r^2}.
+$$
+
+
+### Odvození 
+
++ použití naturálního logaritmu  (misto $log_2()$ ):
+
+$$
+Q(U) = \frac{-U \ln r + \ln(1+r+r^2)}{\ln 2}.
+$$
+
++ dostaneme:
+
+$$
+\frac{dQ}{dU} = \frac{1}{\ln 2}\left[-\ln r - U \frac{1}{r}\frac{dr}{dU} 
+    + \frac{1+2r}{1+r+r^2}\frac{dr}{dU}\right].
+$$
+
++ eliminujeme $\tfrac{dr}{dU}$ z vazby pro střední energii>
+
+$$
+U(1+r+r^2) = r+2r^2,
+$$
+
++ derivací dle U:
+
+$$
+(1+r+r^2) + U(1+2r)\frac{dr}{dU} = (1+4r)\frac{dr}{dU}.
+$$
+
++ dostaneme:
+
+$$
+\frac{dr}{dU} = \frac{1+r+r^2}{(1+4r) - U(1+2r)}.
+$$
+
++ a dosazením do $\frac{dQ}{dU}$:
+
+$$
+\frac{dQ}{dU} = \frac{1}{\ln 2}\left[-\ln r + 
+\frac{dr}{dU}\left(\frac{1+2r}{1+r+r^2} - \frac{U}{r}\right)\right].
+$$
+
++ a použitím:
+
+$$
+\frac{dr}{dU} = \frac{1+r+r^2}{(1+4r) - U(1+2r)}.
+$$
+
+dostaneme derivaci entropie dle střední energie: 
+
+
+$$
+{\frac{dQ}{dU} = \frac{1}{\ln 2}\left[-\ln r 
+    + \frac{(1+2r) - \tfrac{U}{r}(1+r+r^2)}{(1+4r) - U(1+2r)}\right]}
+$$
+
+
+Kde $r=r(U)$ je kladné řešení rovnice:
+
+$$
+U = \frac{r+2r^2}{1+r+r^2}.
+$$
+
+
+### Grafy entropie a derivace entropie jako funkce střední energie
+```{julia}
+using Plots
+
+# Gibbs ratio r(U) from quadratic relation
+function r_of_U(U)
+	disc = -3U^2 + 6U + 1
+	if disc < 0
+		return NaN
+	end
+	# choose the positive branch
+	r1 = (-(U - 1) + sqrt(disc)) / (2 * (U - 2))
+	r2 = (-(U - 1) - sqrt(disc)) / (2 * (U - 2))
+	return r1 > 0 ? r1 : r2
+end
+
+# Entropy Q(U)
+function Q(U)
+	r = r_of_U(U)
+	isnan(r) && return NaN
+	return (-U * log(r) + log(1 + r + r^2)) / log(2)
+end
+
+# Derivative dQ/dU
+function dQdU(U)
+	r = r_of_U(U)
+	isnan(r) && return NaN
+	drdU = (1 + r + r^2) / ((1 + 4r) - U * (1 + 2r))
+	return (
+		(-log(r) + drdU * ((1 + 2r) / (1 + r + r^2) - U / r)) / log(2)
+	)
+end
+
+Uvals = range(0.01, 1.99, length = 200)  # avoid singular endpoints
+Qvals = [Q(U) for U in Uvals]
+dQvals = [dQdU(U) for U in Uvals]
+
+plot(
+	Uvals, Qvals, label = "Q(U)",
+	lw = 2, xlabel = "U", ylabel = "Entropy Q(U)",
+	color = :blue, legend = :topright, size = (900, 600),
+	left_margin = [5mm 5mm],
+	right_margin = [5mm 5mm]
+)
+plot!(
+	twinx(), Uvals, dQvals, label = "dQ/dU", size = (900, 600),
+	lw = 2, ylabel = "dQ/dU", color = :red, legend = :bottomright,
+)
+
+```
+
 

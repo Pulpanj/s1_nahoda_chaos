@@ -1,0 +1,234 @@
+---
+title: "Minimální vzdálenost v trojúhelníku"
+date: "2025-12-08"
+updated: "2025-12-10"
+description: "Jak najít nejkratší spojnice daného bodu k 3 vrcholů rovnoramenného trojúhelníka"
+draft: false
+categories: ["Optimalizace", "Seminář 10" , "Fermatův střed"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p9_optimalizace/torricelli_fermat_stred.pdf)"
+
+# html-math-method: katex
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "torricelli_fermat_stred"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Jak najít nejkratší spojnice daného bodu k 3 vrcholů rovnostranného trojúhelníka
+
+##  Zadání 
+
+Mějme rovnostranný trojúhelník a daný bod P. Úkolem je najít spojnice od bodu P
+k vrcholům trojúhelníka. 
+
+## Princip řešení
+
+Podle Plateau-ova principu
+<https://en.wikipedia.org/wiki/Plateau%27s_laws> musi spojnice s minimální
+délkou svírat úhly 120 stupňů. Spojnice tedy musí musí zahrnovat spojnici
+zadaného bodu P s nejbližším bodem trojúhelníka (v našem obrázku je to vrchol A) a
+pak nejkratší možné spojnice v (zeleném) trojúhelníku tvořeného  bodem P a zbylými vrcholy trojúhelníka (B a C).
+
+Pro nalezení nejkratší možné spojnice v trojúhelníku je třeba najít tzv.
+Fermat–Torricelli-ho bod (viz. <https://en.wikipedia.org/wiki/Fermat_point>)
+označený J v našem obrázku
+
+
+```{julia}
+#| echo: false
+#| output: true
+#| fig-cap:  "Náčrt zadání ulohy"
+
+using Plots, Plots.PlotMeasures
+include("torricelli_point.jl")
+include("sort_points_by_distance.jl")
+L = 10.0 # Define side length
+# Coordinates of equilateral triangle vertices
+A = (0.0, 0.0)                # First vertex at origin
+B = (L, 0.0)                  # Second vertex on x-axis
+C = (L / 2, sqrt(3) / 2 * L)  # Third vertex (equilateral property)
+A, B, C = GPoint(0.0, 0.0),
+GPoint(L, 0.0),
+GPoint(L / 2, sqrt(3) / 2 * L)
+
+plot([A[1], B[1], C[1]], [A[2], B[2], C[2]],
+    seriestype=:shape, lw=2, linecolor=:blue, fillalpha=0.3, 
+    fillcolor=:lightyellow, legend=true, aspect_ratio=:equal,
+    label="", size=(900, 500),
+)
+
+P = GPoint(2.5, 1.0)
+D1, D2, D3 = sort_points_by_distance([A, B, C], P)
+J = GPoint(torricelli_point(P, D2, D3))
+plot!([D2[1], J[1]], [D2[2], J[2]], lw=1,
+    linecolor=:red, fillalpha=0.2, label=nothing
+)
+plot!([D3[1], J[1]], [D3[2], J[2]], lw=1,
+    linecolor=:red, fillalpha=0.2, label=nothing
+)
+plot!([D1[1], P[1]], [D1[2], P[2]], lw=1,
+    linecolor=:red, fillalpha=0.2, label=nothing
+)
+plot!([J[1], P[1]], [J[2], P[2]], lw=1,
+    linecolor=:red, fillalpha=0.2, label=nothing
+)
+plot!([P[1], B[1], C[1], P[1]], [P[2], B[2], C[2], P[2]],
+    seriestype=:shape, lw=0.5,
+    linecolor=:green, fillalpha=0.05, fillcolor=:green,
+    label="trojúhelník s Fermatovým bodem"
+)
+
+scatter!([P[1]], [P[2]], color=:blue, label="P - zadaný bod")
+scatter!([J[1],], [J[2]], color=:red, label="J - bod zajištující min. délku")
+scatter!([A[1]], [A[2]], color=:green, label="")
+scatter!([B[1]], [B[2]], color=:green, label="")
+scatter!([C[1]], [C[2]], color=:green, label="")
+
+annotate!([P[1] - 0.1], [P[2] + 0.5], Plots.text("P", :blue),)
+annotate!([J[1] - 0.2], [J[2] + 0.4], Plots.text("J", :red),)
+annotate!([A[1] - 0.1], [A[2] + 0.4], Plots.text("A", :green),)
+annotate!([B[1] + 0.1], [B[2] + 0.4], Plots.text("B", :green),)
+annotate!([C[1] + 0.4], [C[2] - 0.1], Plots.text("C", :green),)
+
+```
+
+## Torricelli-Fermatův bod trojúhelníka
+
+Postup (a důkaz) nalezení Torricelli-Fermatůva bodu trojúhelníka lze nalézt na
+<https://en.wikipedia.org/wiki/Fermat_point>. Jeho konstrukce je naznačena na následujícím obrazku:
+
+![Fermat Point](/images/Fermat_Point.svg.png)
+
+Následující funkce `torricelli_point.jl` řeší nalezení Torricelli-Fermatůva bodu.
+Implementace zahrnuje hledání minima funkce pomoci 
+optimalizační procedury z package Optim.
+
+```{.julia include="torricelli_point.jl" }
+```
+
+Příklad použití `torricelli_point.jl`:
+
+```{julia}
+#| echo: true
+#| output: true
+P, B, C = GPoint(3.5, 1.0), GPoint(10.0, 0.0), GPoint(10.0, 1.0)
+println(P, A, B)
+fp = torricelli_point(P, B, C)
+println("Torricelli-Fermatův bod trojúhelníka: ", fp)
+
+```
+
+Pro nalezení nejbližšího bodu trojúhelníka od bodu P je použita následující funkce 
+`sort_points_by_distance.l`:
+
+```{.julia include="sort_points_by_distance.jl" }
+```
+
+Příklad použití `sort_points_by_distance.jl`:
+
+```{julia}
+#| echo: true
+#| output: true
+xA = GPoint(0.0, 0.0)
+xB = GPoint(10.0, 0.0)
+xC = GPoint(5.0, 8.0)
+ref = GPoint(2.0, 2.0)
+sort_points_by_distance([xA, xB, xC], ref)
+```
+
+## Ukázka řešení pro jeden bod
+
+Definice rovnostranného trojúhelníka:
+
+```{julia}
+#| echo: true
+#| output: true 
+#| code-fold: false
+
+# Define side length
+L = 10.0
+# Coordinates of equilateral triangle vertices
+A = (0.0, 0.0)                 # First vertex at origin
+B = (L, 0.0)                   # Second vertex on x-axis
+C = (L / 2, sqrt(3) / 2 * L)       # Third vertex (equilateral property)
+A, B, C = GPoint(0.0, 0.0), GPoint(L, 0.0), GPoint(L / 2, sqrt(3) / 2 * L)
+# reference point for which we have to find minimal length
+P = GPoint(2.5, 1.0)
+```
+
+Zobrazení řešení pro jeden bod:
+
+```{julia}
+#| echo: true
+#| output: true 
+#| code-fold: true
+
+plot([A[1], B[1], C[1]], [A[2], B[2], C[2]], seriestype=:shape, lw=2,
+    linecolor=:blue, fillalpha=0.2, fillcolor=:lightyellow,
+    legend=false, aspect_ratio=:equal,
+    grid=true, minorgrid=true, show=true,
+    minorgridlinewidth=0.3,
+    size=(900, 500),
+)
+
+D1, D2, D3 = sort_points_by_distance([A, B, C], P)
+J = GPoint(torricelli_point(P, D2, D3))
+println(J)
+plot!([D2[1], J[1]], [D2[2], J[2]], lw=1, linecolor=:red, fillalpha=0.2)
+plot!([D3[1], J[1]], [D3[2], J[2]], lw=1, linecolor=:red, fillalpha=0.2)
+plot!([D1[1], P[1]], [D1[2], P[2]], lw=1, linecolor=:red, fillalpha=0.2)
+plot!([J[1], P[1]], [J[2], P[2]], lw=1, linecolor=:red, fillalpha=0.2)
+scatter!([P[1]], [P[2]], color=:blue, label="")
+scatter!([J[1],], [J[2]], color=:red, label="")
+scatter!([A[1], B[1], C[1]], [A[2], B[2], C[2]], color=:green, label="")
+
+```
+
+## Ukázka jak se mění řešení pro různé referenční body
+
+Graf ukazující kam se stěhuje bod J pokud je referenční bod na kružnici:
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: true
+
+plot([A[1], B[1], C[1]], [A[2], B[2], C[2]], seriestype=:shape,
+    lw=2, linecolor=:blue, fillalpha=0.2, fillcolor=:lightyellow,
+    legend=true, aspect_ratio=:equal, label="triangle",
+    grid=true, minorgrid=true, show=true,
+    minorgridlinewidth=0.3,
+    size=(900, 500),
+)
+
+T = GPoint(L / 4, sqrt(3) / 8 * L)
+scatter!([T[1]], [T[2]], label="T - střed pro body P", show=true,
+    marker=:cross, markersize=10, color=:green
+)
+
+r = 6
+step = 15
+for phi in step:step:360
+    P = GPoint(T[1] + sind(phi) * r, T[2] + cosd(phi) * r)
+    D1, D2, D3 = sort_points_by_distance([A, B, C], P)
+    J = GPoint(torricelli_point(P, D2, D3))
+    plot!([J[1], P[1]], [J[2], P[2]], lw=0.5, fillalpha=0.2,
+        arrow=Plots.Arrow(:closed, :tail, 0.1, 00.1),
+        linecolor=:lightgrey,
+        label=false
+    )
+    scatter!([J[1]], [J[2]], color=:red, markersize=3, label=false)
+    scatter!([P[1]], [P[2]], color=:blue, markersize=2, label=false)
+end
+
+scatter!([J[1]], [J[2]], color=:red, markersize=3, label="J")
+scatter!([P[1]], [P[2]], color=:blue, markersize=2, label="P")
+scatter!([A[1], B[1], C[1]], [A[2], B[2], C[2]], color=:green, label="")
+
+```
+
