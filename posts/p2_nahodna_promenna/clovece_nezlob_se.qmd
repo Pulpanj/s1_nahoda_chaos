@@ -1,6 +1,6 @@
 ---
 title: "Člověče nezlob se"
-date: "2025-11-10"
+date: "2025-10-13"
 updated: "2025-11-23"
 description: "Analýza pořadí házení kostkou: kdy, poprvé padne 6-ka ?"
 draft: false

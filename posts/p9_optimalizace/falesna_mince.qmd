@@ -35,7 +35,7 @@ Analogicky postupu z [Informační entropie](../p8_information_entropy/co_je_to_
 Každé vážení ma jeden ze 3 možných výsledků (shodná váha, těžší nebo lehčí jedno rameno váhy). 
 Budeme proto pracovat nikoliv s bitem, ale s jednotkou informace mající 3 hodnoty tzv. tribitem, kterému odpovídá použití logaritmu o základu 3 v vzorcích pro informační entropii.
 
-Kolik tribitů obsahue výsledk pokusu (1 falesna mince z 12 )?
+Kolik tribitů obsahuje výsledek pokusu (1 falesna mince z 12 )?
 
 $$
 Q=-\sum_{i=1}^{12}{p_i\cdot log_3(p_i)}
@@ -53,7 +53,7 @@ $$
 #| code-fold: false
 #| label:  "Logaritmus o základu 3 v jazyce julia "
 
-print(log(3,12))
+print(log(3, 12))
 ```
 
 Pro identifikaci falešné mince je tedy potřeba minimálně 3 vážení.
@@ -95,4 +95,11 @@ Výsledky a další postup:
 
 Tento postup vždy identifikuje falešnou minci i zdali je lehčí/těžší ve 3 váženích.
 
+
+
+::: {.callout-tip title="Otázka na závěr ?" icon=false color=green}
+
+Lze napsat program, který najde  sekvenci vážení i v případě obecného zadání K falešných mincí mezi N mincemi ?
+
+:::
 

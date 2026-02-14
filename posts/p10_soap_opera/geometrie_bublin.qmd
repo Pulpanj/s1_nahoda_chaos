@@ -1,0 +1,42 @@
+---
+title: "Tvary mýdlových bublin"
+date: "2025-12-08"
+updated: "2026-01-25"
+description: "Jaké tvary mají mýdlové bubliny když se vzájemně dotýkají?"
+draft: false
+categories: ["Přednáška 10", "Bubliny"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p10_soap_opera/geometrie_bublin.pdf)"
+
+# html-math-method: katex
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "geometrie_bublin"
+        output-ext: "pdf"
+        engine: typst
+
+---
+
+format:
+    typst:
+        output-file: "geometrie_bublin"
+        output-ext: "pdf"
+        engine: typst
+
+# Jaké tvary mají mýdlové bubliny když se vzájemně dotýkají a jak to souvisí s geometrií a fyzikou?
+
+### Co říkají Plateauovy zákony
+
+Pro **rovnovážné** mýdlové filmy / bubliny platí:
+
+- **Tři plochy** (filmy) se setkávají podél jedné křivky (Plateauův okraj) **vždy po třech** a **vždy pod úhlem 120°** mezi každými dvěma.   
+- **Čtyři takové hrany** se pak setkávají v jednom bodě pod tzv. **tetraedrickým úhlem** \(\arccos(-1/3) \approx 109{,}47^\circ\).   
+- Každá jednotlivá plocha má **konstantní střední křivost** (rovnováha mezi tlakem a povrchovým napětím).   
+
+Jinými slovy: konfigurace, kde se plochy potkávají jinak než v 120°/109.47°, je **nestabilní** a film se přeuspořádá.
+
+

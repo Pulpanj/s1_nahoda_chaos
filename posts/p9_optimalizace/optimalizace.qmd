@@ -266,7 +266,7 @@ latex_eq = latexify(simplyfied_dR)
 println(latex_eq)
 ```
 
-t.j. můžeme zobrazovat rovnici jako Quarto jako markdown:
+t.j. můžeme zobrazovat rovnici jako Quarto markdown:
 ```{julia}
 #| echo: fenced
 #| output: asis
@@ -279,9 +279,9 @@ println("\n\$\$\n" * latex_eq * "\$\$\n")
 # Úloha o ušetřené barvě - optimalizace s více proměnnými
 
 Mějme za úkol natřít obdélníkový bazén pomocí sudu barvy, který umožňuje
-vymalovat $S$ čtverečních metrů stěn bazénu. Zadáním optimalizace je nalézt
-rozměry bazénu $x,y,h$ (délka,šířka,hloubka) tak aby objem bazénu byl co
-největší při použití barvy jen ze sudu pro plochu $S$.
+vymalovat $S$ čtverečních metrů stěn bazénu. Zadání (optimalizace) zní: nalézt
+rozměry bazénu $x,y,h$ (délka,šířka,hloubka), tak aby objem bazénu byl co
+největší při použití barvy jen ze sudu obsahujícím barvu jen pro plochu $S$.
 
 Chceme tedy nalézt maximum funkce
 $$

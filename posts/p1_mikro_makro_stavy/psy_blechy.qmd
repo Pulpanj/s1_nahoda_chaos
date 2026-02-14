@@ -113,7 +113,7 @@ O=2^n
 $$
 
 Což odpovídá možnému vývoji v každém z $n$ kroků (buď se počet blech na pravém
-psu zvýší nebo sníží). Multiplicita markostavu $R_n=m$ je rovna počtu kombinací
+psu zvýší nebo sníží). Multiplicita $M$ makrostavu $R_n$  je rovna počtu kombinací
 kdy v $k$ krocích z $n$ kroku blecha skočí na pravého psa.
 
 

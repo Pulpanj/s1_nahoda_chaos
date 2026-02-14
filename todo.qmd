@@ -15,30 +15,39 @@ draft: false
 -   linky do literatury doplnit do postu
 -   pridat policka newly added a pole pro logicke razeni do seznamu postu
 -   cross reference option (popisky schemat a cislovani)
--   zlepsit cislovani rovni
+-   zlepsit cislovani rovnic
 -   pridat seznamy obrazku kodu a tabulek
 -   post fixni body
     -   pavouci diagram doplnit sipky
     -   ~~doplnit definici stabilniho bodu~~
     -   priklad pohyb fce 3. rady s 3 fixnimi body
+    - rozchodit julia package pro 3D grafiku (Makie, GLMakie)  - verze 0.8.1 nefunguje s julia 1.9, ale 0.9.0 ano, ale ta je zatim v beta verzi
 
 ## Náměty ze seancí
 
 -   Optimalizace
-    -   ~~muz s pletivem~~ (viz bazen)
-    -   max. objem pri minimalnim povrchu (viz bazen, ale jak popsat kouli ?)
+    -   ~~muz s pletivem (viz bazen)~~
+    -   ~~max. objem pri minimalnim povrchu (viz bazen) ~~ale jak popsat kouli ?
     -   ~~delka docurani~~ dostrel dela
-    -   spojnice 4 mest
-    -   zachrana tonouciho (+optika)
+    -   ~~spojnice 4 mest~~
+    -   ~~zachrana tonouciho (+optika)~~
     -   priklad Lagrangeovy multiplikatory
-    -   Menealova uloha (bubliny)
+    -   Menelaus's theorem  (trojuhelnik)
+- krivky
+    - retezovka
+    - Brachistochrona 
+    - evolventy
+-   Minimalni plochy
+    - 2 bubliny
+    - rotujici retezovka
+    - bublina v krychli
 -   Kombinatorika
-    -   soucet hodu k kostek
+    -   ~~soucet hodu k kostek~~
     -   ~~doba cekani na prvni sestku~~
     -   pravdepodobnost alespon jedne 6-ky pri hodu k kostkami (Demetre)
-    -   uloha se satnarkou akloubouky
+    -   uloha se satnarkou a klobouky
 -   Bayes rule
-    -   TV sourtez s 3 dvermi
+    -   TV soutez s 3 dvermi
 -   Statistika
     -   Bernouliho process
     -   Poisonovo rozdeleni priklad s vanocnim testem (limita bernouliho)
@@ -55,29 +64,36 @@ draft: false
     -   Nelinearni dynamika s diskretnim casem
         -   konvergence, cykly, chaos
         -   ~~fixni body~~
-        -   bifuracni diagram
+        -   bifuračni diagram
     -   Dynamika se spojitym casem
         -   Verhusuv model
-        -   Riccatiho differencialni rovnice)
+        -   Riccatiho diferencialni rovnice)
         -   stabilita stabilnich bodu
         -   pohybova rovnice kmitani
         -   vynucene kmity
     krivky
         retezovka <https://en.wikipedia.org/wiki/Catenary>
         brachystoida  <https://cs.wikipedia.org/wiki/Brachistochrona>
+
 -   Informacni entropie
     -   ~~odvozeni bitu pro shodne pravdepodobnosti~~
     -   odvozeni bitu pro neshodne pravdepodobnosti
     -   ~~problem o klokanech~~
-    -   uloha o vazeni 12 minci 1 falesna (ma ruznou vahu) kolik vazeni na dvojrammene vaze ji najde ?
-    -   3-stenna kostka a heatmap entropie/energie
-    -   4-stenna kostka a zadane momenty
+    -   ~~uloha o vazeni 12 minci 1 falesna (ma ruznou vahu) kolik vazeni na dvojrammene vaze ji najde ?~~
+    -   ~~3-stenna kostka a heatmap entropie/energie~~
+    -   reseni pro obecně n energii  ei=i.e1 i=2..n
+    -   reseni pro nekonečně  energii
+    - entropie pro idealni plyn (spojitá energie)
+
 -   Matematika
     -   dukaz nekonecneho poctu prvocisel
     -   pingeon princip 
 
-## JP nápady
-
+- Bubliny
+    -   minimalni plochy klasicke
+    -   od minimalnich ploch ke křivosti a diferenciálním rovnicim
+    
 - machacek
 - markov retezec prepaid karet
 - informacni entropie pro prirazovani fraud pripadu spravedlive
+- pruseciky tecen 3 kruznic (leží na přímce)

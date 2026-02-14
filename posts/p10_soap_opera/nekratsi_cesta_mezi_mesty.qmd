@@ -1,0 +1,396 @@
+---
+title: "Nejkratší cesta mezi městy"
+date: "2025-12-08"
+updated: "2026-01-08"
+description: "Jak projektovat nejkratší silnici spojující 4 body v poušti"
+draft: false
+categories: ["Optimalizace", "Přednáška 10" , "Bubliny"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p10_soap_opera/nekratsi_cesta_mezi_mesty.pdf)"
+
+# html-math-method: katex
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "nekratsi_cesta_mezi_mesty"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Jak projektovat nejkratší silnici spojující 4 body v poušti
+
+##  Zadání 
+
+Mějme 4 města v poušti a naším úkolem je navrhnout nejkratší silnici, která je všechny propojí.
+
+## Princip řešení
+
+Řešení je  speciální [Steinerův strom](https://en.wikipedia.org/wiki/Steiner_tree_problem) pro 4 body, kde předpokládáme právě dva „vnitřní“ body A a B.
+
+Máme body $Z_i = (x_i,y_i), i=1,\dots,4$ a hledáme body  
+$A=(x_A,y_A)$, $B=(x_B,y_B)$ tak, aby byla minimální celková délka
+
+$$
+L = |Z_1A| + |Z_2A| + |Z_3B| + |Z_4B| + |AB|.
+$$
+
+To je přesně délka stromu, kde A je spojeno se $Z_1,Z_2,B$ a B se $Z_3,Z_4,A$.
+
+### Numerická procedura pro nalezení  vnitřních bodů
+
+V optimu (pokud žádný z úhlů nepřekročí $120^\circ$) platí klasická Steinerova podmínka: v každém vnitřním bodě (A i B) se tři spojnice setkávají pod úhly $120^\circ$.  
+
+- V bodě A tedy tři úsečky $Z_1A, Z_2A, AB$ svírají mezi sebou úhly $120^\circ$.  
+- V bodě B obdobně $Z_3B, Z_4B, BA$.
+
+To vede na nelineární soustavu rovnic pro souřadnice $A,B$: vektorově lze podmínku „tři hrany pod 120°“ zapsat jako
+
+$$
+\frac{Z_1 - A}{|Z_1 - A|} + \frac{Z_2 - A}{|Z_2 - A|} + \frac{B - A}{|B - A|} = 0,
+$$
+$$
+\frac{Z_3 - B}{|Z_3 - B|} + \frac{Z_4 - B}{|Z_4 - B|} + \frac{A - B}{|A - B|} = 0.
+$$
+
+To jsou čtyři rovnice (dvě souřadnicové v každé) pro čtyři neznámé $x_A,y_A,x_B,y_B$. 
+
+
+Začněme numerickou metodou ktera najde vnitřní body:
+
+```{julia}
+#| echo: true
+#| output: false  #asis
+#| code-fold: false
+
+using Statistics
+using LinearAlgebra
+using Optim
+
+# Pomocná funkce pro eukleidovskou vzdálenost
+dist(p, q) = norm(p .- q)
+
+function L(x, Z)
+    A = x[1:2]
+    B = x[3:4]
+    Z1, Z2, Z3, Z4 = eachrow(Z)
+    return dist(Z1, A) + dist(Z2, A) + dist(Z3, B) + dist(Z4, B) + dist(A, B)
+    # return L_value(A, B, Z)   # whatever your formula is
+end
+
+function find_minL(Z)
+    # Počáteční odhad – třeba střed obdélníku a něco poblíž
+    x0 = [mean(Z[:, 1]), mean(Z[:, 2]), mean(Z[:, 1]) + 0.5, mean(Z[:, 2]) + 0.5]
+
+    # res = optimize(L, x0, BFGS())
+    res = optimize(x -> L(x, Z), x0, BFGS())
+    xopt = Optim.minimizer(res)
+
+    Aopt = xopt[1:2]
+    Bopt = xopt[3:4]
+    return Aopt, Bopt
+end
+
+
+```
+
+## Grafické znázornění 
+Následující funkce zobrazí zadané body a nalezené vnitřní body A,B:
+```{julia}
+#| echo: true
+#| output: false  #asis
+#| code-fold: true
+
+using Plots, Plots.PlotMeasures
+
+# Úhel mezi dvěma vektory v radiánech
+function angle(u, v)
+    cu = dot(u, v) / (norm(u) * norm(v))
+    cu = clamp(cu, -1, 1)   # numerická stabilita
+    return acos(cu)
+end
+
+function angles_at_A_B(A, B, Z1, Z2, Z3, Z4)
+    # Vektory v A
+    v1A = Z1 .- A
+    v2A = Z2 .- A
+    vBA = B .- A
+
+    α1 = angle(v1A, v2A)
+    α2 = angle(v1A, vBA)
+    α3 = angle(v2A, vBA)
+
+    # Vektory v B
+    v3B = Z3 .- B
+    v4B = Z4 .- B
+    vAB = A .- B
+
+    β1 = angle(v3B, v4B)
+    β2 = angle(v3B, vAB)
+    β3 = angle(v4B, vAB)
+
+    return α1, α2, α3, β1, β2, β3
+end
+
+
+function one_visualization(Z, show_angles=false)
+
+    function draw_angle!(plt, P, u, v; r=0.3, label="")
+        # normalizace
+        u = u / norm(u)
+        v = v / norm(v)
+
+        # úhly
+        θ1 = atan(u[2], u[1])
+        θ2 = atan(v[2], v[1])
+
+        # zajistíme správné pořadí
+        if θ2 < θ1
+            θ1, θ2 = θ2, θ1
+        end
+
+        ts = range(θ1, θ2, length=50)
+        xs = P[1] .+ r .* cos.(ts)
+        ys = P[2] .+ r .* sin.(ts)
+
+        plot!(plt, xs, ys, color=:orange, label="")
+
+        # popisek
+        xm = P[1] + r * 0.7 * cos((θ1 + θ2) / 2)
+        ym = P[2] + r * 0.7 * sin((θ1 + θ2) / 2)
+        annotate!(plt, xm, ym, text(label, 8, :black))
+    end
+
+
+    Z1, Z2, Z3, Z4 = eachrow(Z)
+    A, B = find_minL(Z)
+    # úhly
+    α1, α2, α3, β1, β2, β3 = angles_at_A_B(A, B, Z1, Z2, Z3, Z4)
+
+
+    plt = scatter(
+        [Z1[1], Z2[1], Z3[1], Z4[1]],
+        [Z1[2], Z2[2], Z3[2], Z4[2]],
+        label=["Zi" "Z2" "Z3" "Z4"],
+        aspect_ratio=1,
+        markersize=5,
+        size=(1190, 800),
+    )
+    xlims!(plt, -0.5, 1.5)
+    ylims!(plt, -0.5, 1.5)
+
+    scatter!(plt, [A[1]], [A[2]], label="A", markershape=:star5, markersize=5)
+    scatter!(plt, [B[1]], [B[2]], label="B", markershape=:star5, markersize=5)
+
+    # hrany
+    plot!(plt, [Z1[1], A[1]], [Z1[2], A[2]], color=:black, label="")
+    plot!(plt, [Z2[1], A[1]], [Z2[2], A[2]], color=:black, label="")
+    plot!(plt, [Z3[1], B[1]], [Z3[2], B[2]], color=:black, label="")
+    plot!(plt, [Z4[1], B[1]], [Z4[2], B[2]], color=:black, label="")
+    plot!(plt, [A[1], B[1]], [A[2], B[2]], color=:red, linewidth=2, label="")
+
+
+    if show_angles
+        println("A = ", A)
+        println("B = ", B)
+        xopt = [A[1], A[2], B[1], B[2]]
+        println("L_min = ", L(xopt, Z))
+        println("Úhly v A: ", rad2deg.([α1, α2, α3]))
+        println("Úhly v B: ", rad2deg.([β1, β2, β3]))
+
+        draw_angle!(plt, A, Z1 .- A, Z2 .- A,
+            label="$(round(rad2deg(α1), digits=1))°")
+        draw_angle!(plt, A, Z2 .- A, B .- A,
+            label="$(round(rad2deg(α3), digits=1))°")
+
+        draw_angle!(plt, B, Z3 .- B, Z4 .- B,
+            label="$(round(rad2deg(β1), digits=1))°")
+        draw_angle!(plt, B, Z3 .- B, A .- B,
+            label="$(round(rad2deg(β2), digits=1))°")
+    end
+    return plt
+end
+
+
+```
+Příklad pro jednu sadu bodů:
+
+```{julia}
+#| echo: true
+#| output: true
+#| label:  "Vystup řešení pro jednu sadu bodů"
+
+# Čtyři dané body v rovině
+Z = [
+    -0.2 0.0;   # Z1
+    1.0 -0.3;   # Z2
+    1.0 1.4;   # Z3
+    0.2 1.2    # Z4
+]
+
+p = one_visualization(Z, true);
+```
+
+
+```{julia}
+#| echo: true
+#| output: true
+#| fig-cap:  "Graf řešení pro jednu sadu bodů"
+display(p)
+```
+
+
+## Ukázka pro mnoho sad 4 bodů 
+
+A proceduru lze vyzkoušet i pro více počátečních bodů:
+```{julia}
+#| echo: true
+#| output: true
+#| fig-cap:  "Řešení pro náhodně generované body"
+#| code-fold: true
+
+using Random
+using Distributions
+# using Measures
+
+ncols = 5
+nrows = 4
+npoints = ncols * nrows
+
+
+plots = Any[]
+for i in 1:npoints
+    # Čtyři dané body v rovině
+    Z = [
+        0.0 0.0;   # Z1
+        0.0 1.0;   # Z2
+        1.0 0.0;   # Z3
+        0.8 1.2    # Z4
+    ]
+    Z = Z .+ rand(Uniform(-0.3, 0.3), size(Z))
+    p = one_visualization(Z)
+    # title!(p, "#$i")
+    push!(plots, p)
+end
+
+big = plot(
+    plots...,
+    layout=(nrows, ncols),
+    axis=true,
+    framestyle=:semi,
+    margin=0mm,
+    left_margin=0mm,
+    right_margin=0mm,
+    top_margin=0mm,
+    bottom_margin=0mm,
+    size=(1190, 1100),
+    legend=false
+)
+
+display(big)
+
+```
+
+### Degenerace řešení bez 2 vnitřních bodů
+
+- Pokud některý úhel v „trojúhelníku“ kolem A nebo B přesáhne $120^\circ$**, optimální bod splyne s jedním z koncových bodů (klasická vlastnost Fermatova bodu). Pak se topologie stromu mění a A nebo B leží přímo v některém $Z_i$.
+
+Identifikace degenerovaného případu lze provest následující funkci, a tak zobrazit jak tyto konfigurace vypadají:
+
+``` {julia}
+#| echo: true
+#| output: true
+#| fig-cap:  "Degenerovaná řešení pro náhodně generované body"
+#| code-fold: true
+
+using Random
+using Distributions
+
+function is_degenerate(A, B, Z; tol=1e-3)
+    Z1, Z2, Z3, Z4 = eachrow(Z)
+
+    # A splynulo s některým Z1, Z2
+    if norm(A .- Z1) < tol || norm(A .- Z2) < tol
+        return true, "A splynulo s některým Z1 nebo Z2"
+    end
+
+    # B splynulo s některým Z3, Z4
+    if norm(B .- Z3) < tol || norm(B .- Z4) < tol
+        return true, "B splynulo s některým Z3 nebo Z4"
+    end
+
+    # úhly v A a B
+    α1, α2, α3, β1, β2, β3 = angles_at_A_B(A, B, Z1, Z2, Z3, Z4)
+    anglesA = rad2deg.([α1, α2, α3])
+    anglesB = rad2deg.([β1, β2, β3])
+    # print(anglesA)
+    if any(>(120.0 + tol), anglesA)
+        return true, "Úhel v A > 120° → Steinerův bod neexistuje"
+    end
+    if any(>(120.0 + tol), anglesB)
+        return true, "Úhel v B > 120° → Steinerův bod neexistuje"
+    end
+
+    return false, "OK"
+end
+
+function random_Z(; range=1.0)
+    return rand(4, 2) .* range
+end
+
+# Testovací smyčka přes mnoho konfigurací
+function test_many(plots, n=100)
+    degenerated = 0
+    for i in 1:typemax(Int)
+        # Čtyři dané body v rovině
+        Z = [
+            0.0 0.0;   # Z1
+            0.0 1.0;   # Z2
+            1.0 0.0;   # Z3
+            0.8 1.2    # Z4
+        ]
+        Z = Z .+ rand(Uniform(-0.5, 0.5), size(Z))
+        A, B = find_minL(Z)
+        deg, msg = is_degenerate(A, B, Z)
+        if deg
+            println("Test $i: ", msg)
+            p = one_visualization(Z)
+            push!(plots, p)
+            degenerated += 1
+            if degenerated == n
+                return
+            end
+        end
+    end
+end
+
+ncols = 5
+nrows = 4
+npoints = ncols * nrows
+
+plots = Any[]
+@show plots
+test_many(plots, npoints)
+big = plot(
+    plots...,
+    layout=(nrows, ncols),
+    axis=true,
+    framestyle=:semi,
+    margin=0mm,
+    left_margin=0mm,
+    right_margin=0mm,
+    top_margin=0mm,
+    bottom_margin=0mm,
+    size=(1190, 1100),
+    legend=false
+)
+
+display(big)
+
+```
+
+
+Nalezení Steinerova stromu je NP úplný problem, tj. i počítače na něj nestačí - ale umíme najít  řešení blízká optimálnímu...
+

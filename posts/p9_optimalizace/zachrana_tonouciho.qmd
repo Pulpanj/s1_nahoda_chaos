@@ -1,0 +1,456 @@
+---
+title: "Záchrana tonoucího a zákony optiky"
+date: "2025-11-30"
+updated: "2025-12-15"
+description: "Jak nejrychleji doběhnout  z pláže do moře k topícímu se "
+draft: false
+categories: ["Optimalizace", "Seminář 9", "Hádanka","Optika"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p9_optimalizace/zachrana_tonouciho.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "zachrana_tonouciho"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Jak nejrychleji doběhnout  z pláže do moře k topícímu se 
+
+## Zadaní 
+
+Představme si, že stojite na pláží a musíme zachránit tonoucího se v
+moři. Stojíte v počátku souřadnicové soustavy, topící je v moři v
+souřadnicích $(x_t,y_t)$. Břeh moře je od Vas vzdálen x metrů. Otazka zní kde
+se máte vrhnout do vody (v souřadnici $y$), tak aby doba k dostižení tonouciho
+byla minimální (viz obrázek) ? 
+
+Nejkratší cesta není v tomto případě nejrychlejší, protože rychlost plavání
+$v_m$ je určitě menší než rychlost běhu po pláži $v_p$. Jde o život, takže každá
+sekunda je důležitá !
+
+
+```{julia}
+#| echo: false
+#| output: false
+#| code-fold: false
+
+vp = 5      # rychlost behu na plazi [m/s]
+vm = 2      # rychlost plavani v mori [m/s]
+xt = 100    # souradnice x tonouciho  
+yt = 50     # souradnice y tonouciho  
+x = 60;     # nejkratsi vzdalenost k mori
+A = (0.0, 0.0)  # zachrance
+B = (xt, yt); # tonouci 
+```
+
+```{julia}
+#| echo: false
+#| output: true
+#| fig-cap:  "Náčrtek možných drah k záchraně tonoucího"
+
+using Plots, Plots.PlotMeasures, LaTeXStrings,Printf
+function f_digits(x; digits = 3)
+	@sprintf("%.*f", digits, x)
+end
+
+
+include("./doba_k_zachrane.jl")
+include("./najdi_kde_skocit.jl")
+y = najdi_kde_skocit(xt, yt, vp, vm)
+O = (x, y)  # misto skoku do more
+y4 = 20
+xmax = 110;
+ymax = 60
+# plot([A[1], B[1], C[1]], [A[2], B[2], C[2]],
+plot([0, x, x, 0, 0], [0, 0, ymax, ymax, 0],
+	seriestype = :shape, linecolor = :false, fillalpha = 0.3,
+	fillcolor = :lightgreen, xlabel = "x", ylabel = "y",
+	label = "pláž", size = (900, 500),
+	xlims = (-2, xmax), ylims = (-2, ymax),
+)
+plot!([x, xmax, xmax, x, x], [0, 0, ymax, ymax, 0],
+	seriestype = :shape, lw = 3, linecolor = :false, fillalpha = 0.9,
+	fillcolor = :lightblue, legend = true,
+	label = "moře",
+)
+
+plot!([A[1], O[1], B[1]], [A[2], A[2], B[2]], lw = 1,
+	linecolor = :gold, fillalpha = 0.2, label = "O1-Nejrychleji do vody",
+	marker = :circle, markercolor = :gold,
+)
+annotate!([x - 2], [0 + 3], Plots.text("O1", :gold, 10))
+
+plot!([A[1], x, B[1]], [A[2], 30, B[2]], lw = 1,
+	linecolor = :cyan, fillalpha = 0.2, label = "O2-Nejkratší dráha ",
+	marker = :circle, markercolor = :cyan,
+)
+annotate!([x - 2], [30 + 1], Plots.text("O2", :cyan, 10))
+
+plot!([A[1], O[1], B[1]], [A[2], B[2], B[2]], lw = 1,
+	linecolor = :violet, fillalpha = 0.2, label = "O3-Nejkratší plavání",
+	marker = :circle, markercolor = :violet,
+)
+annotate!([x - 4], [yt - 1], Plots.text("O3", :violet, 10))
+
+plot!([A[1], O[1], B[1]], [A[2], y4, B[2]], lw = 1,
+	linecolor = :brown, fillalpha = 0.2, label = "O4-Neoptimální dráha",
+	marker = :circle, markercolor = :brown,
+)
+annotate!([x - 2], [y4 - 2], Plots.text("O4", :brown, 10))
+
+plot!([A[1], O[1]], [A[2], O[2]], lw = 3,
+	arrow = Plots.Arrow(:closed, :head, 4.5, 2.2),
+	linecolor = :red, fillalpha = 0.2, label = "")
+annotate!([x / 2 + 5], [y / 2 + 1], Plots.text(L"L_1", :red, 12))
+
+plot!([O[1], B[1]], [O[2], B[2]], lw = 3,
+	arrow = Plots.Arrow(:closed, :head, 4.5, 2.2),
+	linecolor = :red, fillalpha = 0.2, label = "O-Optimální dráha",
+	marker = :circle, markercolor = :red,
+)
+scatter!([O[1]], [O[2]], color = :red, label = "",
+	marker = :circle, markercolor = :red, markersize = 8,
+)
+annotate!([x + (xt - x) / 2], [O[2] + (yt - O[2]) / 2 - 2],
+	Plots.text(L"L_2", :red, 12),
+)
+
+scatter!([A[1]], [A[2]], color = :blue, label = "A-Zachránce")
+scatter!([B[1]], [B[2]], color = :green, label = "B-Tonoucí",
+	legend = :topleft,
+)
+
+annotate!([A[1] + 2], [A[2] + 6], Plots.text(L"A=[0,0]", :blue, 10))
+annotate!([O[1] + 1], [O[2] - 5], Plots.text(L"O=[x,y]", :red, 12))
+annotate!([B[1] - 1], [B[2] + 3], Plots.text(L"B=[x_t,y_t]", :green, 10))
+
+```
+
+
+## Výpočet času k dostižení tonoucího 
+
+Čas k záchraně lze jednoduše spočítat jako součet času běhu po pláži $T_1$ a
+času plavání $T_2$, které lze vypočítat z délek běhu $L-1$ a plavání $L_2$ a
+rychlostí běhu po pláži $v_p$ a rychlosti plavání v moři $v_m$:
+
+$$
+\begin{equation}
+T(y) = \frac{\sqrt{x^2 + y^2}}{v_p} +
+    \frac{\sqrt{(x_t - x)^2 + (y_t - y)^2}}{v_m}= \frac{L_p}{v_p}+ \frac{L_m}{v_m}  
+\end{equation}
+$$
+
+
+**Parametry zadání:**
+
+Pokud zvolíme následující parametry zadání:
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+
+vp = 5      # rychlost behu na plazi [m/s]
+vm = 2      # rychlost plavani v mori [m/s]
+xt = 100    # souradnice x tonouciho  
+yt = 50     # souradnice y tonouciho  
+x = 60;     # nejkratsi vzdalenost k mori
+A = (0.0, 0.0)  # zachrance
+B = (xt, yt); # tonouci 
+```
+Možností jak dostihnout tonoucího je několik:
+
+- O1 běžet co nejrychleji k moři
+- O2 zvolit nejpřímější cestu
+- O3 zvolit trasu s nejkratším plaváním 
+- Q4 zvolit místo někde uprostřed mezi O1 a O2
+
+## Časy a vzdálenosti různých drah k tonoucímu 
+
+Lze čas k záchraně vyčíslovat následující funkcí:  
+
+
+```{.julia include="doba_k_zachrane.jl" }
+```
+
+Pomocí které lze ukázat, že volba místa, kde skočit do vody, opravdu rozhoduje  o nejkratším case $T(y)$. 
+```{julia}
+
+doba_k_zachrane(0, "O1")
+doba_k_zachrane(30, "O2")
+doba_k_zachrane(50, "O3")
+doba_k_zachrane(20, "O4");
+
+```
+
+Vyneseme-li závislost  času $T(y)$ na místě skoku do vody $y$, je jasné, že existuje optimum $y^*$:
+
+
+```{julia}
+#| echo: false
+#| output: true
+#| code-fold: true
+#| fig-cap:  "Graf časů a délek možných drah k záchraně tonoucího"
+
+YTL = [collect(doba_k_zachrane(y, "")) for y in 0:yt]
+MYTL = vcat(transpose(YTL)...)
+Topt = doba_k_zachrane(y, "")[2]    # optimalni cas
+
+plot(MYTL[:, 1], MYTL[:, 7], label = "L(y)", ylabel = "délka L[m]",
+	xlabel = "y", legend = :left, linestyle = :dash,
+	color = :red, lw = 1, ylims = (0, 500), size = (900, 500),
+	grid = true, gridalpha = 0.1, gridcolor = :gray, minorgrid = true,
+	gridlinewidth = 1, gridstyle = :dash,
+)
+plot!(MYTL[:, 1], MYTL[:, 3], label = "L1(y)", color = :green, lw = 1,
+	linestyle = :dash,
+)
+plot!(MYTL[:, 1], MYTL[:, 4], label = "L2(y)", color = :blue,
+	lw = 1, linestyle = :dash,
+)
+ax = twinx()
+plot!(ax, MYTL[:, 1], MYTL[:, 2], label = "T(y)", ylabel = "čas T[s]",
+	legend = :topright, linestyle = :solid, color = :red, lw = 3,
+	ytick = :true, ylims = (0, 50), gridcolor = :brown, grid = true,
+	gridlinewidth = 1, gridstyle = :solid, minorgrid = true,
+)
+plot!(ax, MYTL[:, 1], MYTL[:, 5], label = "T1(y)",
+	color = :green, lw = 1,
+)
+plot!(ax, MYTL[:, 1], MYTL[:, 6], label = "T2(y)",
+	color = :blue, lw = 1,
+)
+scatter!(ax, [0], [doba_k_zachrane(0, "")[2]], color = :gold, label = "O1")
+scatter!(ax, [30], [doba_k_zachrane(30, "")[2]], color = :cyan, label = "O2")
+scatter!(ax, [50], [doba_k_zachrane(50, "")[2]], color = :violet, label = "O3")
+scatter!(ax, [10], [doba_k_zachrane(10, "")[2]], color = :brown, label = "O4")
+scatter!(ax, [y], [Topt], color = :red, label = "O ")
+annotate!(ax, [y], [Topt + 3],
+	Plots.text(
+		latexstring("y^*:$(f_digits(y,digits = 2))[m] \
+		\\Rightarrow T(y^*):$(f_digits(Topt,digits = 2))[s]"),
+		:red, 12,
+	),
+)
+plot!(ax, [y, y], [0, Topt],
+	arrow = Plots.Arrow(:closed, :head, 4.5, 2.2),label="",
+	linecolor = :red, legend = :topright, legend_columns = 3,
+)
+```
+
+## Optimální dráha s nejkratším  časem
+
+Optimální dráhu z nejmenším časem určíme pomocí derivace funkce $T(y)$:
+$$
+\begin{equation}
+ \frac{dT(y)}{dy} = 
+  \frac{y}{v_p \cdot \sqrt{x^2 + y^2}} \;+\; \frac{y - y_t}{v_m \cdot \sqrt{(x_t - x)^2 + (y_t - y)^2}}.
+\end{equation}
+$$
+
+tak, že najdeme kde je derivace rovna 0: 
+
+$$
+\begin{align}
+ \frac{dT(y)}{dy} \Big|_{y=y^*} = 
+\frac{y^*}{v_p \cdot \sqrt{x^2 + {y^*}^2}} \;+\; 
+\frac{y^* - y_t}{v_m \cdot \sqrt{(x_t - x)^2 + (y_t - y^*)^2}}=0
+\end{align}
+$${#eq-snell}
+
+
+
+Úpravy rovnice $\frac{dT(y)}{dy} =0$ (po vynásobení jmenovateli obou zlomků a
+po umocnění na druhou ) vedou na rovnici 4 stupně:
+
+
+$$
+\begin{align}
+(v_m^2 - v_p^2) \cdot ({y^*})^4
+    + 2 \cdot y_t \cdot (v_p^2 - v_m^2) \cdot ({y^*})^3 \\
+    + \Big[v_m^2\big((x_t-x)^2 + y_t^2\big) - v_p^2\big(x^2 + y_t^2\big)\Big] \cdot ({y^*})^2 \\
+    + 2 \cdot v_p^2 \cdot x^2 \cdot y_t \cdot y^*
+    - v_p^2 \cdot x^2 \cdot y_t^2= 0
+\end{align}
+$$
+
+kterou lze zjednodušit zavedením následujících koeficientů k mocninám $y^*$:
+
+
+$$
+ A\,{y^*}^4 + B\,{y^*}^3 + C\,{y^*}^2 + D\,y^* + E = 0
+$$
+
+kde 
+$A = v_m^2 - v_p^2$
+
+$B = 2\,y_t\,(v_p^2 - v_m^2) = -2\,y_t\,A$
+
+$C = v_m^2\big((x_t-x)^2 + y_t^2\big) - v_p^2\big(x^2 + y_t^2\big)$
+
+$D = 2\,v_p^2\,x^2\,y_t$
+
+$E = -\,v_p^2\,x^2\,y_t^2$
+
+
+Tuto rovnici lze řešit Ferrariho metodou, což je historicky první algebraický
+postup (z 16. století) k řešení obecné kvartické (čtvrtého stupně) rovnice,
+která převádí tento složitý problém na řešení kubické rovnice, jež se pak
+vyřeší pomocí Cardanových vzorců. Tím získáme pomocnou konstantu,
+která nám umožní rozložit původní kvartickou rovnici na dvě kvadratické
+rovnice (viz. <https://cs.wikipedia.org/wiki/Kvartick%C3%A1_rovnice>).
+
+
+Řešení rovnice s díky použití package Polynomials je snadné, jediné co je třeba
+ošetřit je výběr z kořenů (z obecně 4 řešení kvartické rovnice je třeba vybrat
+ty splňující podmínku $y^* \in (0,y)$ )
+
+```{.julia include="najdi_kde_skocit.jl" }
+```
+
+A dosazením konkretních hodnot ze zadání vypočteme místo skoku $y^*$ a optimální čas $T(y^*)$:
+
+```{julia}
+#| echo: true
+#| output: true
+#| code-fold: false
+y = najdi_kde_skocit(xt, yt, vp, vm)
+doba_k_zachrane(y, "Optimální dráha");
+
+```
+
+
+
+# Analogie k optice
+
+Nalezené řešení má zajímavou (a hlubokou) analogii v optice. Pokud se zaměříme
+na úhly $\alpha_1$, $\alpha_2$ které svírají segmenty optimální dráhy s kolmicí na moře:
+
+```{julia}
+#| echo: false
+#| output: true
+#| fig-cap:  "Zobrazení úhlů segmentů optimální dráhy "
+
+using Plots, Plots.PlotMeasures, LaTeXStrings, Printf
+
+"""
+    arc(cx, cy, r, θ1, θ2; n=200, plotargs...)
+
+Plot an arc of a circle centered at (cx, cy) with radius `r`
+from angle `θ1` to `θ2` (in radians).
+"""
+function arc(cx, cy, r, θ1, θ2; n=50, plotargs...)
+    θ = range(θ1 / 180 * pi, θ2 / 180 * pi; length=n)
+    x = cx .+ r .* cos.(θ)
+    y = cy .+ r .* sin.(θ)
+    plot!(x, y; aspect_ratio=:equal, plotargs...)
+end
+
+y = najdi_kde_skocit(xt, yt, vp, vm)
+y, Ty, L1, L2, T1, T2, L = doba_k_zachrane(y, "")
+
+O = (x, y)  # misto skoku do more
+y4 = 20
+xmax = 110;
+ymax = 60
+# plot([A[1], B[1], C[1]], [A[2], B[2], C[2]],
+plot([0, x, x, 0, 0], [0, 0, ymax, ymax, 0],
+    seriestype=:shape, linecolor=:false, fillalpha=0.3,
+    fillcolor=:lightgreen, xlabel="x", ylabel="y",
+    label="pláž", size=(900, 500),
+    xlims=(-2, xmax), ylims=(-2, ymax),
+)
+plot!([x, xmax, xmax, x, x], [0, 0, ymax, ymax, 0],
+    seriestype=:shape, lw=3, linecolor=:false, fillalpha=0.9,
+    fillcolor=:lightblue, legend=true,
+    label="moře",
+)
+
+
+plot!([0, 110], [O[2], O[2]], lw=1,
+    # arrow=Plots.Arrow(:closed, :head, 4.5, 2.2),
+    linecolor=:gray, fillalpha=0.2, label="")
+
+plot!([A[1], O[1]], [A[2], O[2]], lw=3,
+    arrow=Plots.Arrow(:closed, :head, 4.5, 2.2),
+    linecolor=:red, fillalpha=0.2, label="")
+annotate!([x / 2 + 5], [y / 2 + 1], Plots.text(L"L_1", :red, 12))
+
+plot!([O[1], B[1]], [O[2], B[2]], lw=3,
+    arrow=Plots.Arrow(:closed, :head, 4.5, 2.2),
+    linecolor=:red, fillalpha=0.2, label="O-Optimální dráha",
+    marker=:circle, markercolor=:red,
+)
+scatter!([O[1]], [O[2]], color=:red, label="",
+    marker=:circle, markercolor=:red, markersize=8,
+)
+annotate!([x + (xt - x) / 2], [O[2] + (yt - O[2]) / 2 + 2],
+    Plots.text(L"L_2", :red, 12),
+)
+
+
+
+annotate!([O[1] - 22], [O[2] - 7],
+    Plots.text(L"\alpha_1", :black, 16),
+)
+
+annotate!([O[1] + 25], [O[2] + 2],
+    Plots.text(L"\alpha_2", :black, 16),
+)
+
+alpha1 = asind(y / L1)
+alpha2 = asind((yt - y) / L2)
+arc(O[1], O[2], 20, 180, 180+alpha1, linecolor=:black,linewidth = 1, label="")
+arc(O[1], O[2], 20, 0, alpha2, linecolor=:black,linewidth = 1, label="")
+
+
+scatter!([A[1]], [A[2]], color=:blue, label="A-Zachránce")
+scatter!([B[1]], [B[2]], color=:green, label="B-Tonoucí",
+    legend=:topleft,
+)
+annotate!([A[1] + 2], [A[2] + 6], Plots.text(L"A=[0,0]", :blue, 10))
+annotate!([O[1] + 1], [O[2] - 5], Plots.text(L"O=[x,y]", :red, 12))
+annotate!([B[1] - 1], [B[2] + 3], Plots.text(L"B=[x_t,y_t]", :green, 10))
+
+# y = najdi_kde_skocit(xt, yt, vp, vm)
+# y, Ty, L1, L2, T1, T2,L=doba_k_zachrane(y, "")
+# doba_k_zachrane(y, "")
+
+
+```
+
+lze z rovnice popisujícxí optimální dráhu [-@eq-snell] odvodit:
+
+$$
+\begin{align}
+ \frac{y^*}{v_p \cdot \sqrt{x^2 + {y^*}^2}}  =
+\frac{y_t-y^*}{v_m \cdot \sqrt{(x_t - x)^2 + (y_t - y^*)^2}}\\
+\frac{y^*}{v_p \cdot L_1}  =
+\frac{y_t-y^*}{v_m \cdot L_2 }\\
+\frac{1}{v_p} \cdot sin(\alpha_1)  =
+\frac{1}{v_m} \cdot sin(\alpha_2)  
+\end{align}
+$$
+
+Což vede k jednoduchému vztahu v optice nazývaného [Snellův
+zákon](https://cs.wikipedia.org/wiki/Snell%C5%AFv_z%C3%A1kon):
+
+$$
+\frac{sin(\alpha_1)}{sin(\alpha_2)}  =
+\frac{v_p}{v_m}
+$$
+
+Snellův zákon popisuje lom paprsku světla při průchodu rozhraním dvou materiálů
+majících různé rychlosti šíření světla. Snellův zákon - většinou zapamatovaný
+pomocí meme "Hůl do vody ponořená, zdá se býti zalomená" je ale důsledkem
+obecnějšího principu geometrické optiky nazývaného [Fermatův
+princip](https://cs.wikipedia.org/wiki/Fermat%C5%AFv_princip), který říká:
+
+**Světlo se v prostoru šíří z jednoho bodu do druhého po takové dráze, aby doba
+potřebná k proběhnutí této dráhy byla minimální.**
+
+Světlo se tedy snaží zachránit tonoucího co nejrychleji !

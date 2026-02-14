@@ -1,0 +1,644 @@
+---
+title: "Dvě kulové bubliny"
+date: "2025-12-08"
+updated: "2026-01-25"
+description: "Jak se napojují dvě kulové mýdlové bubliny různých velikostí ?"
+draft: false
+categories: ["Optimalizace", "Přednáška 11" , "Bubliny"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p10_soap_opera/dve_kulove_bubliny.pdf)"
+
+# html-math-method: katex
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "dve_kulove_bubliny"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Jak se napojují dvě kulové mýdlové bubliny různých velikostí ?
+
+## Zadání 
+
+Jaké jsou průniky dvou kulových bublin, ktere se vzájemně dotýkají ?
+
+Vytvoří se mezi nimi společná stěna, která je částí kulové plochy. 
+Jaký má tato plocha poloměr a jaké jsou úhly mezi normálami v místě průniku ?
+
+
+
+```{julia}
+#| echo: false
+#| output: true  #asis
+#| fig-cap:  "Náčrt dvou kulových bublin, které se dotýkají a vytvářejí společnou stěnu."
+using Plots
+
+# Radii
+R1 = 1.0
+R2 = 0.7
+R3 = 1 / (1 / R2 - 1 / R1)
+
+# Distance for 120° intersection between circle 1 and 2
+d12 = sqrt(R1^2 + R2^2 - R1 * R2)
+d13 = sqrt(R1^2 + R3^2 + R1 * R3)
+
+# Centers C1 and C2
+C1 = (0.0, 0.0)
+C2 = (d12, 0.0)
+C3 = (d13, 0.0)
+
+# Intersection point of circle 1 and 2
+xp = (R1^2 - R2^2 + d12^2) / (2 * d12)
+yp = sqrt(R1^2 - xp^2)
+
+
+plot(aspect_ratio=:equal, legend=false,
+    size=(1000, 800),
+    framestyle=:origin,
+    xticks=([], []),
+    yticks=([], []),
+    grid=false,
+)
+
+
+# Parametric circle generator
+function circle_xy(center, r; n=50, alpha1=0, alpha2=0)
+    θ = range(deg2rad(alpha1), deg2rad(alpha2); length=n)
+    x = center[1] .+ r .* cos.(θ)
+    y = center[2] .+ r .* sin.(θ)
+    return x, y
+end
+
+# Draw circles
+x1, y1 = circle_xy(C1, R1, alpha1=42.0, alpha2=360 - 42.0)
+plot!(x1, y1, color=:red, linewidth=4, linestyle=:solid)
+
+x2, y2 = circle_xy(C2, R2, alpha1=100.0, alpha2=-100.0)
+plot!(x2, y2, color=:green, linewidth=4, linestyle=:solid)
+
+x3p, y3p = circle_xy(C3, R3, alpha1=163, alpha2=197)
+plot!(x3p, y3p, color=:blue, linewidth=4, linestyle=:solid)
+
+# --- Add arrows with independent angles in degrees ---
+function draw_radius_arrow!(C, R, angle_deg, label, color)
+    θ = deg2rad(angle_deg)
+    dx = R * cos(θ)
+    dy = R * sin(θ)
+
+    plot!(
+        [C[1], C[1] + dx],
+        [C[2], C[2] + dy],
+        arrow=:start, color=color, linewidth=1
+    )
+
+    annotate!(
+        C[1] + (dx + 0.25) / 2,
+        C[2] + (dy + 0.1) / 2,
+        text(label, 10, color)
+    )
+end
+
+# Example angles for each circle
+draw_radius_arrow!(C1, R1, 60, "R1", :red)
+draw_radius_arrow!(C2, R2, 320, "R2", :green)
+draw_radius_arrow!(C3, R3, 170, "R3", :blue)
+
+
+# Draw centers
+scatter!([C1[1], C2[1], C3[1]], [0, 0, 0], color=:black, markersize=6)
+# draw intersection points
+scatter!([xp], [yp], color=:magenta, markersize=8)
+scatter!([xp], [-yp], color=:magenta, markersize=8)
+
+xlabel!("")
+ylabel!("")
+
+# Limits
+xmin = -1.3
+xmax = 3.2
+ymax = 1.3
+plot!(xlim=(xmin, xmax), ylim=(-ymax, ymax))
+
+```
+
+
+
+
+
+## Řešení
+
+Plateauovy zákony pro mýdlové bubliny říkají, že **tři plochy** (filmy) se setkávají podél jedné křivky (Plateauův okraj) **vždy po třech** a **vždy pod úhlem 120°** mezi každými dvěma. 
+
+Dvě vnější kulové bubliny (červená a zelená s poloměry $R_1$ a $R_2$) se tedy
+musí dle vzájemně dotýkat tak, že tak, že úhel mezi normálami k jejich plochám
+v místě dotyku je 120°. V případě dvou kulových bublin, které se dotýkají, se
+tedy vytvoří společná stěna (modrá), která je částí kulové plochy. Tato plocha
+bude mít poloměr $R_3$ a bude se napojovat na obě vnější bubliny pod úhlem 120°
+(opět ve smyslu , že úhel mezi normálami k jejich plochám v místě dotyku je
+120°.
+
+První část řešení je tedy odvození vztahu mezi poloměry $R_1$, $R_2$ a
+vzdáleností jejich středů tak aby úhly mezi normálami v místě průniku byly
+120°. 
+
+Řešení pro poloměr $R_3$ společné stěny pak lze odvodit z geometrických
+vztahů mezi těmito třemi bublinami a jejich vzájemnými úhly. 
+
+### Vzdálenost středů vnější kulových bublin.
+
+Podle Plateauových zákonů se musí dotýkat tak, že úhel mezi normálami k jejich
+plochám v místě dotyku je 120°. To znamená, že vzdálenost $X$ mezi jejich
+středy musí být taková, aby úhel mezi poloměry v místě dotyku byl 60° (protože
+180° − 120° = 60°), jak ukazuje následující obrázek: 
+
+
+
+```{julia} 
+#| echo: false
+#| output: true #asis 
+#| fig-cap: "Vzdálenost středů vnější kulových bublin"
+
+using Plots
+# Radii
+R1 = 1.0
+R2 = 0.7
+R3 = 1 / (1 / R2 - 1 / R1)
+
+# Distance for 120° intersection between circle 1 and 2
+d12 = sqrt(R1^2 + R2^2 - R1 * R2)
+
+
+# Centers C1 and C2
+C1 = (0.0, 0.0)
+C2 = (d12, 0.0)
+
+# Intersection point of circle 1 and 2
+xp = (R1^2 - R2^2 + d12^2) / (2 * d12)
+yp = sqrt(R1^2 - xp^2)
+
+
+# Parametric circle generator
+function circle_xy(center, r; n=50, alpha1=0, alpha2=0)
+    θ = range(deg2rad(alpha1), deg2rad(alpha2); length=n)
+    x = center[1] .+ r .* cos.(θ)
+    y = center[2] .+ r .* sin.(θ)
+    return x, y
+end
+
+# Draw angle arc centered at point P with radius r_arc and angle span (deg)
+function draw_angle_arc!(P, r_arc, start_deg, end_deg, label, color)
+    θ = range(deg2rad(start_deg), deg2rad(end_deg), length=100)
+    x = P[1] .+ r_arc .* cos.(θ)
+    y = P[2] .+ r_arc .* sin.(θ)
+
+    plot!(x, y, color=color, linewidth=1, arrow=(:both, 1))
+
+    # Label in the middle of the arc
+    midθ = deg2rad((start_deg + end_deg) / 2)
+    annotate!(
+        P[1] + r_arc * cos(midθ) + 0.04,
+        P[2] + r_arc * sin(midθ) + 0.05,
+        text(label, 10, color)
+    )
+end
+
+plot(aspect_ratio=:equal, legend=false,
+    size=(1000, 800),
+    framestyle=:origin,
+    xticks=([], []),
+    yticks=([], []),
+    grid=false,
+)
+
+
+# Draw circles
+x1, y1 = circle_xy(C1, R1, alpha1=42.0, alpha2=360 - 42.0)
+plot!(x1, y1, color=:red, linewidth=1, linestyle=:solid)
+
+x2, y2 = circle_xy(C2, R2, alpha1=100.0, alpha2=-100.0)
+plot!(x2, y2, color=:green, linewidth=1)
+
+# x3p, y3p = circle_xy(C3, R3, alpha1=0, alpha2=360.0)
+# plot!(x3p, y3p, color=:blue, linewidth=2)
+
+# --- Add arrows with independent angles in degrees ---
+function draw_radius_arrow!(C, R, angle_deg, label, color)
+    θ = deg2rad(angle_deg)
+    dx = R * cos(θ)
+    dy = R * sin(θ)
+
+    plot!(
+        [C[1], C[1] + dx],
+        [C[2], C[2] + dy],
+        arrow=false, color=color, linewidth=3
+    )
+
+    annotate!(
+        C[1] + (dx + 0.08) / 2,
+        C[2] + (dy + 0.2) / 2,
+        text(label, 10, color)
+    )
+end
+
+# Example angles for each circle
+draw_radius_arrow!(C1, R1, 43, "R1", :red)
+draw_radius_arrow!(C2, R2, 102, "R2", :green)
+
+plot!(
+    [C1[1], C2[1]],
+    [0, 0],
+    arrow=:both, color=:black, linewidth=3
+)
+annotate!(
+    (C1[1] + C2[1]) / 2, -0.2,
+    text("X", 10, :black)
+)
+
+P = (xp, yp)
+
+# Directions from intersection to centers
+α1 = atan(yp - C1[2], xp - C1[1])
+α2 = atan(yp - C2[2], xp - C2[1])
+
+# Convert to degrees
+a1 = rad2deg(α1)
+a2 = rad2deg(α2)
+# Normalize angles
+if a2 < a1
+    a2 += 360
+end
+
+# Draw arc of 120 degrees
+draw_angle_arc!(P, 0.15, 5, a1 + 91, "120°", :grey)
+# Draw arc of 120 degrees
+draw_angle_arc!(P, 0.25, -75, -135, "60°", :grey)
+
+# Draw centers
+scatter!([C1[1], C2[1],], [0, 0], color=:black, markersize=6)
+
+# Draw the common intersection point
+scatter!([xp], [yp], color=:magenta, markersize=8)
+# Draw the common intersection point
+scatter!([xp], [-yp], color=:magenta, markersize=8)
+
+# Limits
+xmin = -1.3
+xmax = 3.2
+ymax = 1.3
+plot!(xlim=(xmin, xmax), ylim=(-ymax, ymax))
+```
+
+Chceme odvodit X v trojúhelníku, který má strany $a = R_1$, $b = R_2$, $c = X$ a  úhel proti straně X je 60°.
+To je přesně situace, kterou popisuje kosinová věta:
+
+$$
+X^2 = R_1^2 + R_2^2 - 2 R_1  R_2 \cos(60^\circ)
+$$
+
+A protože $cos(60^\circ) = \frac12$, dostáváme finální výsledek pro $X$:
+
+$$
+X = \sqrt{R_1^2 + R_2^2 - R_1 R_2}
+$$
+
+
+### Odvození poloměru $R_3$ 
+
+Vnitřní stěna mezi dvěma kulovými bublinami bude mít poloměr $R_3$ a bude se
+napojovat na obě vnější bubliny pod úhlem 120°. To znamená, že úhel mezi
+normálami k plochám v místě dotyku bude 120°, jak ukazuje následující obrázek:
+
+```{julia}
+#| echo: false
+#| output: true #asis 
+#| fig-cap: "Odvození poloměru $R_3$ vnitřní stěny mezi dvěma kulovými bublinami"
+
+using Plots
+
+# Radii
+R1 = 1.0
+R2 = 0.7
+R3 = 1 / (1 / R2 - 1 / R1)
+
+# Distance for 120° intersection between circle 1 and 2
+d12 = sqrt(R1^2 + R2^2 - R1 * R2)
+d13 = sqrt(R1^2 + R3^2 + R1 * R3)
+
+# Centers C1 and C2
+C1 = (0.0, 0.0)
+C2 = (d12, 0.0)
+C3 = (d13, 0.0)
+
+# Intersection point of circle 1 and 2
+xp = (R1^2 - R2^2 + d12^2) / (2 * d12)
+yp = sqrt(R1^2 - xp^2)
+
+
+# Parametric circle generator
+function circle_xy(center, r; n=50, alpha1=0, alpha2=0)
+    θ = range(deg2rad(alpha1), deg2rad(alpha2); length=n)
+    x = center[1] .+ r .* cos.(θ)
+    y = center[2] .+ r .* sin.(θ)
+    return x, y
+end
+
+# Draw angle arc centered at point P with radius r_arc and angle span (deg)
+function draw_angle_arc!(P, r_arc, start_deg, end_deg, label, color)
+    θ = range(deg2rad(start_deg), deg2rad(end_deg), length=100)
+    x = P[1] .+ r_arc .* cos.(θ)
+    y = P[2] .+ r_arc .* sin.(θ)
+
+    plot!(x, y, color=color, linewidth=1, arrow=(:both, 1))
+
+    # Label in the middle of the arc
+    midθ = deg2rad((start_deg + end_deg) / 2)
+    annotate!(
+        P[1] + r_arc * cos(midθ) + 0.04,
+        P[2] + r_arc * sin(midθ) + 0.1,
+        text(label, 10, color)
+    )
+end
+
+plot(aspect_ratio=:equal, legend=false,
+    size=(1000, 800),
+    framestyle=:origin,
+    xticks=([], []),
+    yticks=([], []),
+    grid=false,
+)
+
+# Draw circles
+x1, y1 = circle_xy(C1, R1, alpha1=42.0, alpha2=360 - 42.0)
+plot!(x1, y1, color=:red, linewidth=1, linestyle=:solid)
+
+x2, y2 = circle_xy(C2, R2, alpha1=100.0, alpha2=-100.0)
+plot!(x2, y2, color=:green, linewidth=1)
+
+x3p, y3p = circle_xy(C3, R3, alpha1=0, alpha2=360.0)
+plot!(x3p, y3p, color=:blue, linewidth=1)
+
+# --- Add arrows with independent angles in degrees ---
+function draw_radius_arrow!(C, R, angle_deg, label, color)
+    θ = deg2rad(angle_deg)
+    dx = R * cos(θ)
+    dy = R * sin(θ)
+
+    plot!(
+        [C[1], C[1] + dx],
+        [C[2], C[2] + dy],
+        arrow=false, color=color, linewidth=3
+    )
+
+    annotate!(
+        C[1] + (dx + 0.08) / 2,
+        C[2] + (dy + 0.3) / 2,
+        text(label, 10, color)
+    )
+end
+
+draw_radius_arrow!(C1, R1, 43, "R1", :red)
+draw_radius_arrow!(C3, R3, 163, "R3", :blue)
+
+plot!(
+    [C1[1], C3[1]],
+    [0, 0],
+    arrow=:both, color=:black, linewidth=3
+)
+annotate!(
+    (C1[1] + C3[1]) / 2, +0.1,
+    text("Y", 10, :black)
+)
+
+# Intersection point
+P = (xp, yp)
+
+# Directions from intersection to centers
+α1 = atan(yp - C1[2], xp - C1[1])
+α2 = atan(yp - C2[2], xp - C2[1])
+
+# Convert to degrees
+a1 = rad2deg(α1)
+a2 = rad2deg(α2)
+# Normalize angles
+if a2 < a1
+    a2 += 360
+end
+
+# Draw arc of 120 degrees
+draw_angle_arc!(P, 0.15, 5, a1 + 91, "120°", :grey)
+draw_angle_arc!(P, 0.25, -15, -135, "120°", :grey)
+draw_angle_arc!(P, 0.45, -5, -100, "120°", :grey)
+
+scatter!([C1[1], C2[1],], [0, 0], color=:black, markersize=6)
+
+# Draw the common intersection point
+scatter!([xp], [yp], color=:magenta, markersize=8)
+# Draw the common intersection point
+scatter!([xp], [-yp], color=:magenta, markersize=8)
+
+# Limits
+xmin = -1.3
+xmax = 3.2
+ymax = 1.3
+plot!(xlim=(xmin, xmax), ylim=(-ymax, ymax))
+```
+
+
+Trojúhelník má strany: $R_1$, $R_3$  a $Y$  a úhel proti straně $Y$  je 120°. Opět použijeme kosinovou větu:
+
+$$
+Y^2 = R_1^2 + R_3^2 - 2 R_1 R_3 \cos 120^\circ.
+$$
+
+a protože $\cos 120^\circ = -\tfrac12$ dostaneme:
+
+$$
+Y^2 = R_1^2 + R_3^2 - 2 R_1 R_3 \left(-\tfrac12\right)
+    = R_1^2 + R_3^2 + R_1 R_3.
+$$
+
+a tím i konečný výsledek pro $Y$:
+
+$$
+Y = \sqrt{R_1^2 + R_3^2 + R_1 R_3}
+$$
+
+
+
+### Odvozeni $R3$ z $R1$ a $R2$
+
+Co je dané:
+
+- Všechny tři kružnice se protínají v jednom bodě $P$ .
+- Úhly mezi poloměry v $P$ :
+
+  - mezi $R_1$  a $R_2$ : $60^\circ$  → vzdálenost středů $C_1,C_2 = X$ ,
+  - mezi $R_1$  a $R_3$ : $120^\circ$  → vzdálenost středů $C_1,C_3 = Y$ ,
+  - mezi $R_2$  a $R_3$ : $60^\circ$  → vzdálenost středů $C_2,C_3 = Z$ .
+
+Vzdálenost mezi středy $C_2,C_3$ je rovna ale rozdílu vzdáleností mezi $C_1,C_3$ a $C_1,C_2$:
+
+$$
+Z = Y - X.
+$$
+
+
+A zároveň z kosinové věty plyne, že vzdálenosti mezi středy $C_2,C_3$ jsou dány vztahem:
+
+$$
+Z^2 = R_2^2 + R_3^2 - R_2 R_3.
+$$
+
+
+Pokud do rovnice pro $Z$ dosadíme již odvozené závislosti $X$ a $Y$ (na $R_1, R_2, R_3$), dostaneme rovnici, která nám umožní odvodit $R_3$  v závislosti na $R_1$  a $R_2$:
+
+Rovnici  $Z = Y - X$ můžeme přepsat na:
+
+$$
+(Y - X)^2 = Z^2.
+$$
+
+$$
+(\sqrt{Y^2} - \sqrt{X^2})^2 = Z^2
+$$
+
+$$
+Y^2 + X^2 - 2\sqrt{X^2 Y^2} = Z^2.
+$$
+
+Odtud:
+
+$$
+\sqrt{X^2 Y^2} = \frac{X^2 + Y^2 - Z^2}{2}.
+$$
+
+Pak:
+
+$$
+X^2 Y^2 = \left(\frac{X^2 + Y^2 - Z^2}{2}\right)^2.
+$$
+
+Dosadíme výrazy za $X^2, Y^2, Z^2$  v závislosti na $R_1, R_2, R_3$  a po algebraickém vyčištění dostaneme kvadratickou rovnici v $R_3$ , která se pokrátí na:
+
+$$
+\bigl(R_3 - \frac{R_1 R_2}{R_1 - R_2}\bigr)^2 = 0.
+$$
+
+Z kterého plyne - překvapivě krásný - výsledek:
+
+$$
+R_3 = \frac{R_1 R_2}{R_1 - R_2}
+$$
+
+který známější ve tvaru:
+$$
+\frac{1}{R_3} = \frac{1}{R_2} - \frac{1}{R_1}
+$$
+
+T.j. poměr vnitřní stěny mezi dvěma kulovými bublinami je dán vztahem, který
+vypadá jako vzorec pro paralelní odpor v elektrickém obvodu, což není náhoda,
+protože oba systémy jsou založeny na stejném principu rovnováhy sil (tlaků v
+případě bublin a proudů v případě odporů).
+
+### Kontrola úhlů a vzdáleností 
+
+Výsledek lze ověřit numericky na konkrétních hodnotách pomocí následnících funkcí:
+
+```{julia}
+R3func(R1, R2) = R1 * R2 / (R1 - R2)
+
+Xfunc(R1, R2) = sqrt(R1^2 + R2^2 - R1 * R2)
+Yfunc(R1, R3) = sqrt(R1^2 + R3^2 + R1 * R3)
+Zfunc(R2, R3) = sqrt(R2^2 + R3^2 - R2 * R3)
+
+function check_geometry(R1, R2)
+    R3v = R3func(R1, R2)
+    Xv = Xfunc(R1, R2)
+    Yv = Yfunc(R1, R3v)
+    Zv = Zfunc(R2, R3v)
+    println("R1=$R1  R2=$R2  R3=$R3v")
+    println("X=$Xv  Y=$Yv  Z=$Zv  Y-X=$(Yv - Xv)")
+end
+```
+
+Pak už zkoušet různé hodnoty:
+
+```julia
+check_geometry(3.0, 1.5)
+check_geometry(4.0, 2.0)
+check_geometry(5.0, 3.0)
+```
+
+
+## Analýza z pohledu rovnováhy tlaků
+
+Uvnitř každé bubliny je tlak vyšší než venku, protože povrchové napětí se snaží
+minimalizovat povrch a tím stlačuje vzduch uvnitř. Když se dvě bubliny
+dotýkají, musí být tlak uvnitř každé z nich vyrovnán tlakem v místě dotyku, což
+vede k rovnováze sil a určuje tvar společné stěny mezi nimi.
+
+### Laplaceův zákon pro kulové rozhraní
+
+Laplaceův zákon pro kulové rozhraní říká, že rozdíl tlaku mezi vnitřkem a
+vnějškem kulové bubliny je úměrný povrchovému napětí $\gamma$ a nepřímo úměrný
+poloměru křivosti $R$ :
+
+$$
+\Delta p = p_{\text{uvnitř}} - p_{\text{venku}} = \frac{2\gamma}{R}
+$$
+
+
+### Rozdíly tlaků na různých rozhraních
+
+A v našem případě máme tři rozhraní:
+
+- vnější stěna bubliny 1: poloměr $R_1$ , tlak uvnitř $p_1$ , venku $p_0$ 
+- vnější stěna bubliny 2: poloměr $R_2$ , tlak uvnitř $p_2$ , venku $p_0$ 
+- vnitřní stěna mezi bublinami: poloměr $R_3$ , tlaky $p_2$  a $p_1$  
+
+
+
+Pro vnější stěny dostáváme:
+
+$$
+p_1 - p_0 = \frac{2\gamma}{R_1}
+$$
+$$
+p_2 - p_0 = \frac{2\gamma}{R_2}
+$$
+
+Pro vnitřní stěnu mezi bublinami platí:
+
+$$
+p_2 - p_1 = \frac{2\gamma}{R_3}
+$$
+
+Pro posledni rozhraní je nutno ve vzorci pro $\Delta p$ nutno jako vnitřní
+stěnu vybrat stranu mající vyšší tlak, tj. v případě menší bubliny s poloměrem
+$R_2$ pak znamená, že za vnitřní tlak se pokládá $p_2$ a vnější tlak je $p_1$
+(tato podmínka jen zajišťuje kladný poloměr $R_3$, v opačném případě by záporný
+poloměr $R_3$ představoval "vybouleni" na druhou stranu ).
+
+A pokud dosadíme $p_1, p_2$  z prvních dvou rovnic:
+
+$$
+(p_0 + \frac{2\gamma}{R_2}) - (p_0 + \frac{2\gamma}{R_2})
+= \frac{2\gamma}{R_3}
+$$
+
+$$
+2\gamma\left(\frac{1}{R_2} - \frac{1}{R_1}\right) = \frac{2\gamma}{R_3}
+$$
+
+a po vykrácení  $2\gamma$ dostaneme:
+
+$$
+\frac{1}{R_3} = \frac{1}{R_2} - \frac{1}{R_1}
+$$
+
+Přesně ten samý vzorec, který jsme dostali čistě z geometrie a podmínky $Z= Y - X$.
+Fyzika tedy přesně potvrdila náš geometrický vzorec.

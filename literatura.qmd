@@ -1,109 +1,157 @@
 ---
 title: Seznam dostupné literatury 
 toc: false
+# execute:
+#   freeze: false  # re-render only when source changes
+#   cache: false
 
+format:
+  typst:
+      output-file: "literatura"
+      output-ext: "pdf"
+      engine: typst    
+      keep-typ: false
+      papersize: a4
+      margin:
+          x: 1.5cm
+          y: 1.5cm
+      toc: false
+      fontsize: 9pt
+      include-in-header:
+          - text: |
+              #set table(stroke: 0.5pt + black)  
+
+  html:
+    table:
+      striped: false
+      hover: false
+      responsive: false
+      theme:
+          light: brand
+          dark: slate 
+
+
+format-links:
+  - ipynb
+  - format: typst
+    text: PDF
+    icon: file-pdf
 ---
 
+```{julia}
+#| echo: false
+#| output: asis  #asis
+#| cache: false
+#| freeze: false
+using OrderedCollections
+include("generate_book_list.jl")
+book_list = [
+    OrderedDict(
+        "label" => "Přednáška 1 (Počet pravděpodobnosti )",
+    ),
+    OrderedDict(
+        "Název" => "Grinstead and Snell’s Introduction to Probability",
+        "Autor" => "Charles M. Grinstead, J. Laurie Snell.",
+        "PDF" => "https://math.dartmouth.edu/~prob/prob/prob.pdf",
+        "URL" => "https://stats.libretexts.org/Bookshelves/Probability_Theory/Introductory_Probability_(Grinstead_and_Snell)",
+        # "Poznámka" => "LibreTexts je online version, která obsahuje i další materiály, včetně cvičení a řešení.",
+        "cover" => "/images/stats_full.png"
+    ),
+    OrderedDict(
+        "label" => "Přednáška 5 (Nelineární dynamika a chaos)",
+    ),
+    OrderedDict(
+        "Název" => "Understanding Nonlinear Dynamics",
+        "Autor" => "",
+        # "Reference" => "",
+        "PDF" => "https://www.academia.edu/88608923/Understanding_Nonlinear_Dynamics",
+        "URL" => "https://link.springer.com/book/10.1007/978-1-4612-0823-5",
+        # "Poznámka" => "",
+        "Rok" => "February 1995",
+        "cover" => "/images/kaplan.jpg"
+    ),
+    OrderedDict(
+        "Název" => "NONLINEAR DYNAMICS AND CHAOS: With Applications to Physics, Biology, Chemistry, and Engineering",
+        "Autor" => "Steven H. Strogatz",
+        # "Reference" => "",
+        "PDF" => "https://www.biodyn.ro/course/literatura/Nonlinear_Dynamics_and_Chaos_2018_Steven_H._Strogatz.pdf",
+        # "URL" => "",
+        # "Poznámka" => "",
+        "Rok" => "2018",
+        "cover" => "/images/nonlinear-dynamics-and-chaos-2nd-ed.jpg"
+    ),
+    OrderedDict(
+        "label" => "Přednáška 8 (Informační teorie )",
+    ),
+    OrderedDict(
+        "Název" => "Information Theory and Statistical Mechanics",
+        "Autor" => "Jaynes, E. T.",
+        "Reference" => "Physical Review. Series II. 106 (4): 620–630.",
+        "PDF" => "https://bayes.wustl.edu/etj/articles/theory.1.pdf",
+        # "Poznámka" => "",
+        "Rok" => "2018",
+        # "cover" => "/images/.png"
+    ),
+    OrderedDict(
+        "Název" => "WHERE DO WE STAND ON MAXIMUM ENTROPY?",
+        "Autor" => "Jaynes, E. T.",
+        "Reference" => "Maximum Entropy Formalism Conference, Massachusetts Institute of Technology, May 2-4, 1978",
+        "PDF" => "https://bayes.wustl.edu/etj/articles/stand.on.entropy.pdf",
+        "Rok" => "1978",
+        # "cover" => "/images/nonlinear-dynamics-and-chaos-2nd-ed.jpg"
+    ),
+    OrderedDict(
+        "label" => "Přednáška 8 (Optimalizace,Matematické hádanky)",
+    ),
+    OrderedDict(
+        "Název" => "Can You Solve My Problems?",
+        "Autor" => "Alex Bellos",
+        "Reference" => "Alex Bellos Puzzle Books",
+        "Link" => "<a href='https://us.amazon.com/Can-You-Solve-Problems-Perplexing/dp/161519388X/ref=sr_1_5?dib=eyJ2IjoiMSJ9.8OHr6xeTfuQuWaE9x0Gq0fFnr_1Lg6Ow22-38c30T6S18dBQlQ5ASORF8XHIzFU99KoeT4eBUUqwa43Icw8LUXxADlyMYRWoUIhkH-jALR6YxZa1pF1ALmHRzARleDiJ2gdnJTtL_x8yXMnKgZncGxxJmeLBmAI4I-zPg3o92xJo3GvkS1zIkMdeHseDcTPgGU-EFF7tKBEeS7YdZOpDRLOwejt-ASM1xZx494f4gpg.7h_L-EBzycJ3rklEp48gnvM6wXJ6F3Ia4VQxeIMcaBY&dib_tag=se&qid=1764975563&refinements=p_27%3ABello+Alex&s=books&sr=1-5'>Amazon</a>", "Book URL" => "https://us.amazon.com/Can-You-Solve-Problems-Perplexing/dp/161519388X/ref=sr_1_5?dib=eyJ2IjoiMSJ9.8OHr6xeTfuQuWaE9x0Gq0fFnr_1Lg6Ow22-38c30T6S18dBQlQ5ASORF8XHIzFU99KoeT4eBUUqwa43Icw8LUXxADlyMYRWoUIhkH-jALR6YxZa1pF1ALmHRzARleDiJ2gdnJTtL_x8yXMnKgZncGxxJmeLBmAI4I-zPg3o92xJo3GvkS1zIkMdeHseDcTPgGU-EFF7tKBEeS7YdZOpDRLOwejt-ASM1xZx494f4gpg.7h_L-EBzycJ3rklEp48gnvM6wXJ6F3Ia4VQxeIMcaBY&dib_tag=se&qid=1764975563&refinements=p_27%3ABello+Alex&s=books&sr=1-5",
+        # "Poznámka" => "",
+        "Rok" => "2017",
+        "cover" => "/images/alex_bellos_can_you_solve.jpg"
+    ),
+    OrderedDict(
+        "label" => "Přednáška 10,11 (Mýdlové bubliny)",
+    ),
+    OrderedDict(
+        "Název" => "Soap-Bubbles and the Forces Which Mould Them",
+        "Autor" => "Boys, C. V.",
+        "Reference" => "Charles Vernon",
+        "URL" => "https://www.gutenberg.org/ebooks/33370",
+        "Rok" => "1855-1944",
+        "cover" => "/images/pg33370.cover.medium.jpg"
+    ),
+    OrderedDict(
+        "Název" => "THE SCIENCE OF SOAP FILMS AND SOAP BUBBLES",
+        "Autor" => "Cyril Isenberg",
+        "Reference" => "University of Kent at Canterbury, DOVER PUBLICATIONS, INC., New York ",
+        # "PDF" => "https://pdfcoffee.com/the-science-of-soap-films-and-soap-bubbles-cyril-isenberg-5-pdf-free.html",
+        "URL" => "https://www.scribd.com/document/472537596/The-science-of-soap-films-and-soap-bubbles-by-Cyril-Isenberg-pdf",
+        "Rok" => "1992",
+        "cover" => "/images/isenberg.jpg"
+    ),
+    OrderedDict(
+        "Název" => "Plateau's Problem An Invitation to Varifold Geometry  ",
+        "Autor" => "Frederick J. Almgren, Jr, Kenneth J. Brakke and John M. Sullivan",
+        "Reference" => "STUDENT MATHEMATICAL LIBRARY Volume 13 ",
+        "PDF" => "https://www.ams.org/books/stml/013/stml013-endmatter.pdf",
+        # "URL" => "https://www.scribd.com/document/472537596/The-science-of-soap-films-and-soap-bubbles-by-Cyril-Isenberg-pdf",
+        "Rok" => "2000",
+        "cover" => "/images/almgren.jpg"
+    ),
 
-::: {.grid}
-
-
-
-
-::: {.g-col-2}
-[![](/images/stats_full.png){width=1.2in}](https://math.dartmouth.edu/~prob/prob/prob.pdf) 
-:::
-
-::: {.g-col-10}
-|  |  |
-|:----------|:------------------------------------------------------------| 
-|   **Název:** | Grinstead and Snell’s Introduction to Probability |
-|    **Autor:** | harles M. Grinstead, J. Laurie Snell. |
-|    **PDF download:** |<https://math.dartmouth.edu/~prob/prob/prob.pdf> |
-|   **URL:**  | on line version: <https://stats.libretexts.org/Bookshelves/Probability_Theory/Introductory_Probability_(Grinstead_and_Snell)> |
-|    **Rok:**  | 2006 | 
-:::
-
-<!-- ============================== -->
-
-::: {.g-col-2}
-![](/images/kaplan.jpg){width=1.2in}
-:::
-
-::: {.g-col-10}
-|  |  |
-|:----------|:------------------------------------------------------------| 
-|   **Název:** | Understanding Nonlinear Dynamics |
-|    **Autor:** | Daniel Kaplan, Leon Glass |
-|    **URL:**  |<https://link.springer.com/book/10.1007/978-1-4612-0823-5> |
-|    **PDF download:**  |<https://www.academia.edu/88608923/Understanding_Nonlinear_Dynamics> |
-|    **Rok:**  | February 1995 | 
-:::
-
-<!-- ============================== -->
-
-
-::: {.g-col-2}
-[![](/images/nonlinear-dynamics-and-chaos-2nd-ed.jpg){width=1.2in}](https://www.biodyn.ro/course/literatura/Nonlinear_Dynamics_and_Chaos_2018_Steven_H._Strogatz.pdf) 
-:::
-
-::: {.g-col-10}
-|  |  |
-|:----------|:------------------------------------------------------------| 
-|   **Název:** | NONLINEAR DYNAMICS AND CHAOS: With Applications to Physics, Biology, Chemistry, and Engineering |
-|    **Autor:** | Steven H. Strogatz |
-|    **URL:**  |<https://www.biodyn.ro/course/literatura/Nonlinear_Dynamics_and_Chaos_2018_Steven_H._Strogatz.pdf> |
-|    **Rok:**  | 2018 | 
-:::
-
-
-
-::: {.g-col-2}
-[![](/images/pdf_icon.png){width=1.2in}](https://bayes.wustl.edu/etj/articles/theory.1.pdf) 
-:::
-
-::: {.g-col-10}
-|  |  |
-|:----------|:------------------------------------------------------------| 
-|   **Název:** | Information Theory and Statistical Mechanics |
-|    **Autor:** | Jaynes, E. T. |
-|    **URL:**  |<https://bayes.wustl.edu/etj/articles/theory.1.pdf> |
-|    **Rok:**  | 2018 | 
-|    **Reference:**  | Physical Review. Series II. 106 (4): 620–630. | 
-:::
-
-
-
-::: {.g-col-2}
-[![](/images/pdf_icon.png){width=1.2in}](https://bayes.wustl.edu/etj/articles/stand.on.entropy.pdf) 
-:::
-
-::: {.g-col-10}
-|  |  |
-|:----------|:------------------------------------------------------------| 
-|   **Název:** | WHERE DO WE STAND ON MAXIMUM ENTROPY? |
-|    **Autor:** | Jaynes, E. T. |
-|    **URL:**  |<https://bayes.wustl.edu/etj/articles/stand.on.entropy.pdf> |
-|    **Rok:**  | 1978. | 
-|    **Reference:**  | Maximum Entropy Formalism Conference, Massachusetts Institute of Technology, May 2-4, 1978 | 
-:::
-
-
-
-::: {.g-col-2}
-[![](/images/alex_bellos_can_you_solve.jpg){width=1.2in}](https://us.amazon.com/Can-You-Solve-Problems-Perplexing/dp/161519388X/ref=sr_1_5?dib=eyJ2IjoiMSJ9.8OHr6xeTfuQuWaE9x0Gq0fFnr_1Lg6Ow22-38c30T6S18dBQlQ5ASORF8XHIzFU99KoeT4eBUUqwa43Icw8LUXxADlyMYRWoUIhkH-jALR6YxZa1pF1ALmHRzARleDiJ2gdnJTtL_x8yXMnKgZncGxxJmeLBmAI4I-zPg3o92xJo3GvkS1zIkMdeHseDcTPgGU-EFF7tKBEeS7YdZOpDRLOwejt-ASM1xZx494f4gpg.7h_L-EBzycJ3rklEp48gnvM6wXJ6F3Ia4VQxeIMcaBY&dib_tag=se&qid=1764975563&refinements=p_27%3ABello+Alex&s=books&sr=1-5) 
-:::
-
-::: {.g-col-10}
-|  |  |
-|:----------|:------------------------------------------------------------| 
-|   **Název:** | Can You Solve My Problems? |
-|    **Autor:** | Alex Bellos |
-|    **URL:**  |[Amazon](https://us.amazon.com/Can-You-Solve-Problems-Perplexing/dp/161519388X/ref=sr_1_5?dib=eyJ2IjoiMSJ9.8OHr6xeTfuQuWaE9x0Gq0fFnr_1Lg6Ow22-38c30T6S18dBQlQ5ASORF8XHIzFU99KoeT4eBUUqwa43Icw8LUXxADlyMYRWoUIhkH-jALR6YxZa1pF1ALmHRzARleDiJ2gdnJTtL_x8yXMnKgZncGxxJmeLBmAI4I-zPg3o92xJo3GvkS1zIkMdeHseDcTPgGU-EFF7tKBEeS7YdZOpDRLOwejt-ASM1xZx494f4gpg.7h_L-EBzycJ3rklEp48gnvM6wXJ6F3Ia4VQxeIMcaBY&dib_tag=se&qid=1764975563&refinements=p_27%3ABello+Alex&s=books&sr=1-5) |
-|    **Rok:**  | 2017. | 
-|    **Reference:**  | Alex Bellos Puzzle Books | 
-:::
-
-:::
-
+    # OrderedDict(
+    #     "Název" => "",
+    #     "Autor" => "",
+    #     "Reference" => " ",
+    #     "PDF" => "",
+    #     "URL" => "",
+    #     "Rok" => "",
+    #     "cover" => "/images/.jpg"
+    # ),
+]
+generate_book_list(book_list)
+```
 

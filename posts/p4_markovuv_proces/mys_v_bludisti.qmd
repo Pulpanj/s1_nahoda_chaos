@@ -1,0 +1,175 @@
+---
+title: "Myš v bludišti"
+date: "2025-10-20"
+updated: "2025-12-18"
+description: "Od  myši v bludišti k Markovovým řetězcům"
+draft: false
+categories: ["Markovovy řetězce", "Přednáška 4"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p4_markovuv_proces/mys_v_bludisti.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "mys_v_bludisti"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Myš v bludišti
+
+## Pravidla pohybu
+
+Mějme bludiště s buňkami uspořádanými do čtverce, kde se náhodně pohybuje myš,
+tj. myš si náhodně vybírá jakykoliv z průchodů mezi jednotlivými buňkami. Čísla
+u šipek udávají pravděpodobnosti přesunu myši z jedné bunky do druhé.
+
+```{dot}
+//| file: bludiste.dot
+//| fig-width: 3.5
+//| fig-height: 3.5
+``` 
+
+Myš je na počátku v buňce 1 a v každém časovém intervalu se přesune do jiné buňky. 
+
+## Jak analyzovat pozici myši po N pohybech
+
+Pozice myši v bludišti v n-tém časovém intervalu je náhodná veličina $X_n$
+nabývající jedné z 9 možných stavů $S \in (1..9)$.
+
+Pravděpodobnosti pozic $X_1,X_2$ lze naznačit následujícím způsobem:
+
+Po prvním přesunu se myš z buňky 1 
+
+  -   s pravděpodobností p=1/2 přesune  do buňky 2 a 
+    - po druhém přesunu se myš z buňky 2 
+        -   s pravděpodobností p=1/3 přesune  zpět do buňky 1 a 
+        -   s pravděpodobností p=1/3 přesune   do buňky 4 a 
+        -   s pravděpodobností p=1/3 přesune   do buňky 5 
+            - atd.
+  -   s pravděpodobností p=1/2 přesune  do buňky 4 
+    - po druhém přesunu se myš z buňky 4 
+        -   s pravděpodobností p=1/3 přesune  zpět do buňky 1 a 
+        -   s pravděpodobností p=1/3 přesune   do buňky 5 a 
+        -   s pravděpodobností p=1/3 přesune   do buňky 7 
+            - atd.
+
+Tento způsob analýzy je pro větší počet časových intervalů prakticky
+nepoužitelný.
+
+Důležitým poznatkem pro analýzu pravděpodobností $p(X_n=S_i)$ je fakt, že
+pravděpodobnost pozice myši $X_n$ závisí **jen** na její pozici
+(pravděpodobnosti její pozice) v předchozím časovém kroku $X_{n-1}$.
+
+Hodnoty pravděpodobností $p(X_n=S_i)$ (kde $S_i$ je jednou z 9 hodnot možných
+stavů $S$) tak závisí jen na vektoru hodnot pravděpodobností pozic v předchozím
+kroku $p(X_{n-1}=S_j)$ (kde $S_j$ je jednou z hodnot možných stavů $S$ v
+předchozim kroku).
+
+Tuto závislost lze popsat vztahem
+
+
+$$
+\begin{equation}
+p(X_i=S_i)=\sum_{j \in S} P_{i,j}\cdot p(X_{i-1}=S_j)
+\end{equation}
+$$
+
+Kde 
+
+$P_{i,j}$ jsou pravděpodobnost přechodu ze stavu j do stavu i (kde i a j
+stavy z množiny možných stavů $S \in (1..9)$. V příkladu s myší jsou tedy např.
+$P_{4,1}=\frac{1}{2}$, $P_{4,2}=\frac{1}{3}$ a $P_{6,5}=\frac{1}{4}$
+
+Pokud nadefinujeme vektory $p_n=p(X_n=S_i)$ a $p_{n-1}=p(X_{n-1}=S_j)$ a maticí
+pravděpodobností přechodu $\mathbb P = [P_{i,j}]$, kde i a j jsou stavy z $S
+\in (1..9)$, pak lze předchozí vztah zapsat maticově:
+
+
+$$
+\begin{equation}
+ p_n=\mathbb P \cdot   p_{n-1}
+\end{equation}
+$$
+
+Matice přechodů   $\mathbb P = [P_{i,j}]$ má pro příklad s myší následující tvar:
+
+
+$$
+\begin{equation}
+\mathbb P =\begin{bmatrix} 
+0           & \frac{1}{3}   &0             &\frac{1}{3}   &0             &0             &0             &0           &0 \\ 
+\frac{1}{2} & 0             &\frac{1}{2}   &0             &\frac{1}{4}   &0             &0             &0           &0 \\ 
+0           & \frac{1}{3}   &0             &0             &0             &\frac{1}{3}   &0             &0           &0 \\ 
+\frac{1}{2} & 0             &0             &0             &\frac{1}{4}   &0             &\frac{1}{2}   &0           &0 \\ 
+0           & \frac{1}{3}   &0             &\frac{1}{3}   &0             &\frac{1}{3}   &0             &\frac{1}{3} &0 \\ 
+0        & 0       &\frac{1}{2}   &0             &\frac{1}{4}   &0             &0             &0           &\frac{1}{2}\\ 
+0           & 0             &0             &\frac{1}{3}   &0             &0             &0             &\frac{1}{3} &0 \\ 
+0         & 0             &0             &0             &\frac{1}{4}   &0             &\frac{1}{2}   &0    &\frac{1}{2}\\
+0           & 0             &0             &0             &0             &\frac{1}{3}   &0             &\frac{1}{3} &0 
+\end{bmatrix}
+\end{equation}
+$$
+
+a počáteční stav je popsán vektorem 
+
+
+$$
+\begin{equation}
+ p_0=
+\begin{bmatrix} 
+1  \\  0 \\  0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 
+\end{bmatrix},
+\end{equation}
+$$
+
+
+## Vyčíslení pravděpodobností stavů
+
+Pravděpodobnosti stavu v dalších časových intervalech $p_1,p_2 \dots$ lze pak
+snadno vypočítat násobením maticí $\mathbb P$:
+
+
+```{julia}
+P = [
+    0.0 1/3 0.0 1/3 0.0 0.0 0.0 0.0 0.0
+    1/2 0.0 1/2 0.0 1/4 0.0 0.0 0.0 0.0
+    0.0 1/3 0.0 0.0 0.0 1/3 0.0 0.0 0.0
+    1/2 0.0 0.0 0.0 1/4 0.0 1/2 0.0 0.0
+    0.0 1/3 0.0 1/3 0.0 1/3 0.0 1/3 0.0
+    0.0 0.0 1/2 0.0 1/4 0.0 0.0 0.0 1/2
+    0.0 0.0 0.0 1/3 0.0 0.0 0.0 1/3 0.0
+    0.0 0.0 0.0 0.0 1/4 0.0 1/2 0.0 1/2
+    0.0 0.0 0.0 0.0 0.0 1/3 0.0 1/3 0.0
+]
+round.(P, digits=3)
+
+```
+
+```{julia}
+p0 = [1 0 0 0 0 0 0 0 0]'
+println(p0)
+```
+
+```{julia}
+p1=P*p0
+```
+
+```{julia}
+p2=P*p1
+```
+
+```{julia}
+p6=P*P*P*P*p2
+```
+
+
+```{julia}
+p51=P^51*p0
+```
+
+
+## Konvergence pravděpodobností stavů
+

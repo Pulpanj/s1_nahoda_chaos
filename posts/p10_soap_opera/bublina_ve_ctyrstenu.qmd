@@ -1,0 +1,298 @@
+---
+title: "Bublina ve čtyřstěnu"
+date: "2025-12-08"
+updated: "2026-01-25"
+description: "Jaké se vytvoří bubliny když ponoříme čtyřstěn do mýdlových bublin a proč?"
+draft: false
+categories: ["Optimalizace", "Přednáška 11" , "Bubliny"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p10_soap_opera/bublina_ve_ctyrstenu.pdf)"
+
+# html-math-method: katex
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "bublina_ve_ctyrstenu"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Jaké se vytvoří bubliny když ponoříme čtyřstěn do mýdlových bublin a proč?
+
+## Zadání 
+
+Pokud  ponoříme do roztoku s mýdlovými bublinami čtyřstěn (tetrahedral), vznikne uvnitř čtyřstěnu bublina, která se snaží minimalizovat svou plochu při daném objemu. Jaký tvar tato bublina má?
+
+
+
+## Princip řešení
+
+Vznikne bublina, která minimalizuje plochu při daném objemu. Plochu bubliny lze modelovat jako součet ploch čtyř mýdlových blan, které se napojují na stěny čtyřstěnu.
+
+
+
+```{julia}
+#| echo: false
+#| output: true  #asis
+#| fig-cap:  " Čtyřstěn a rovinné bubliny na jeho hranách a středu jeho stěn"
+
+
+using CairoMakie
+using GeometryBasics, Statistics
+using Makie: wireframe!, scatter!
+using Makie.GeometryBasics: Rect3f
+
+
+# --- Tetrahedron geometry -----------------------------------------------------
+V = Point3f[
+    (1, 1, 1),
+    (1, -1, -1),
+    (-1, 1, -1),
+    (-1, -1, 1)
+]
+
+F = TriangleFace{Int32}.([
+    (1, 2, 3),
+    (1, 2, 4),
+    (2, 3, 4),
+    (3, 1, 4)
+])
+
+outer_mesh = GeometryBasics.Mesh(V, F)
+
+# Centroid
+C = Point3f(
+    mean(p[1] for p in V),
+    mean(p[2] for p in V),
+    mean(p[3] for p in V)
+)
+
+
+# --- Plotting function --------------------------------------------------------
+function draw_box!(ax, limits)
+    (x1, x2), (y1, y2), (z1, z2) = limits
+
+    corners = [
+        Point3f(x1, y1, z1), Point3f(x2, y1, z1),
+        Point3f(x2, y2, z1), Point3f(x1, y2, z1),
+        Point3f(x1, y1, z2), Point3f(x2, y1, z2),
+        Point3f(x2, y2, z2), Point3f(x1, y2, z2)
+    ]
+
+    edges = [
+        (1, 2), (2, 3), (3, 4), (4, 1),
+        (5, 6), (6, 7), (7, 8), (8, 5),
+        (1, 5), (2, 6), (3, 7), (4, 8)
+    ]
+
+    for (a, b) in edges
+        lines!(ax, [corners[a], corners[b]], color=:black, linewidth=1)
+    end
+end
+
+function draw_tetra!(ax, irow, icol)
+    # Outer tetrahedron
+    # mesh!(ax, outer_mesh; color=(colorant"#4b9cd3", 0.15), shading=false)
+    wireframe!(ax, outer_mesh; color=:black, linewidth=1.5)
+
+    # Centroid
+    scatter!(ax, [C]; markersize=32, color=:red)
+    scatter!(ax, V; markersize=32, color=:blue)
+
+    labels = ["V1", "V2", "V3", "V4"]
+    offset = Vec3f(-0.0, -0.05, 0.08)
+
+    for (label, p) in zip(labels, V)
+        text!(ax, label, position=p + offset)
+    end
+
+
+    # Lines from centroid to vertices
+    for v in V
+        lines!(ax, [C, v]; color=:red, linewidth=3.5)
+    end
+
+    # Internal triangular walls
+    edges = [
+        (1, 2), (1, 3), (1, 4),
+        (2, 3), (2, 4), (3, 4)
+    ]
+
+    col_list = [:orange, :yellow, :blue, :green, :cyan, :magenta]
+
+    for (i, (a, b)) in enumerate(edges)
+        internal_mesh = GeometryBasics.Mesh(
+            Point3f[C, V[a], V[b]],
+            [TriangleFace{Int32}((1, 2, 3))]
+        )
+
+        mesh!(
+            ax,
+            internal_mesh;
+            color=(col_list[i], 0.15),
+            shading=true,
+            transparency=true,
+            overdraw=false
+        )
+    end
+    #  viewpoint depends on row/col 
+    ax.azimuth[] = deg2rad(20) * (icol - 1 + (irow - 1) * 3) + deg2rad(55)
+    ax.elevation[] = deg2rad(0) * (irow - 1) + deg2rad(30)
+
+    # hidedecorations!(ax)
+    # hidespines!(ax)
+
+    ax.xticks[] = -1.1:0.1:1.1
+    ax.yticks[] = -1.1:0.1:1.1
+    ax.zticks[] = -1.1:0.1:1.1
+
+    ax.limits[] = common_limits
+    draw_box!(ax, common_limits)
+
+    # ax.xticklabelsvisible[] = false
+    # ax.yticklabelsvisible[] = false
+    # ax.zticklabelsvisible[] = false
+end
+
+
+fig = Figure(size=(1200, 1200))
+# Grid size 
+nrows = 1
+ncols = 1
+axes = Matrix{Axis3}(undef, nrows, ncols)
+
+xs = getindex.(V, 1)
+ys = getindex.(V, 2)
+zs = getindex.(V, 3)
+
+xmin, xmax = minimum(xs), maximum(xs)
+ymin, ymax = minimum(ys), maximum(ys)
+zmin, zmax = minimum(zs), maximum(zs)
+pad = 0.1
+xmin -= pad
+xmax += pad
+ymin -= pad
+ymax += pad
+zmin -= pad
+zmax += pad
+common_limits = (
+    (xmin, xmax),
+    (ymin, ymax),
+    (zmin, zmax)
+)
+
+for irow in 1:nrows
+    for icol in 1:ncols
+        ax = Axis3(fig[irow, icol], aspect=:data)
+        axes[irow, icol] = ax
+        draw_tetra!(ax, irow, icol)
+    end
+end
+
+fig
+
+```
+
+## Odvození úhlu mezi bublinami
+Podle zákonů, které formuloval [Joseph Plateau](https://en.wikipedia.org/wiki/Plateau%27s_laws) nastane minimalizace plochy čtyři bublin, které se  setkávají v jednom bodě pod úhlem přibližně 109.47°, což je **úhel mezi hranami pravidelného čtyřstěnu**.
+
+$$
+\theta = 109.47^\circ = \arccos\!\left(-\frac13\right)
+$$
+
+
+## Definice vrcholů čtyřstěnu
+Nejsnaze se úhel odvodí tak, že si čtyřstěn umístíme tak, aby jeho **těžiště bylo v počátku** a jeho **čtyři vrcholy byly symetrické**.
+
+$$
+\begin{aligned}
+v_1 &= (1, 1, 1) \\
+v_2 &= (1, -1, -1) \\
+v_3 &= (-1, 1, -1) \\
+v_4 &= (-1, -1, 1)
+\end{aligned}
+$$
+
+Tyto čtyři vrcholy maji shodnou vzdálenost od počátku souřadnic (0, 0, 0) v kterém leží těžiště čtyřstěnu.
+
+
+
+## Úhel mezi dvěma vrcholy a počátkem
+Pokud si vezmeme dva vrcholy čtyřstěnu, například $v_1$ a $v_2$, můžeme spočítat úhel mezi přímkami z počátku (těžiště) k těmto vrcholům pomocí kosinové věty"
+
+$$
+\cos\theta = \frac{v_1 \cdot v_2}{\|v_1\|\,\|v_2\|}
+$$
+
+
+
+## Výpočet jednotlivých částí 
+
+_Násobení vektorů:_
+$$
+v_1 \cdot v_2
+= (1)(1) + (1)(-1) + (1)(-1)
+= 1 - 1 - 1
+= -1
+$$
+
+_Výpočet velikostí vektorů:_
+
+$$
+\|v_1\| = \sqrt{1^2 + 1^2 + 1^2} = \sqrt{3}
+$$
+$$
+\|v_2\| = \sqrt{1^2 + (-1)^2 + (-1)^2} = \sqrt{3}
+$$
+
+ _Dosazení do kosinové věty:_
+$$
+\cos\theta = \frac{-1}{\sqrt{3}\,\sqrt{3}}= \frac{-1}{3}
+$$
+
+takže nakonec dostaneme:
+
+$$
+\theta = \arccos\left(-\frac13\right)
+$$
+
+Což je přibližně:
+
+
+```{julia}
+theta = acos(-1 / 3)
+theta_deg = rad2deg(theta)
+```
+
+### Ověření vzorce numericky pomocí Julia
+```{julia} 
+using LinearAlgebra
+
+# --- 1. Define tetrahedron vertices (regular, edge length arbitrary) ---
+V1 = [1.0,  1.0,  1.0]
+V2 = [1.0, -1.0, -1.0]
+V3 = [-1.0, 1.0, -1.0]
+V4 = [-1.0, -1.0, 1.0]
+
+V = [V1, V2, V3, V4]
+
+# --- 2. Compute centroid ---
+C = (V1 + V2 + V3 + V4) / 4
+
+# --- 3. Vectors from centroid to vertices ---
+U = [v .- C for v in V]
+
+# --- 4. Function to compute angle between two vectors ---
+angle(u, v) = acos( dot(u,v) / (norm(u)*norm(v)) )
+
+# --- 5. Compute all 6 angles between centroid→vertex vectors ---
+println("Angles between centroid→vertex vectors:")
+for i in 1:4, j in i+1:4
+    θ = angle(U[i], U[j])
+    println("Angle V$(i)–V$(j) = ", θ*180/pi, "°")
+end
+```
+

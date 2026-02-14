@@ -30,7 +30,6 @@
 }
 
 
-
 .listing-title a {
     font-weight: bold;
     font-size: 1.1em;
@@ -41,6 +40,13 @@
 .quarto-listing-table table table-striped table-hover {
     background-color: #1a5e9e;
 }
+
+/* 
+.literature_table tr:nth-child(even),
+.literature_table tr:nth-child(odd) {
+    /* background-color: rgb(220, 153, 153) !important;
+    border: 1px solid red !important; */
+} */
 
 
 /* <header id="title-block-header" class="quarto-title-block"><h1 class="title display-7">Post With Code</h1></header> */

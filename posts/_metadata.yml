@@ -20,6 +20,10 @@ title-block-banner: true
 format:
   typst:
       keep-typ: false
+      papersize: a4
+      margin:
+        x: 1.5cm
+        y: 1.5cm
       toc: true
       number-sections: true
       toc-depth: 2       # Optional: controls heading levels shown

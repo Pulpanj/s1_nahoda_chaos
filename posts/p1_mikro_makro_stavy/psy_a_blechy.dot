@@ -1,4 +1,4 @@
-digraph TEST {
+digraph blechy {
     rankdir = TB;
     node [fontsize=24];
     graph [compound = true; border = 2;fontsize=24];
