@@ -6,7 +6,7 @@ description: "Nelineární diferenční rovnice a deterministický chaos "
 draft: false
 categories: ["Přednáška 5", "Nelineární dynamika"]
 # image: "image.jpg"
-pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p6_nelinearni_dynamika/logisticka_mapa.pdf)"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p5_nelinearni_dynamika/logisticka_mapa.pdf)"
 
 html-math-method: katex
 engine: julia
@@ -338,10 +338,10 @@ function plot_sequence(x0, R; N=200, M=50)
         title="x(n+1) = R.x(n).(1 - x(n))\nR = $R, x₀ = $x0",
         size=(900, 500),
         # marker=:dot,
-        markersize=2,
+        # markersize=2,
         # markerstrokecolor = :black, 
-        markerstrokewidth = 0.5,
-        color=:orange,
+        # markerstrokewidth = 0.5,
+        # color=:orange,
         legend=false,
     )
 end
@@ -411,7 +411,7 @@ function bifurcation_diagram(pngname,
 
     p = scatter(xs, ys;
         markersize=0.4,
-        color=:blue,
+        # markerstrokecolor=:blue,
         marker=:dot,
         markerstrokewidth=0,
         xlabel="R",
@@ -426,8 +426,8 @@ function bifurcation_diagram(pngname,
         ys = [y1, y1, y2, y2, y1]
         plot!(p, xs, ys; color=:red, lw=1)
     end
-    savefig(p, "figs/"*pngname*".png")
-    return 
+    savefig(p, "./figs/" * pngname * ".png")
+    return
 end
 ```
 Funkce pro vykreslení bifurkačního diagramu
@@ -514,7 +514,7 @@ Detail bifurkačního diagramu  \#2
 #| code-fold: true
 #| fig-path: figs
 bifurcation_diagram(
-    "bifur4",    3.70250, 3.7028; x0=0.1,    N=3000, samples=1000,    discard=1500,  ylims=[0.485, 0.512])
+    "bifur4", 3.70250, 3.7028; x0=0.1, N=3000, samples=1000, discard=1500, ylims=[0.485, 0.512])
 ```
 Detail bifurkačního diagramu \#3
 :::
