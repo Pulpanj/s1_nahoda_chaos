@@ -534,7 +534,7 @@ $$
 R_3 = \frac{R_1 R_2}{R_1 - R_2}
 $$
 
-který známější ve tvaru:
+který je známější ve tvaru:
 $$
 \frac{1}{R_3} = \frac{1}{R_2} - \frac{1}{R_1}
 $$

@@ -20,15 +20,15 @@ format:
         engine: typst
 ---
 
-# Jaké se vytvoří bubliny když ponoříme čtyřstěn do mýdlových bublin a proč?
+## Jaké se vytvoří bubliny když ponoříme čtyřstěn do mýdlových bublin a proč?
 
-## Zadání 
+### Zadání 
 
 Pokud  ponoříme do roztoku s mýdlovými bublinami čtyřstěn (tetrahedral), vznikne uvnitř čtyřstěnu bublina, která se snaží minimalizovat svou plochu při daném objemu. Jaký tvar tato bublina má?
 
 
 
-## Princip řešení
+### Princip řešení
 
 Vznikne bublina, která minimalizuje plochu při daném objemu. Plochu bubliny lze modelovat jako součet ploch čtyř mýdlových blan, které se napojují na stěny čtyřstěnu.
 
@@ -220,7 +220,7 @@ Tyto čtyři vrcholy maji shodnou vzdálenost od počátku souřadnic (0, 0, 0) 
 
 
 
-## Úhel mezi dvěma vrcholy a počátkem
+### Úhel mezi dvěma vrcholy a počátkem
 Pokud si vezmeme dva vrcholy čtyřstěnu, například $v_1$ a $v_2$, můžeme spočítat úhel mezi přímkami z počátku (těžiště) k těmto vrcholům pomocí kosinové věty"
 
 $$
@@ -229,7 +229,7 @@ $$
 
 
 
-## Výpočet jednotlivých částí 
+### Výpočet jednotlivých částí 
 
 _Násobení vektorů:_
 $$
@@ -267,7 +267,7 @@ theta = acos(-1 / 3)
 theta_deg = rad2deg(theta)
 ```
 
-### Ověření vzorce numericky pomocí Julia
+#### Ověření vzorce numericky pomocí Julia
 ```{julia} 
 using LinearAlgebra
 

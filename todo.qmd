@@ -15,6 +15,7 @@ draft: false
 -   linky do literatury doplnit do postu
 -   pridat policka newly added a pole pro logicke razeni do seznamu postu
 -   cross reference option (popisky schemat a cislovani)
+-   sjednoti captions pro figs a listings
 -   zlepsit cislovani rovnic
 -   pridat seznamy obrazku kodu a tabulek
 -   post fixni body
@@ -61,10 +62,10 @@ draft: false
         -   pocet zmen znamenka
 -   Dynamika
     -   Linearni dynamika s diskretnim casem
-    -   Nelinearni dynamika s diskretnim casem
-        -   konvergence, cykly, chaos
+    -   ~~Nelinearni dynamika s diskretnim casem~~
+        -   ~~konvergence, cykly, chaos~~
         -   ~~fixni body~~
-        -   bifuračni diagram
+        -   ~~bifuračni diagram~~
     -   Dynamika se spojitym casem
         -   Verhusuv model
         -   Riccatiho diferencialni rovnice)

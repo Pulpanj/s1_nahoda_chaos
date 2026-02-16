@@ -21,15 +21,9 @@ format:
 
 ---
 
-format:
-    typst:
-        output-file: "geometrie_bublin"
-        output-ext: "pdf"
-        engine: typst
-
 # Jaké tvary mají mýdlové bubliny když se vzájemně dotýkají a jak to souvisí s geometrií a fyzikou?
 
-### Co říkají Plateauovy zákony
+## Co říkají Plateauovy zákony
 
 Pro **rovnovážné** mýdlové filmy / bubliny platí:
 

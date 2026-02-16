@@ -22,12 +22,16 @@ format:
       keep-typ: false
       papersize: a4
       margin:
-        x: 1.5cm
-        y: 1.5cm
+        x: 1.8cm
+        y: 1.8cm
       toc: true
+      lof: true
+      lot: true
       number-sections: true
       toc-depth: 2       # Optional: controls heading levels shown
       number-depth: 2
+      cap-location: top
+      fig-cap-location: top
       include-in-header:
           - text: |
               #set table(stroke: 0.5pt + black) 
@@ -80,6 +84,13 @@ format:
     code-overflow: wrap
     code-annotations: hover
     code-fold: true
+    cap-location: top
+    fig-cap-location: top
+    title: "All Posts"
+    # listing:
+    #   contents: /posts
+    #   type: default
+
 css: /resources/styles.css        
 
 format-links:

@@ -85,7 +85,7 @@ end
 
 ```{julia}
 #| code-fold: true
-# Ukázka použití: počet kombinací pro25 kostek a součet 20
+# Ukázka použití: počet kombinací pro 5 kostek a součet 20
 N = 5
 K = 20
 result = dice_sum_combinations(N, K)

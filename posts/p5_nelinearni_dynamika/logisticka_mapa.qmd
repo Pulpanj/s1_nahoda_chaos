@@ -1,0 +1,532 @@
+---
+title: "Nelineární  diferenční rovnice"
+date: "2025-10-27"
+updated: "2026-02-12"
+description: "Nelineární diferenční rovnice a deterministický chaos "
+draft: false
+categories: ["Přednáška 5", "Nelineární dynamika"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p6_nelinearni_dynamika/logisticka_mapa.pdf)"
+
+html-math-method: katex
+engine: julia
+
+format:
+    typst:
+        output-file: "logisticka_mapa"
+        output-ext: "pdf"
+        # include-after-body: 
+        #     text: |
+        #    
+
+---
+
+
+# Nelineární  diferenční rovnice a deterministický chaos
+
+Popis systému s diskrétním časem je jeho stav popsán posloupností stavů
+$\{x_i\}$ v diskrétních časových bodech $i=0,1,2,3,\ldots$. 
+
+Zajímavým systémem s nelineární, byť jednoduchou, diferenční rovnicí je tzv.
+kvadratická mapa (nebo také [logistická
+mapa](https://en.wikipedia.org/wiki/Logistic_map) ) definovaná následujícím
+vztahem:
+
+$$
+x_{n+1} = R \cdot x_n \cdot (1-x_n)
+$$
+
+kde $x_0=C$  je počáteční stav systému.
+
+
+::: {#lst-code0 .listing}
+
+```{julia}
+#| echo: true
+#| output: false  
+#| code-fold: true
+
+function iterate_map(x0, R; N=200)
+    """
+        iterate_map(x0, R; N=200)
+
+    Compute the sequence x(n+1) = R * x(n) * (1 - x(n))
+    starting from x(0) = x0, for N steps.
+    Returns a vector of length N+1.
+    """
+    x = zeros(Float64, N + 1)
+    x[1] = x0
+    for n in 1:N
+        x[n+1] = R*(1 - x[n]) * x[n]
+    end
+    return x
+end
+```
+Funkce generující vektor hodnot $x_n$ pro $n \in 1..N$
+:::
+
+## Posloupnosti hodnot systému s nelineární diferenční rovnicí
+
+Následující grafy ukazují jak se mění chování tohoto systému pro různé hodnoty
+parametru $R$ (počáteční hodnota $x_0=0.3$ ovlivnuje jen rychlost s jakou se
+systém ustálí na některém z shora uvedeném typu chování).
+
+
+::: {#lst-code1 .listing}
+```{julia}
+#| echo: true
+#| output: false  
+#| code-fold: true
+
+using Plots
+
+function sweep_plot(x0, Rs; N=50, nrefs=[], ncols=2)
+    """
+        sweep_plot(x0, Rs; N=200, ncols=3)
+
+    Create a grid of plots for several R values.
+    """
+    plots = []
+    for (R, nref) in zip(Rs, nrefs)
+        # use R and x together
+        x = iterate_map(x0, R; N=N)
+
+        # last  values (or fewer)
+        k = min(nref, length(x))
+        tail_vals = x[end-k+1:end]
+        tail_idx = (length(x)-k+1):length(x)
+
+        # choose distinct colors for tail points
+        colors = distinguishable_colors(k)
+
+        # base plot with markers
+        p = plot(0:N, x,
+            xlabel="n",
+            ylabel="x(n)",
+            title="R = $R",
+            lw=2,
+            marker=:circle,
+            markersize=3,
+            legend=false)
+
+        # highlight each last point with its own color
+        for (i, v, c) in zip(tail_idx, tail_vals, colors)
+            scatter!(p, [i], [v];
+                marker=:circle,
+                markersize=5,
+                color=c)
+
+            # reference line to the right in the same color
+            plot!(p, [20, N], [v, v];
+                lw=1.5,
+                ls=:solid,
+                color=c,
+                alpha=0.8)
+        end
+
+        # base plot with markers
+        plot!(0:N, x,
+            xlabel="n",
+            ylabel="x(n)",
+            title="R = $R",
+            lw=2,
+            color=:orange,
+            marker=:circle,
+            markersize=3,
+            legend=false)
+        push!(plots, p)
+    end
+
+    plot(plots..., size=(1000, 1300),
+        layout=(ceil(Int, length(Rs) / ncols), ncols))
+end
+```
+Funkce pro vykreslení sady posloupností pro různé hodnoty R
+:::
+
+
+::: {#fig-fig1 .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: true
+
+Rs = [1.0, 3.25, 3.5, 3.559, 3.59]
+nrefs = [3, 2, 4, 8, 40]
+p = sweep_plot(0.3, Rs, N=80, nrefs=nrefs, ncols=1)
+display(p)
+```
+Vývoj systému s nelineární diferenční rovnicí pro různé hodnoty parametru R"
+:::
+
+
+## Typy chování systému s nelineární diferenční rovnicí
+
+V závislosti na hodnotě parametru $R$ se tento systém pro rostoucí čas $n$ vyvíjí několika způsoby:
+
+ - Ustálený stav - hodnota $x_n$ konverguje k nějaké konstantní hodnotě
+ - Cyklus - hodnota $x_n$ osciluje mezi 2 a více hodnotami
+ - Aperiodický vývoj - hodnota $x_n$ se se zvyšujícím $n$ zdánlivě náhodně mění
+(ale tento aperiodický vývoj - označovaný jako deterministický chaos -
+samozřejmě není náhodný, jako jiné skutečné náhodné procesy) 
+
+Hraniční hodnoty parametru R pro různé typy chování: 
+
+- Pro 3,0000 < R < 3,4495 existuje stabilní cyklus periody 2.
+- Pro 3,4495 < R < 3,5441 existuje stabilní cyklus periody 4.
+- Pro 3,5441 < R < 3,5644 existuje stabilní cyklus periody 8.
+- Pro 3,5644 < R < 3,5688 existuje stabilní cyklus periody 16.
+- Jak se R zvyšuje blíže k 3,570, existují stabilní cykly periody 2n,kde se perioda cyklů zvyšuje s přiblížením k 3,570.
+- Pro hodnoty R > 3,570 existují úzké rozsahy periodických řešení a také aperiodické chování.
+
+## Pavučinové grafy
+
+Nejlépe se charakter chování kvadratické mapy demonstruje na tzv. pavučinovém
+grafu, který zobrazuje iterace posloupnosti $\{x_n\}$. Graf zobrazuje pro
+hodnotu $x_0$ (osa x) nalezenou hodnotu $x_1$ (osa y). Následně se pak pro
+nalezenou hodnotu $x_1$ (pomocí přímky x=y) nalezne nová hodnota na ose x, pro
+kterou se najde odpovídající nová hodnota $x_{2}$ a takto se pokračuje pro další hodnoty $x_{n+1}$. 
+
+Následující grafy ukazují jak vypadají pavučinové grafy posloupností $x_{n+1}$. pro nahoře zobrazené  hodnoyy R.
+
+
+::: {#lst-code1 .listing}
+```{julia}
+#| echo: true
+#| output: false  
+#| code-fold: true
+using Plots, LaTeXStrings
+function cob_qmap(; x0=0.5, R=2, n_cobs=5)
+
+    function qmap(x)
+        return R * x * (1 - x)
+    end
+
+    function basegraph()
+        plot(
+            x -> qmap(x), 0, 1, linewidth=3,
+            linecolor=:red,
+            ylabel="y", yticks=range(0, (R + 0.1) / 4 + 0.2, step=0.1),
+            xlabel="x", xticks=range(0, 1, step=0.1),
+            framestyle=:origin,
+            grid=:on, minorgrid=true,
+            size=(900, 500),
+            show=false,
+            legend=false,
+            title="R = $R"
+        )
+        annotate!(x0 + 0.01, -0.08, Plots.text(L"$x_0$", :green), show=false)
+        p0 = plot!([0, (R + 0.1) / 4 + 0.2], [0, (R + 0.1) / 4 + 0.2],
+            xlim=(0, 1), ylim=(0, (R + 0.1) / 4 ),
+            linewidth=1, linecolor=:blue, show=false)
+        return p0
+    end
+
+    x = Array{Float64}(undef, n_cobs + 1)
+    lineX = Array{Float64}(undef, 2 * n_cobs + 1)
+    lineY = Array{Float64}(undef, 2 * n_cobs + 1)
+    x[begin+0] = x0
+    lineX[begin+0] = x0
+    lineY[begin+0] = 0
+    for i in 1:n_cobs
+        x[begin+i] = qmap(x[begin+i-1])
+        lineX[begin+2*i-1] = x[begin+i-1]
+        lineY[begin+2*i-1] = x[begin+i]
+        lineX[begin+2*i] = x[begin+i]
+        lineY[begin+2*i] = x[begin+i]
+    end
+    p1 = basegraph()
+    p1 = plot!(
+        lineX, lineY,
+        arrow=Plots.Arrow(:closed, :head, 4.5, 2.2),
+        linecolor=:grey, label="x0=$x0",
+        transparency=0.3
+    )
+    p1 = plot!(
+        lineX[end-10:end], lineY[end-10:end],
+        linecolor=:lightgreen,
+        linewidth=2
+    )
+    display(p1)
+end
+```
+Funkce pro zobrazení pavučinového grafu
+:::
+
+Následující grafy ukazují jak vypadají pavučinové grafy posloupností $x_{n+1}$. pro nahoře zobrazené  hodnoty R.
+
+::: {#fig-fig2 .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: false
+cob_qmap(x0=0.3, R=1, n_cobs=80)
+```
+Pavučinový graf pro R=1
+:::
+
+::: {#fig-fig2 .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: false
+cob_qmap(x0=0.3, R=3.25, n_cobs=80)
+```
+Pavučinový graf pro R=3.25
+:::
+
+
+::: {#fig-fig3 .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: false
+cob_qmap(x0=0.3, R=3.5, n_cobs=80)
+```
+Pavučinový graf pro R=3.5
+:::
+
+::: {#fig-fig4 .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: false
+cob_qmap(x0=0.3, R=3.55, n_cobs=100)
+```
+Pavučinový graf pro R=3.55
+:::
+
+
+::: {#fig-fig5 .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: false
+cob_qmap(x0=0.3, R=3.759, n_cobs=80)
+```
+Pavučinový graf pro R=3.759
+:::
+
+## Aperiodické chování
+
+Poslední pavučinový graf jasně indikuje aperiodické chování posloupnosti
+$\{x_n\}$, hodnoty posloupnosti $\{x_n\}$ nekonvergují k žádnému cyklu jak je
+možno demonstrovat následujícím grafem:
+
+
+::: {#lst-code1 .listing}
+```{julia}
+#| echo: true
+#| output: false
+#| fig-fold: show
+#| lst-cap: "Hodnoty posloupnosti pro R=3.579 a n=1500..2000"
+#| label: l1
+
+
+using Plots
+
+function plot_sequence(x0, R; N=200, M=50)
+    """
+        plot_sequence(x0, R; N=200)
+
+    Plot the sequence for given x0 and R.
+    """
+    x = iterate_map(x0, R; N=N)
+    scatter(M:N, x[M:N],
+        xlabel="n",
+        ylabel="x(n)",
+        title="x(n+1) = R.x(n).(1 - x(n))\nR = $R, x₀ = $x0",
+        size=(900, 500),
+        # marker=:dot,
+        markersize=2,
+        # markerstrokecolor = :black, 
+        markerstrokewidth = 0.5,
+        color=:orange,
+        legend=false,
+    )
+end
+
+```
+Funkce pro graf hodnot posloupnosti
+:::
+
+
+::: {#fig-seq .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: false
+
+p = plot_sequence(0.3, 3.579, N=2000, M=500)
+display(p)
+```
+Hodnoty posloupnosti pro R=3.579 a n=1500..2000
+:::
+
+
+```{=typst}
+#pagebreak()
+```
+
+## Bifurkační diagramy
+
+Charakter chování kvadratické mapy pro různé hodnoty R nejlepe ukazuje
+bifurkační diagram, který ukazuje hodnoty posloupnosti $\{x_n\}$ v závislosti
+na parametru R (zobrazeny jsou hodnoty pro n>500, což zajistí, že není
+zobrazena konvergence počátečních hodnot k případným cyklům):
+
+
+::: {#lst-code20 .listing}
+```{julia}
+#| echo: true
+#| output: false  
+#| code-fold: true
+#| fig-format: png
+using Plots
+
+function bifurcation_diagram(pngname,
+    Rmin, Rmax; x0=0.1, N=2000, discard=500, samples=1500,
+    ylims=[0, 1],
+    x1=0, y1=0, x2=0, y2=0
+)
+    """
+        bifurcation_diagram(Rmin, Rmax; x0=0.1, N=2000, discard=500, samples=800)
+
+    Generate a bifurcation diagram for R in [Rmin, Rmax].
+    - `discard` iterations are thrown away to remove transients.
+    - `samples` is the number of R values.
+    """
+    Rs = range(Rmin, Rmax; length=samples)
+    xs = Float64[]
+    ys = Float64[]
+
+    for R in Rs
+        x = iterate_map(x0, R; N=N)
+        # keep only the tail after transients
+        for n in discard+1:N+1
+            push!(xs, R)
+            push!(ys, x[n])
+        end
+    end
+
+    p = scatter(xs, ys;
+        markersize=0.4,
+        color=:blue,
+        marker=:dot,
+        markerstrokewidth=0,
+        xlabel="R",
+        ylabel="x",
+        # title="Bifurkační diagram for x(n+1) = R.x(n).1 - x(n))",
+        legend=false,
+        ylims=ylims,
+        size=(900, 600)
+    )
+    if x1 != x2
+        xs = [x1, x2, x2, x1, x1]
+        ys = [y1, y1, y2, y2, y1]
+        plot!(p, xs, ys; color=:red, lw=1)
+    end
+    savefig(p, "figs/"*pngname*".png")
+    return 
+end
+```
+Funkce pro vykreslení bifurkačního diagramu
+:::
+
+
+Je zajímavé zobrazovat detailní části bifurkačního diagramu (dokazujícího, ze chování se mění i při sebemenší změně hodnoty R).
+Následující grafy "zoomují" do malých oblastí  bifurkačního diagramu:
+
+::: {.landscape} 
+
+
+::: {#fig-bif1 .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: true
+#| fig-path: figs
+bifurcation_diagram(
+    "bifur1",    2.9, 4.0; x0=0.1, N=800, samples=500,  x1=3.57, y1=0.2, x2=3.75, y2=0.95)
+```
+Bifurkační diagram
+:::
+
+![](figs/bifur1.png){height=80%}
+
+
+
+```{=typst}
+#pagebreak()
+``` 
+
+
+
+
+
+
+::: {#fig-bif2 .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: true
+#| fig-path: figs
+bifurcation_diagram(
+    "bifur2", 3.57, 3.75; x0=0.1, N=1000, samples=500,
+    ylims=[0.2, 0.95], x1=3.7, y1=0.24, x2=3.706, y2=0.93)
+```
+Detail bifurkačního diagramu  \#1
+:::
+
+![](figs/bifur2.png){height=80%}
+
+
+
+```{=typst}
+#pagebreak()
+```
+
+::: {#fig-bif3 .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: true
+#| fig-path: figs
+bifurcation_diagram(
+    "bifur3",    3.7, 3.706; x0=0.1,    N=2000, samples=1000,    
+    discard=1500,    ylims=[0.22, 0.93],  x1=3.70250, y1=0.485, x2=3.7028, y2=0.512)
+```
+Detail bifurkačního diagramu  \#2
+:::
+
+![](figs/bifur3.png){height=80%}
+
+
+
+```{=typst}
+#pagebreak()
+```
+
+::: {#fig-bif4 .figure}
+```{julia}
+#| echo: true
+#| output: true  
+#| code-fold: true
+#| fig-path: figs
+bifurcation_diagram(
+    "bifur4",    3.70250, 3.7028; x0=0.1,    N=3000, samples=1000,    discard=1500,  ylims=[0.485, 0.512])
+```
+Detail bifurkačního diagramu \#3
+:::
+
+![](figs/bifur4.png){height=80%}
+:::
+
+
+<!-- 
+```{=typst}
+// #figure(image("figs/plot1.png"), caption: ["First figure caption"])
+ #outline(title: "Figures", target: figure.where(kind: image)) 
+//#pagebreak()
+``` 
+-->
