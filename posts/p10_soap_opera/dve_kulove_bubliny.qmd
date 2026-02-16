@@ -549,6 +549,10 @@ případě bublin a proudů v případě odporů).
 Výsledek lze ověřit numericky na konkrétních hodnotách pomocí následnících funkcí:
 
 ```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+
 R3func(R1, R2) = R1 * R2 / (R1 - R2)
 
 Xfunc(R1, R2) = sqrt(R1^2 + R2^2 - R1 * R2)
@@ -565,9 +569,14 @@ function check_geometry(R1, R2)
 end
 ```
 
+
 Pak už zkoušet různé hodnoty:
 
-```julia
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
 check_geometry(3.0, 1.5)
 check_geometry(4.0, 2.0)
 check_geometry(5.0, 3.0)
