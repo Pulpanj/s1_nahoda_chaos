@@ -13,3 +13,6 @@ krasna animace pohybu 3 těles  na základě Newtonovske mechaniky, článek pop
 - Minimalni povrchy 
   - [Sbírka křivek a povrchů včetně jejich vzorečků ](https://www.mathcurve.com/surfaces.gb/surfaces.shtml){target="_blank"}
   sbirka seriozních matematických popisů křivek, povrchů a podobnych objektu, v tomto [odkazu](https://www.mathcurve.com/surfaces.gb/minimale/minimale.shtml) jsou minimalni povrchy, ktere vznikaji jako reseni problemu minimalni plochy mezi nejakymi hranicemi, jsou to krasne a zajimave objekty, ktere se vyskytuji v mnoha oblastech matematiky a fyziky 
+
+  - Procesy obnovy
+- [Video ukazující aplikaci časových rozložení událostí na reálné problemy](https://video.sas.com/detail/video/2563969348001/system-modeling-with-sas-simulation-studio-part-one) {target="_blank"}. Ukázkové video, které ukazuje, jak se dají v software použít časová rozložení pro modelování reálných problémů, a jak se dají použít pro modelování procesu obnovy po nějakém narušení systému.

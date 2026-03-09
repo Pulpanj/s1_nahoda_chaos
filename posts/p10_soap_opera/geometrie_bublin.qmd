@@ -3,7 +3,7 @@ title: "Tvary mýdlových bublin"
 date: "2025-12-08"
 updated: "2026-01-25"
 description: "Jaké tvary mají mýdlové bubliny když se vzájemně dotýkají?"
-draft: false
+draft: true
 categories: ["Přednáška 10", "Bubliny"]
 # image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p10_soap_opera/geometrie_bublin.pdf)"
@@ -33,4 +33,45 @@ Pro **rovnovážné** mýdlové filmy / bubliny platí:
 
 Jinými slovy: konfigurace, kde se plochy potkávají jinak než v 120°/109.47°, je **nestabilní** a film se přeuspořádá.
 
+<!-- 
 
+
+The Young–Laplace equation for minimal surfaces describes the equilibrium of a surface with zero mean curvature, where the pressure difference (
+) across the surface is zero (
+), implying the surface minimizes area, as in soap films. The equation is defined as 
+, where 
+ are principal radii of curvature. 
+Wikipedia
+
+https://en.wikipedia.org/wiki/Young%E2%80%93Laplace_equation
+
+https://en.wikipedia.org/wiki/Minimal_surface
+
+Key Aspects of the Minimal Surface Equation
+Mean Curvature: A surface is minimal if its mean curvature 
+ is zero at every point, meaning the principal curvatures are equal in magnitude but opposite in sign (
+).
+Physical Meaning: The equation, derived from the Wikipedia Young–Laplace equation (
+), states that for a soap film with equal pressure on both sides (
+), the mean curvature 
+ must be zero.
+PDE Representation: For a surface defined as the graph of a function 
+, the minimal surface equation is a second-order nonlinear partial differential equation:
+
+.
+Geometric Property: Every point on a minimal surface is a saddle point (negative Gaussian curvature, 
+).
+Examples: Common examples include the catenoid, helicoid, and Enneper surface. 
+Wikipedia
+Wikipedia
+ +4
+The equation was formulated by Lagrange in 1762 as part of solving the Scribd Plateau problem. 
+
+
+https://www.sciencedirect.com/topics/mathematics/minimal-surface-equation
+
+https://www.scribd.com/document/246099961/Minimal-Surface 
+
+
+https://en.wikipedia.org/wiki/Euler%E2%80%93Lagrange_equation
+-->

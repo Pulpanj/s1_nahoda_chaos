@@ -1,0 +1,571 @@
+---
+title: "Pan Bayes jde na rande"
+date: "2026-03-02"
+updated: "2026-03-08"
+description: "Podmíněná pravděpodobnost v reálném životě"
+draft: false
+categories: ["Přednáška 13", "Podmíněná pravděpodobnost"]
+# image: "image.jpg"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p5_nelinearni_dynamika/bayesovo_rande.pdf)"
+
+html-math-method: katex
+engine: julia
+
+format:
+    typst:
+        output-file: "bayesovo_rande"
+        output-ext: "pdf"
+        # include-after-body: 
+        #     text: |
+        #    
+
+---
+
+# Podmíněná pravděpodobnost v reálném životě - schůzka na Petříně
+
+Mladý pan Bayes se rozhodl jít na rande. On i jeho potenciální partnerka Anička
+bydlí na kolejích na Strahově a dohodnou se, že se setkají u sochy na Petříně u
+sochy Karla Hynka Máchy. Oba mají mnoho jiných zájmů a tak neví kdy přesně
+dorazí, ale slibili si, určitě nekdy mezi 18:00 a 19:00 tam budou. Pan Bayes je
+ochoten čekat na Aničku maximálně 15 minut, pak se radši bude věnovat nějakému
+matematickému problému. Anička má více nápadníku a tak je na pana Bayese
+ochotna čekat maximálně 5 minut.
+
+## Zadání
+
+- Jaké jsou šance, že Pan Bayes se a Aničkou potká a projdou se po Petříně na
+jejich prvním rande ?
+
+- Jakou pravděpodobnost má Pan Bayes, že se a Aničkou potká a projdou se po Petříně na
+jejich prvním rande, pokud dorazi např. v 18:20 
+
+- Jakou pravděpodobnost má Pan Bayes na první rande, pokud dorazi mezi 18:20 a 18:30 
+a jak se tato pravděpodobnost změní, pokud přijde mezi 18:00 a 18:10 ?
+
+
+## Grafické znázornění problému
+
+Doby příchodu pana Bayese a Aničky můžeme znázornit v grafu, kde na ose x bude čas příchodu pana Bayese a na ose y čas příchodu Aničky. Oba časy budou v minutách od 18:00, takže interval bude od 0 do 60 minut. Každý bod v tomto grafu bude reprezentovat konkrétní kombinaci časů příchodu pana Bayese a Aničky (a intervalů, kdy budou čekat). Například bod (10, 5) bude znamenat, že pan Bayes přišel v 18:05 a Anička přišla v 18:10. 
+
+Rande se bude konat, pokud se časy příchodu pana Bayese a Aničky budou překrývat, což znamená, že rozdíl mezi nimi bude menší než 15 minut pro pana Bayese a menší než 5 minut pro Aničku. To znamená, že rande se bude konat, pokud bude bod v grafu ležet v obdélníkové oblasti, kde jsou splněny tyto podmínky (a obdélníkem prochází přímka $T_a = T_b$). 
+
+Grafické znázornění jiných časů příchodu $T_a=18:25$, $T_b=18:35$, ukazuje situaci kdy se rande neuskuteční.
+
+```{julia}
+#| echo: false
+#| output: true #asis 
+##| fig-cap: "Rande na Petříně"
+
+using Plots, LaTeXStrings,Dates,Colors
+
+"""
+    rgb_parts(c)
+Vrátí RGB komponenty barvy `c` jako tuple (r, g, b).
+"""
+function rgb_parts(c)
+    col = parse(Colorant, string(c)) |> RGB
+    return (col.r, col.g, col.b)
+end
+
+"""
+    to_rgb(c)
+Převede libovolnou barvu `c` na RGB.
+Podporuje jak již RGB, tak i jiné formy (např. :red, "#ff0000", "red").
+"""
+to_rgb(c) = c isa Colorant ? RGB(c) : RGB(parse(Colorant, string(c)))
+
+"""
+    mix_colors(ca, cb, w=0.5
+    Smíchá dvě barvy `ca` a `cb` s váhou `w` pro `ca` a `1-w` pro `cb`.
+    Vrací výslednou barvu jako RGB.
+"""
+function mix_colors(ca, cb, w=0.5)
+    a = to_rgb(ca)
+    b = to_rgb(cb)
+    return RGB(
+        a.r * w + b.r * (1 - w),
+        a.g * w + b.g * (1 - w),
+        a.b * w + b.b * (1 - w)
+    )
+end
+
+"""
+    draw_polygon_datetime!(p, start, xs, ys; color=:red, alpha=0.3)
+
+Vykreslí polygon v grafu `p` s časovými osami.
+Souřadnice jsou zadány v minutách od času `start`.
+"""
+function draw_polygon_datetime!(p, start, xs, ys; color=:red, alpha=0.3, lw=1.5)
+
+    # převod DateTime → float přes unix time (ms)
+    tofloat(t) = float(Dates.value(t))   # value(t) = milliseconds since epoch
+
+    xs = tofloat.(start .+ Minute.(xs))
+    ys = tofloat.(start .+ Minute.(ys))
+
+    # převod barvy na RGBA
+    # převede libovolnou barvu na RGB
+    to_rgb(c) = c isa Colorant ? RGB(c) : RGB(parse(Colorant, string(c)))
+    base = to_rgb(color)
+    rgba = RGBA(base.r, base.g, base.b, alpha)
+
+    # vykreslení polygonu
+    plot!(p, Plots.Shape(xs, ys),
+        color=rgba,
+        linecolor=base,
+        transparency=0.01,
+        linewidth=lw)
+end
+
+"""
+    rande_cross(ta, tb; ca=:blue, cb=:red, dta=5, dtb=15, rande=true)
+
+Vykreslí křížek pro Aničku a pana Bayese v grafu `p` s časovými osami.
+- `ta`: čas příchodu Aničky v minutách od `start`
+- `tb`: čas příchodu pana Bayese v minutách od `start`
+- `ca`: barva pro Aničku
+- `cb`: barva pro pana Bayese   
+- `dta`: doba čekání Aničky v minutách
+- `dtb`: doba čekání pana Bayese v minutách   
+- `rande`: jestli se Anička a pan Bayes potkají (true/false)
+"""
+
+function rande_cross(ta, tb; ca=:blue, cb=:red, dta=5, dtb=15, rande=true)
+    t0 = start
+    # cekani Anicky
+    y1 = t0 + Minute(ta)
+    y2 = y1 + Minute(dta)
+    plot!(p, [t0, t0], [y1, y2]; color=ca, lw=3)
+    annotate!(p, t0 + Minute(2) + Second(20), y2 - Minute(3), text("Anička \nčeká", 8, ca))
+
+
+    # vodorovné čáry 
+    for t in start+Minute(ta):Minute(dta):start+Minute(ta + dta)
+        # hline!(p, [t], color=(:red, 0.4), lw=0.5)
+        # hline!(p, [t], color=RGBA(rgb_parts(ca)..., 0.4))
+        xmin = start + Minute(0)
+        xmax = start + Minute(tb + dtb)
+        plot!(p, [xmin, xmax], [t, t], color=RGBA(rgb_parts(cb)..., 0.4), lw=1.5)
+
+    end
+
+    # cekani Bayese
+    x1 = t0 + Minute(tb)
+    x2 = x1 + Minute(dtb)
+    plot!(p, [x1, x2], [t0, t0]; color=cb, lw=3)
+    annotate!(p, x1 + Minute(2) + Second(20), t0 + Minute(2), text("Bayes \nčeká", 8, cb))
+
+    # svislé čáry x 
+    for t in start+Minute(tb):Minute(dtb):start+Minute(tb + dtb)
+        ymin = start + Minute(0)
+        ymax = start + Minute(ta + dta)
+        plot!(p, [t, t], [ymin, ymax], color=RGBA(rgb_parts(cb)..., 0.4), lw=1.5)
+    end
+
+    cr = mix_colors(ca, cb, 0.5)
+    draw_polygon_datetime!(p, start, [tb, tb + dtb, tb + dtb, tb], [ta, ta, ta + dta, ta + dta], color=cr, alpha=0.3)
+    # draw_rect_datetime!(p, start; x1=tb, x2=tb + dtb, y1=ta, y2=ta + dta, color=cr, alpha=0.25)
+
+    if rande
+        annotate!(p, x1 + Minute(3), y1 + Minute(3), text("Rande!", 10, cr))
+    else
+        annotate!(p, x1 + Minute(3), y1 + Minute(3), text("Rande\n nebude", 10, cr))
+    end
+end
+
+# časový interval
+start = DateTime(2025, 3, 3, 18, 0)
+stop = DateTime(2025, 3, 3, 19, 0)
+
+# body po 10 minutách
+times = start:Minute(10):stop
+
+#  diagonála
+p = plot(times, times;
+    xlabel=L"čas příchodu a interval čekání pana Bayese ($T_b$)",
+    ylabel=L"čas příchodu a interval čekání Aničky ($T_a$)",
+    title="Rande na Petříně",
+    color=:black, lw=2,
+    legend=false,
+    xticks=(times, Dates.format.(times, "HH:MM")),
+    yticks=(times, Dates.format.(times, "HH:MM")),
+    size=(1000, 1000)
+)
+
+label = "Anička a  Bayes \nse potkají, když \nbude kdykoliv během \njejich čekání "*L"$T_a=T_b$"
+annotate!(p, start + Minute(45), start + Minute(55), text(label, 10, :black))
+
+rande_cross(10, 5, rande=true)
+rande_cross(25, 35, ca=:green, cb=:brown, rande=false)
+
+display(p)
+
+```
+
+## Pravděpodobnost rande 
+
+Pro nalezení pravděpodobnosti rande je nutno rozlišit dva případy: 
+
+1) Anička dorazí dříve a bude $\delta_a$=5 minut čekat na pana Bayes
+
+$$
+\begin{align}
+T_a \lt T_b \\
+T_b - T_a \lt \delta_a
+\end{align}
+$$
+
+
+2) Pan Bayes dříve a bude $\delta_b$=15 minut čekat na Aničku 
+$$
+\begin{align}
+T_a \lt T_b \\
+T_a - T_b \lt \delta_b
+\end{align}
+$$
+
+Podmínky 1) a 2) lze zobrazit graficky jako dvě oblasti $P1$ a $P2$ v následujícím grafu, který reprezentuje všechny možné kombinace časů příchodu pana Bayese a Aničky (během intervalu $T$ tj. v našem případě jedné hodiny).
+
+```{julia}
+#| echo: false
+#| output: true #asis 
+##| fig-cap: "Rande na Petříně"
+
+using Plots, LaTeXStrings, Dates, Colors
+
+# časový interval
+start = DateTime(2025, 3, 3, 18, 0)
+stop = DateTime(2025, 3, 3, 19, 0)
+
+# body po 10 minutách
+times = start:Minute(10):stop
+
+#  diagonála
+p = plot(times, times;
+    xlabel=L"čas příchodu a interval čekání pana Bayese ($T_b$)",
+    ylabel=L"čas příchodu a interval čekání Aničky ($T_a$)",
+    title="Pravděpodobnost rande na Petříně",
+    color=:white, lw=2,
+    legend=false,
+    xticks=(times, Dates.format.(times, "HH:MM")),
+    yticks=(times, Dates.format.(times, "HH:MM")),
+    size=(1000, 1000)
+)
+dta = 5
+dtb = 15
+xs = [0, 60, 60, 0]
+ys = [0, 0, 60, 0]
+
+draw_polygon_datetime!(p, start, xs, ys, color=:red, alpha=0.05)
+annotate!(p, start + Minute(45), start + Minute(5), text("Anička přišla dříve,\nčekala, ale pan Bayes \nnedorazil do 5 minut ", 10, RGBA(rgb_parts(:red)..., 0.4)))
+
+xs = [0, 0, 60, 0]
+ys = [0, 60, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:blue, alpha=0.05)
+annotate!(p, start + Minute(15), start + Minute(55), text("Pan Bayes přišel dříve,\nčekal, ale Anička \nnedorazila do 15 minut ", 10, RGBA(rgb_parts(:blue)..., 0.4)))
+
+
+xs = [0, dta, 60, 60, 0]
+ys = [0, 0, 60 - dta, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:red, alpha=0.35)
+annotate!(p, start + Minute(33), start + Minute(20), text(L"$P_1$:"* " Anička přišla dříve,\n čekala a pan Bayes dorazil,\nza méně než 5 minut,\nRANDE bude ", 10, :red))
+
+
+xs = [0, 0, 60 - dtb, 60, 0]
+ys = [0, dtb, 60, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:blue, alpha=0.35)
+annotate!(p, start + Minute(23), start + Minute(30), text(L"$P_2$:"* " Pan Bayes \npřišel dříve,\n čekal a Anička \ndorazila,za méně než \n15 minut,\nRANDE bude ", 10, :blue))
+
+xs = [0, 60]
+ys = [0, 60]
+draw_polygon_datetime!(p, start, xs, ys, color=:white, alpha=1, lw=3)
+display(p)
+
+```
+
+Pravděpodobnost rande je pak poměr ploch odpovídajících $P_1$ a $P_2$ k ploše celého čtverce.  
+
+Plochy $P_1$ a $P_2$ lze vypočítat jako rozdíl  plochy celého čtverce a plochy trojúhelníku, který vznikne z podmínky pro rande. Pro $P_1$ je to trojúhelník s odvěsnami $T$ a $T-\delta_a$, pro $P_2$ je to trojúhelník s odvěsnami $T$ a $T-\delta_b$.:
+$$
+\begin{equation}
+P_1 = \frac{1}{2} \cdot T^2 - \frac{1}{2} \cdot (T-\delta_a)^2 = \frac{1}{2} \cdot 60^2 - \frac{1}{2} \cdot 55^2 = 1800 - 1512.5 = 287.5
+\end{equation}
+$$
+
+$$
+\begin{equation}
+P_2 = \frac{1}{2} \cdot T^2 - \frac{1}{2} \cdot (T-\delta_b)^2 = \frac{1}{2} \cdot 60^2 - \frac{1}{2} \cdot 45^2 = 1800 - 1012.5 = 787.5
+\end{equation}
+$$
+
+Celková plocha čtverce je $P_0 = T^2 = 60^2 = 3600$.
+
+Pravděpodobnost rande je tedy
+
+$$
+\begin{equation}
+p(rande)=\frac{(P_1+P_2)}{P_0} = \frac{287.5 + 787.5}{3600} = \frac{1075}{3600} \approx 0.2986
+\end{equation}
+$$
+
+
+## Pravděpodobnost rande, pokud pan Bayes přijde v 18:20
+
+Pokud pan Bayes přijde  v 18:20, pak se jeho čas příchodu stává pevnou hodnotou $T_b=20$ minut. V tomto případě se rande bude konat, pokud Anička dorazí mezi 25 a 35 minutami (tedy mezi 18:15 a 18:35), protože pan Bayes bude čekat 15 minut a Anička bude čekat 5 minut.
+
+
+
+
+```{julia}
+#| echo: false
+#| output: true #asis 
+##| fig-cap: "Rande na Petříně"
+
+using Plots, LaTeXStrings, Dates, Colors
+
+# časový interval
+start = DateTime(2025, 3, 3, 18, 0)
+stop = DateTime(2025, 3, 3, 19, 0)
+
+# body po 10 minutách
+times = start:Minute(10):stop
+
+#  diagonála
+p = plot(times, times;
+    xlabel=L"čas příchodu a interval čekání pana Bayese ($T_b$)",
+    ylabel=L"čas příchodu a interval čekání Aničky ($T_a$)",
+    title="Pravděpodobnost rande pokud pan Bayes přijde v 18:20",
+    color=:white, lw=2,
+    legend=false,
+    xticks=(times, Dates.format.(times, "HH:MM")),
+    yticks=(times, Dates.format.(times, "HH:MM")),
+    size=(1000, 1000)
+)
+dta = 5
+dtb = 15
+xs = [0, 60, 60, 0]
+ys = [0, 0, 60, 0]
+
+draw_polygon_datetime!(p, start, xs, ys, color=:red, alpha=0.05)
+annotate!(p, start + Minute(45), start + Minute(5), text("Anička přišla dříve,\nčekala, ale pan Bayes \nnedorazil do 5 minut ", 10, RGBA(rgb_parts(:red)..., 0.4)))
+
+xs = [0, 0, 60, 0]
+ys = [0, 60, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:blue, alpha=0.05)
+annotate!(p, start + Minute(10), start + Minute(55), text("Pan Bayes přišel dříve,\nčekal, ale Anička \nnedorazila do 15 minut ", 10, RGBA(rgb_parts(:blue)..., 0.4)))
+
+
+xs = [0, dta, 60, 60, 0]
+ys = [0, 0, 60 - dta, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:red, alpha=0.35)
+annotate!(p, start + Minute(48), start + Minute(34), text(L"$P_1$:" * " Anička přišla dříve,\n čekala a pan Bayes dorazil,\nza méně než 5 minut,\nRANDE bude ", 10, :red))
+
+
+xs = [0, 0, 60 - dtb, 60, 0]
+ys = [0, dtb, 60, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:blue, alpha=0.35)
+annotate!(p, start + Minute(38), start + Minute(45), text(L"$P_2$:" * " Pan Bayes \npřišel dříve,\n čekal a Anička \ndorazila,za méně než \n15 minut,\nRANDE bude ", 10, :blue))
+
+xs = [0, 60]
+ys = [0, 60]
+draw_polygon_datetime!(p, start, xs, ys, color=:white, alpha=1, lw=3)
+
+xs = [20, 20]
+ys = [15, 35]
+draw_polygon_datetime!(p, start, xs, ys, color=:green, alpha=1, lw=3)
+annotate!(p, start + Minute(12), start + Minute(33), text(L"$p(rande | T_b=20):" * " Pan Bayes \npřišel v 18:30,a Anička \ndorazila,mezi \n18:15 a 18:35,\nRANDE bude ", 10, :green))
+display(p)
+
+```
+
+
+Pravděpodobnost rande v tomto případě je tedy poměr délky intervalu, ve kterém se rande koná, k celkovému intervalu, ve kterém Anička může dorazit:
+$$
+\begin{equation}    
+p(rande | T_b=20) = \frac{20}{60} = \approx 0.3333
+\end{equation}
+$$
+
+## Pravděpodobnost rande, pokud pan Bayes přijde mezi 18:20 a 18:30
+Pokud pan Bayes přijde mezi 18:20 a 18:30, pak se jeho čas příchodu stává náhodnou proměnnou $T_b$ s rovnoměrným rozdělením na intervalu [20, 30] minut.Grafické znázornění situace, kdy pan Bayes přijde mezi 18:20 a 18:30, ukazuje, že rande se bude konat, pokud Anička dorazí mezi 15 a 45 minutami (tedy mezi 18:15 a 18:45), protože pan Bayes bude čekat 15 minut a Anička bude čekat 5 minut.
+
+
+```{julia}
+#| echo: false
+#| output: true #asis 
+##| fig-cap: "Rande na Petříně"
+
+using Plots, LaTeXStrings, Dates, Colors
+
+# časový interval
+start = DateTime(2025, 3, 3, 18, 0)
+stop = DateTime(2025, 3, 3, 19, 0)
+
+# body po 10 minutách
+times = start:Minute(10):stop
+
+#  diagonála
+p = plot(times, times;
+    xlabel=L"čas příchodu a interval čekání pana Bayese ($T_b$)",
+    ylabel=L"čas příchodu a interval čekání Aničky ($T_a$)",
+    title="Pravděpodobnost rande pokud pan Bayes přijde někdy mezi 18:20 a 18:30",
+    color=:white, lw=2,
+    legend=false,
+    xticks=(times, Dates.format.(times, "HH:MM")),
+    yticks=(times, Dates.format.(times, "HH:MM")),
+    size=(1000, 1000)
+)
+dta = 5
+dtb = 15
+xs = [0, 60, 60, 0]
+ys = [0, 0, 60, 0]
+
+draw_polygon_datetime!(p, start, xs, ys, color=:red, alpha=0.05)
+annotate!(p, start + Minute(45), start + Minute(5), text("Anička přišla dříve,\nčekala, ale pan Bayes \nnedorazil do 5 minut ", 10, RGBA(rgb_parts(:red)..., 0.4)))
+
+xs = [0, 0, 60, 0]
+ys = [0, 60, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:blue, alpha=0.05)
+annotate!(p, start + Minute(10), start + Minute(55), text("Pan Bayes přišel dříve,\nčekal, ale Anička \nnedorazila do 15 minut ", 10, RGBA(rgb_parts(:blue)..., 0.4)))
+
+
+xs = [0, dta, 60, 60, 0]
+ys = [0, 0, 60 - dta, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:red, alpha=0.35)
+annotate!(p, start + Minute(48), start + Minute(34), text(L"$P_1$:" * " Anička přišla dříve,\n čekala a pan Bayes dorazil,\nza méně než 5 minut,\nRANDE bude ", 10, :red))
+
+
+xs = [0, 0, 60 - dtb, 60, 0]
+ys = [0, dtb, 60, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:blue, alpha=0.35)
+annotate!(p, start + Minute(38), start + Minute(45), text(L"$P_2$:" * " Pan Bayes \npřišel dříve,\n čekal a Anička \ndorazila,za méně než \n15 minut,\nRANDE bude ", 10, :blue))
+
+xs = [0, 60]
+ys = [0, 60]
+draw_polygon_datetime!(p, start, xs, ys, color=:white, alpha=1, lw=3)
+
+xs = [20, 20, 30, 30, 30, 20]
+ys = [0, 60, 60, 0, 0, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:orange, alpha=0.05, lw=1)
+annotate!(p, start + Minute(38), start + Minute(20), text(L"$p(T_b\in[20,30])$:" * "\nPan Bayes přišel \nmezi 18:20 a 18:30", 10, :orange))
+
+xs = [20, 20, 30, 30, 20]
+ys = [15, 35, 45, 25, 15]
+draw_polygon_datetime!(p, start, xs, ys, color=:green, alpha=0.3, lw=3)
+annotate!(p, start + Minute(12), start + Minute(36), text(L"$p(rande | T_b\in[20,30])$:" * "\nPan Bayes přišel \nmezi 18:20 a 18:30 \na rande bude", 10, :green))
+
+display(p)
+
+```
+
+Pravděpodobnost rande v tomto případě je tedy poměr plochy oblasti, ve které se rande koná, k ploše oblasti, ve které pan Bayes může přijít mezi 18:20 a 18:30. Výpočet této pravděpodobnosti je tedy podobný jako v předchozím případě, ale místo úsečky $T_a \in $(18:15,18:35) se interval $\delta_b=10$ minut, ve kterém pan Bayes může přijít. Pravděpodobnost rande je pak d8na  podílem  ploch zeleného lichoběžníku a oranžového obdélníku.
+
+$$
+\begin{equation}
+p(rande)=\frac{(5+15) \cdot 10}{10 \cdot 60}=\frac{1}{3}= \approx 0.3333
+\end{equation}
+$$
+
+Tento případ se tedy příliš neliší od předchozího (kdy pan Bayes dorazí přesně v 18:20), protože obě doby čekání nejsou 
+nijak ovlivněny omezujícím intervalem 18:00 a 19:00. Situace pro jakýkoliv čas mezi 18:20 a 18:30 je tedy naprosto analogická příchodu přesně v 18:20. Následující případ ukazuje, že situace je jiná pokud pan Bayes přijde mezi 18:00 a 18:10.
+
+## Pravděpodobnost rande, pokud pan Bayes přijde mezi  18:00 a 18:10
+Grafické znázornění situace, kdy pan Bayes přijde mezi 18:00 a 18:10, je na následujícím grafu:
+
+
+```{julia}
+#| echo: false
+#| output: true #asis 
+##| fig-cap: "Rande na Petříně"
+
+using Plots, LaTeXStrings, Dates, Colors
+
+# časový interval
+start = DateTime(2025, 3, 3, 18, 0)
+stop = DateTime(2025, 3, 3, 19, 0)
+
+# body po 10 minutách
+times = start:Minute(10):stop
+
+#  diagonála
+p = plot(times, times;
+    xlabel=L"čas příchodu a interval čekání pana Bayese ($T_b$)",
+    ylabel=L"čas příchodu a interval čekání Aničky ($T_a$)",
+    title="Pravděpodobnost rande pokud pan Bayes přijde v 18:20",
+    color=:white, lw=2,
+    legend=false,
+    xticks=(times, Dates.format.(times, "HH:MM")),
+    yticks=(times, Dates.format.(times, "HH:MM")),
+    size=(1000, 1000)
+)
+dta = 5
+dtb = 15
+xs = [0, 60, 60, 0]
+ys = [0, 0, 60, 0]
+
+draw_polygon_datetime!(p, start, xs, ys, color=:red, alpha=0.05)
+annotate!(p, start + Minute(45), start + Minute(5), text("Anička přišla dříve,\nčekala, ale pan Bayes \nnedorazil do 5 minut ", 10, RGBA(rgb_parts(:red)..., 0.4)))
+
+xs = [0, 0, 60, 0]
+ys = [0, 60, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:blue, alpha=0.05)
+annotate!(p, start + Minute(20), start + Minute(55), text("Pan Bayes přišel dříve,\nčekal, ale Anička \nnedorazila do 15 minut ", 10, RGBA(rgb_parts(:blue)..., 0.4)))
+
+
+xs = [0, dta, 60, 60, 0]
+ys = [0, 0, 60 - dta, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:red, alpha=0.35)
+annotate!(p, start + Minute(48), start + Minute(34), text(L"$P_1$:" * " Anička přišla dříve,\n čekala a pan Bayes dorazil,\nza méně než 5 minut,\nRANDE bude ", 10, :red))
+
+
+xs = [0, 0, 60 - dtb, 60, 0]
+ys = [0, dtb, 60, 60, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:blue, alpha=0.35)
+annotate!(p, start + Minute(38), start + Minute(45), text(L"$P_2$:" * " Pan Bayes \npřišel dříve,\n čekal a Anička \ndorazila,za méně než \n15 minut,\nRANDE bude ", 10, :blue))
+
+xs = [0, 60]
+ys = [0, 60]
+draw_polygon_datetime!(p, start, xs, ys, color=:white, alpha=1, lw=3)
+
+xs = [0, 0, 10, 10, 10, 00]
+ys = [0, 60, 60, 0, 0, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:orange, alpha=0.05, lw=1)
+annotate!(p, start + Minute(16), start + Minute(40), text(L"$p(T_b\in[0,10])$:" * "\nPan Bayes přišel \nmezi 18:20 a 18:30", 10, :orange))
+
+xs = [0, 0, 10, 10, 5,0]
+ys = [0, 15, 25, 05, 0, 0]
+draw_polygon_datetime!(p, start, xs, ys, color=:green, alpha=0.3, lw=3)
+annotate!(p, start + Minute(16), start + Minute(3), text(L"$p(rande | T_b\in[0,10])$:" * "\nPan Bayes přišel \nmezi 18:00 a 18:10 \na rande bude", 10, :green))
+
+display(p)
+
+```
+
+Pravděpodobnost rande je i v tomto případě poměr plochy oblasti, ve které se rande koná, k ploše oblasti, ve které pan Bayes může přijít mezi 18:20 a 18:30. Výpočet vypočte plocha (uříznutého) zeleného lichoběžníku k ploše oranžového obdélníku .
+
+$$
+\begin{equation}
+p(rande)=\frac{(5+15) \cdot 10-\frac{5 \cdot 5}{2}}{10 \cdot 60}=\frac{187.5}{600}=  0.3125
+\end{equation}
+$$
+
+## Závěr 
+
+Nechoďte na rande včas...
+
+Celý tento příklad ukazuje co je podmíněná pravděpodobnost.
+
+Její definice 
+
+$$
+\begin{equation}
+p(A|B)=\frac{p(A \cap B)}{p(B)}
+\end{equation}
+$$
+
+je v nasem posledním případě interpretována jako pravděpodobnost, že se rande uskuteční (A), pokud pan Bayes přijde mezi 18:20 a 18:30 (B). Tato pravděpodobnost se vypočítá jako poměr plochy oblasti, ve které se rande koná (A ∩ B), k ploše oblasti, ve které pan Bayes může přijít mezi 18:20 a 18:30 (B).
+
+Pravděpodobnost $p(B)$ je tedy pravděpodobnost, že pan Bayes přijde mezi 18:20 a 18:30, což je poměr délky intervalu (10 minut) k celkovému intervalu (60 minut), tedy $\frac{10}{60}$. 
+
+Pravděpodobnost $p(A \cap B)$ je pak poměr plochy oblasti, ve které se rande koná když pan Bayes přijde mezi 18:20 a 18:30, k ploše celého čtverce, což je $\frac{187.5}{3600}$.
+

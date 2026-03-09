@@ -58,7 +58,7 @@ book_list = [
         "cover" => "/images/stats_full.png"
     ),
     OrderedDict(
-        "label" => "Přednáška 5 (Nelineární dynamika a chaos)",
+        "label" => "Přednáška 4,5 (Nelineární dynamika a chaos)",
     ),
     OrderedDict(
         "Název" => "Understanding Nonlinear Dynamics",
@@ -155,3 +155,11 @@ book_list = [
 generate_book_list(book_list)
 ```
 
+
+<!-- 
+https://nzdr.ru/data/media/biblio/kolxoz/M/MD/Morgan%20F.%20Geometric%20measure%20theory.%20A%20beginner's%20guide%20(4ed.,%20AP,%202009)(ISBN%20012374444X)(O)(259s)_MD_.pdf
+Geometric Measure Theory
+A Beginner’s Guide
+Fourth Edition
+
+FRANK MORGAN -->

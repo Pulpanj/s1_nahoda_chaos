@@ -25,7 +25,7 @@ format:
 ## Popis zadání
 
 Mějme dělo, ktere střílí náboje o hmotnosti $m$ díky energii $E$ (kterou dodává
-nálož děla). Díky tomu je náboj vystřelen rychlostí $v$. . Pro jednoduchost
+nálož děla). Díky tomu je náboj vystřelen rychlostí $v$. Pro jednoduchost
 předpokládáme, že náboj není brzděn vzduchem, a že gravitační pole je
 konstantní (odstranění prvního předpokladu by vedlo k realistickému popisu
 střely balistickou křivkou, nehomogenní gravitační pole by spíše vedlo k
@@ -419,7 +419,7 @@ Dosazením $y^*=x^*$, do [-@eq-one]:
 $$
 \begin{align} 
 S - x^2 - 2x^2 = S - 3x^2 = 0 \\
-x^2 = \frac{S}{3}
+x^2 = \frac{S}{3}\\
 x=\sqrt{\frac{S}{3}}=y 
 \end{align}
 $${#eq-xstar}
