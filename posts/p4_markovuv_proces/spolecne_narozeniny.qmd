@@ -1,0 +1,170 @@
+---
+title: "Společné narozeniny"
+date: "2025-10-20"
+updated: "2026-03-11"
+description: "Kolik lidí musí být ve skupině, aby pravděpodobnost, že alespoň dva lidé mají stejné narozeniny, byla větší než 50%?"
+draft: false
+categories: ["Hádanka", "Přednáška 4"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p4_markovuv_proces/spolecne_narozeniny.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "spolecne_narozeniny"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Společné narozeniny
+
+Kolik lidí musí být ve skupině, aby pravděpodobnost, že alespoň dva lidé mají stejné narozeniny, byla větší než 50%?
+
+## Řešení
+
+Nechť $n$ je počet lidí ve skupině a předpokládejme, že každý člověk má stejnou pravděpodobnost narození v kterémkoli z 365 dní v roce (ignorujeme přestupné roky a další faktory). Označme $P(n)$ pravděpodobnost, že 2 nebo více lidí maji shodne narozeniny ve skupině $n$ lidí. Pak komplementární pravděpodobnost, že všichni lidé mají různé narozeniny, je $Q(n)=1-P(n)$. Pravdepodobnost $Q(n)$, že všichni lidé mají různé narozeniny, lze vypočítat jako:
+
+-   $n=1$ - první člověk může mít narozeniny kdykoli
+
+$$
+    Q(1) = 1
+$$
+
+-   $n=2$ - druhý člověk musí mít narozeniny v jiném dni než první)
+
+$$
+Q(2) = \left(1 - \frac{364}{365} \right)
+$$
+
+-   $n=3$ - třetí člověk musí mít narozeniny v jiném dni než první dva
+
+$$
+Q(3) =\left(1 - \frac{364}{365} \right) \cdot \left(1 - \frac{363}{365} \right)
+$$
+
+-  $n=4$ - čtvrtý člověk musí mít narozeniny v jiném dni než první tři etc.
+
+Obecně pro $n$ lidí je pravděpodobnost, že všichni mají různé narozeniny rovna:
+
+$$
+Q(n) = \prod_{k=0}^{n-1} \left(1 - \frac{k}{365} \right)
+$$
+A pravděpodobnost, že alespoň dva lidé mají stejné narozeniny je tedy:
+
+$$
+P(n) = 1 - Q(n) = 1 - \prod_{k=0}^{n-1} \left(1 - \frac{k}{365} \right)
+$$
+
+## Výpočet pravděpodobnosti $P(n)$
+
+Výpočet $P(n)$ je snadný pomocí kódu v jazyce Julia:
+
+```{julia}
+Q = 1.0
+n_half = 0
+Pn_half = 0.0
+P = zeros(365)
+for n in 1:365
+    Q *= (1 - (n - 1) / 365)
+    P[n] = 1 - Q
+    if Q < 0.5 && Pn_half == 0.0
+        n_half = n
+        Pn_half = P[n]
+    end
+    if mod((n + 1), 10) == 0 && n < 170
+        println("n = $(n+1) ->  P(n) = $(P[n])")
+    end
+end
+println("Pro n = $(n_half) je pravděpodobnost P(n) = $Pn_half, což je větší než 0.5")
+```
+
+Graficky můžeme zobrazit závislost $P(n)$ na $n$:
+
+```{julia}
+using Plots, LaTeXStrings
+g = plot(P,
+    xlabel=L"$n$ - velikost skupiny ",
+    ylabel=L"$P(n)$ - pravděpodobnost alespoň dvou lidí se stejnými narozeninami",
+    title="Společné narozeniny",
+    color=:blue, lw=2,
+    legend=false,
+    xlim=(1, 80),
+    ylim=(0, 1),
+    minorgrid=true, gridalpha=0.3,
+    xticks=(0:10:180),
+    yticks=(0:0.1:1),
+    size=(800, 800),
+)
+g = plot!(P[1:180],
+    markershape=:circle, markersize=2, markercolor=:red,
+)
+display(g)
+```
+
+
+# Ověření výsledku simulací
+
+Následující kod v jazyce Julia simuluje náhodné přiřazení narozenin pro skupinu $n$ lidí a ověřuje, zda alespoň dva lidé mají stejné narozeniny:
+
+```{julia}
+function simulate_birthdays(n)
+    birthdays = rand(1:365, n)  # náhodné přiřazení narozenin
+    return length(unique(birthdays)) < n  # vrací true, pokud jsou shodné narozeniny
+end
+function estimate_probability(n, trials)
+    count = 0
+    for _ in 1:trials
+        if simulate_birthdays(n)
+            count += 1
+        end
+    end
+    return count / trials
+end
+n = 23
+trials = 1000 # počet simulací    
+estimated_P = estimate_probability(n, trials)
+println("Odhad pravděpodobnosti P($n) z $trials simulací: $estimated_P")
+```
+
+Graficky můžeme zobrazit odhad pravděpodobnosti z simulací pro různé hodnoty $n$:
+```{julia}
+using Plots, LaTeXStrings
+max_n = 80
+estimated_Ps_20 = [estimate_probability(n, 20) for n in 1:max_n]
+estimated_Ps_1000 = [estimate_probability(n, 1000) for n in 1:max_n]
+# estimated_Ps_10000 = [estimate_probability(n, 10000) for n in 1:max_n]
+g_sim = plot(P[1:max_n],
+    xlabel=L"$n$ - velikost skupiny ",
+    ylabel=L"$P(n) - pravděpodobnost narozeninové kolize",
+    title="Odhad pravděpodobnosti z simulací z $trials simulací \na teoretická pravděpodobnost",
+    label="Teoretická pravděpodobnost",
+    color=:blue, lw=1,
+    legend=true,
+    xlim=(1, max_n), ylim=(0, 1.1),
+    minorgrid=true, gridalpha=0.3,
+    xticks=(0:10:max_n),
+    yticks=(0:0.1:1.1),
+    size=(800, 800)
+)
+g_sim = plot!(estimated_Ps_20,
+    markershape=:circle, markersize=2, markercolor=:red,color=:red, label="Odhad z 20 simulací",
+)
+g_sim = plot!(estimated_Ps_1000,
+    markershape=:circle, markersize=3, markercolor=:green,color=:green, label="Odhad z 1000 simulací",
+)
+# g_sim = plot!(estimated_Ps_10000,
+#     markershape=:circle, markersize=5, markercolor=:brown,color=:brown, label="Odhad z 10000 simulací"
+# )
+display(g_sim)
+```
+
+
+## Závěr
+
+Vypočítáme $P(n)$ pro různé hodnoty $n$ a zjistíme, že pro $n=23$ je $P(23)
+\approx 0.5073$, což znamená, že v skupině 23 lidí je pravděpodobnost, že
+alespoň dva lidé mají stejné narozeniny, větší než 50%.
+
+Pravděpodobnost $P(n)$ roste s rostoucím $n$ a pro $n=50$ je již $P(50) \approx 0.97$, což znamená, že v skupině 50 lidí je téměř jisté, že alespoň dva lidé mají stejné narozeniny.

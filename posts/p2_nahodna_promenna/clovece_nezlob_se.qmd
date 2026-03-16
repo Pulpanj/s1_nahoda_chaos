@@ -1,7 +1,7 @@
 ---
 title: "Člověče nezlob se"
 date: "2025-10-13"
-updated: "2025-11-23"
+updated: "2026-03-13"
 description: "Analýza pořadí házení kostkou: kdy, poprvé padne 6-ka ?"
 draft: false
 categories: ["Náhodná proměnná", "Seminář 2", "Odvození" ]
@@ -25,7 +25,7 @@ Pokud mu nepadne musi čekat na další kolo.
 Jak dlouho čeká - kolikrát musi hodit kostkou nez postoupi z domečku? 
 Doba čekání  je náhodná veličina s nekonečně mnoho hodnotami.
 
-# Pořadí hodu kdy padla prvni 6-ka jako náhodná proměnná 
+# Pořadí hodu, kdy padla prvni 6-ka jako náhodná proměnná 
 
 ## Pravděpodobnost, že 6-ka padne v k-tém hodu 
 
@@ -226,7 +226,7 @@ $$
 S(1 - q) = q(1 - q^k) \quad \Rightarrow \quad S = \frac{q(1 - q^k)}{1 - q}
 $$
 
-__✅ Výsledek:__
+__Výsledek:__
 $$
 \sum_{i=1}^{k} q^i = \frac{q(1 - q^k)}{1 - q}, \quad \text{pro } q \ne 1
 $$
@@ -273,7 +273,7 @@ Pro geometrické rozdělení (počítané od $i = 1$):
 
 $$
 \begin{align}
-\mathbb{E}[X]  &= \sum_{i=1}^{\infty} i \cdot p \cdot (1 - p)^{i - 1} 
+\mathbb{E}[K]  &= \sum_{i=1}^{\infty} i \cdot p \cdot (1 - p)^{i - 1} 
     &= p \cdot \frac{1}{q} \cdot  \sum_{i=1}^{\infty} i  \cdot (q)^{i} = p \cdot \frac{1}{q} \cdot \frac{q}{(1 - q)^2}
     = \frac{1}{p}
 \end{align}
@@ -286,9 +286,43 @@ Kde:
 V našem případě:
 $p = \frac{1}{6}$
 
-__📊Takže střední hodnota pořadí hodu do první 6-ky je:__
+__Takže střední hodnota pořadí hodu do první 6-ky je:__
 
 $$
 \mathbb{E}[K] =6
 $$ 
+
+
+## Závěr - jde to i jednodušeji:
+
+Existuje jednodušší odvozeni, které vubec nevyžaduje použití nekonečné řady,
+ale využívá pouze vlastnosti střední hodnoty:
+
+Nechť $K$ je náhodná veličina označující pořadí hodu, kdy poprvé padne 6-ka a
+její střední hodnota $\mathbb{E}[K]=x$. Pokud hodíme kostkou poprv0, tak je
+pravděpodobnost, že padne 6-ka $\frac{1}{6}$ a v tomto případě $K=1$. Pokud
+nepadne 6-ka, což se stane s pravděpodobností $\frac{5}{6}$, tak se dostaneme
+do stejné situace jako na začátku, ale s tím rozdílem, že už jsme provedli
+jeden hod, takže $K$ bude o 1 větší než na začátku. Tedy:
+
+$$
+\begin{align}
+x &= \frac{1}{6} \cdot 1 + \frac{5}{6} \cdot (x + 1) \\
+x&= \frac{1}{6} + \frac{5}{6} \cdot x + \frac{5}{6} \\
+x&= 1 + \frac{5}{6} \cdot x
+\end{align}
+$$ 
+
+A po úpravě dostaneme:
+
+$$
+x =\mathbb{E}[K]= 6
+$$
+
+Jak prosté, elegantní a rychlé odvození střední hodnoty náhodné veličiny K
+mající nekonečně mnoho možných hodnot. Tento postup avšak nijak nedokazuje, že
+střední hodnota $\mathbb{E}[K]$ je konečná, ale pouze že pokud je konečná, tak
+musí být rovna 6. Pro zjištění, zda je $\mathbb{E}[K]$ konečná, je nutné použít
+odvození pomocí nekonečné řady.
+
 

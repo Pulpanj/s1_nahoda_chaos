@@ -1,7 +1,7 @@
 ---
 title: "Myš v bludišti"
 date: "2025-10-20"
-updated: "2025-12-18"
+updated: "2026-02-25"
 description: "Od  myši v bludišti k Markovovým řetězcům"
 draft: false
 categories: ["Markovovy řetězce", "Přednáška 4"]
@@ -129,7 +129,7 @@ $$
 ## Vyčíslení pravděpodobností stavů
 
 Pravděpodobnosti stavu v dalších časových intervalech $p_1,p_2 \dots$ lze pak
-snadno vypočítat násobením maticí $\mathbb P$:
+snadno vypočítat násobením následující maticí $\mathbb P$:
 
 
 ```{julia}
@@ -148,28 +148,263 @@ round.(P, digits=3)
 
 ```
 
+Počáteční stav $p_0$ je vektorem, který má hodnotu 1 pro buňku 1 a 0 pro všechny ostatní buňky, protože myš začíná v buňce 1.
+
 ```{julia}
 p0 = [1 0 0 0 0 0 0 0 0]'
 println(p0)
 ```
 
+Počáteční stav $p_0$ vynásobíme maticí $\mathbb P$ a získáme pravděpodobnosti pozice myši po prvním pohybu $p_1$:
+
 ```{julia}
 p1=P*p0
 ```
+
+a po druhém pohybu $p_2$  dostaneme vynásobením $p_1$ maticí $\mathbb P$:
 
 ```{julia}
 p2=P*p1
 ```
 
-```{julia}
-p6=P*P*P*P*p2
-```
-
+Například pravděpodobnosti, kde bude myš po šestém pohybu lze spočítat opakovaným násobením maticí $\mathbb P$:
 
 ```{julia}
-p51=P^51*p0
+p6=P*P*(P*(P*p2))
 ```
-
 
 ## Konvergence pravděpodobností stavů
 
+Po dostatečném počtu pohybů se pravděpodobnosti pozice myši $p_n$ přestávají měnit a konvergují k určitému vektoru pravděpodobností, který se nazývá **stacionární rozdělení**.
+To znamená, že po dostatečném počtu pohybů se pravděpodobnosti pozice myši ustálí a nebudou se dále měnit, i když myš bude pokračovat v pohybu.
+Stacionární rozdělení lze získat jako limitu pravděpodobností pozice myši po nekonečném počtu pohybů:
+
+$$
+\begin{equation}
+p^* = \lim_{n \to \infty} p_n
+\end{equation}
+$$
+
+kde $p^*$ je stacionární rozdělení.
+
+Odvozeni vzorce pro stacionární rozdělení je založeno na jednoduché úvaze - při dosažení stacionárního stavu $p^*$ se pravděpodobnosti pozice myši nebudou dále měnit, tedy:
+
+$$
+\begin{equation}
+p^* = \mathbb P \cdot p^*
+\end{equation}
+$$
+
+Řešení této maticové rovnice je založeno na tzv. vlastních číslech a vlastních vektorech matice přechodů $\mathbb P$. Vlastní čísla a vlastní vektory matice $\mathbb P$ jsou řešením rovnice:
+$$
+\begin{equation}
+\mathbb P \cdot v = \lambda \cdot v
+\end{equation}
+$$
+
+To znamená, že stacionární rozdělení lze získat jako normovaný vlastní vektor matice $\mathbb P$ odpovídající vlastnímu číslu 1.
+
+## Výpočet  vlastních čísel a vektorů
+
+Výpočet vlastních čísel a vlastních vektorů matice $\mathbb P$ je v praxi často
+prováděn numericky pomocí algoritmů . V jazyce Julia lze tento výpočet provést
+pomocí funkce `eigen` z balíku `LinearAlgebra`, která vrací vlastní čísla a
+vlastní vektory matice.
+
+```{julia}
+using LinearAlgebra
+
+# Matice, pro kterou chceme vlastní čísla a vektory
+A = [0.4 0.6 0;
+    0.6 0.3 0.1;
+    0.0 0.1 0.9]
+
+# Výpočet vlastních čísel a vektorů
+F = eigen(A)
+# normalizace vlastních vektorů
+Vnorm = [v / norm(v) for v in eachcol(F.vectors)]
+λ = F.values        # vlastní čísla
+V = F.vectors       # sloupce jsou vlastní vektory (už normalizované)
+
+for (i, λi) in enumerate(λ)
+    println("λ[$i] = $λi")
+    println("v[$i] = ", V[:, i])
+end
+```
+Kontrola: Vlastní vektor odpovídající vlastnímu číslu 1 by měl být stacionárním rozdělením, což znamená, že jeho součet by měl být 1 a všechny jeho komponenty by měly být nezáporné. Pokud tomu tak není, je třeba tento vektor normalizovat, aby se stal platným rozdělením pravděpodobnosti.
+
+
+
+```{julia}
+# Normalizace vlastního vektoru odpovídajícího vlastnímu číslu 1
+idx = findfirst(isapprox.(λ, 1; atol=1e-12, rtol=1e-12))
+v1 = V[:, idx]
+a_star = v1 / sum(v1)
+println("Stacionární rozdělení p*: ")
+for i in 1:length(a_star)
+    println(i, "->   ", round(a_star[i]; digits=5))
+end
+
+println("Kontrola P.p*: ")
+a_star_next = A * a_star
+clean(x; tol=1e-12) = abs(x) < tol ? 0.0 : x
+for i in 1:length(a_star)
+    println(i, "->   ", round(a_star[i]; digits=5))
+end
+```
+
+## Výpočet stacionárního rozdělení pro matici $\mathbb P$
+
+V našem případě myšího bludiště, po výpočtu vlastních čísel a vektorů matice $\mathbb P$, zjistíme, že i zde existuje jedno vlastní číslo, které je rovno 1 (nebo velmi blízko 1 vzhledem k numerické přesnosti), a odpovídající vlastní vektor nám poskytne stacionární rozdělení pravděpodobností pozice myši v bludišti.
+
+```{julia}
+# vypocet stacionarniho stavu pro matici P
+F = eigen(P)
+# normalizace vlastních vektorů
+λ = F.values        # vlastní čísla
+V = F.vectors       # sloupce jsou vlastní vektory (už normalizované)
+
+for (i, λi) in enumerate(λ)
+    println("λ[$i] = $λi")
+end
+for (i, λi) in enumerate(λ)
+    println("v[$i] = ", round.(V[:, i], digits=5))
+end
+
+idx = findfirst(isapprox.(λ, 1; atol=1e-12, rtol=1e-12))
+v1 = V[:, idx]
+
+p_star = v1 / sum(v1)
+println("Stacionární rozdělení p*:")
+clean(x; tol=1e-12) = abs(x) < tol ? 0.0 : x
+for i in 1:length(p_star)
+    println(i, " -> ", round(clean(p_star[i]); digits=3))
+end
+sum_p_star = sum(p_star)
+println("Součet komponent stacionárního rozdělení: ", sum_p_star)
+
+println("Kontrola P.p*: ")
+p_star_odd = P * p_star
+for i in 1:length(p_star)
+    println(i, " -> ", round(clean(p_star[i]); digits=3))
+
+end
+
+```
+
+Pokud zkusíme výpočet stacionárního rozdělení ověřit pomocí násobení maticí
+$\mathbb P$ zjistíme, že naše bludiště má zajímavou vlastnost - první pohyb
+myši skončí v buňce číslo 2, následující pohyb musí skončit v buňce s lichým
+číslem a další pohyb zare musí skončit v buňce s sudým číslem.
+
+
+Když zavedeme zkratku pro násobení maticí $\mathbb P$ vícekrát, můžeme získat
+pravděpodobnosti pozice myši např. po 51 pohybech:
+
+```{julia}
+p51 = P^51 * p0
+
+println("Kontrola P*p* po 51 krocích: ")
+for i in 1:length(p51)
+    println(i, " -> ", round(clean(p51[i]); digits=3))
+
+end
+```
+
+A po 52 pohybech dostaneme:
+```{julia}
+p52 = P^52 * p0
+
+println("Kontrola P*p* po 52 krocích: ")
+for i in 1:length(p52)
+    println(i, " -> ", round(clean(p52[i]); digits=3))
+
+end
+```
+
+a po 53 pohybech:
+```{julia}
+p53 = P^53 * p0
+println("Kontrola P*p* po 53 krocích: ")
+for i in 1:length(p53)
+    println(i, " -> ", round(clean(p53[i]); digits=3))
+end
+```
+
+a po 54 pohybech:
+```{julia}
+p54 = P^54 * p0
+println("Kontrola P*p* po 54 krocích: ")
+for i in 1:length(p54)
+    println(i, " -> ", round(clean(p54[i]); digits=3))
+end
+```
+
+Z výsledku ověření vidíme, že naše matice přechodů $\mathbb P$ má zajímavou
+vlastnost - po dostatečném počtu pohybů se pravděpodobnosti pozice myši po
+lichém počtu pohybů ustálí na jedné sadě hodnot ("lichý" stacionární stav,
+mající pravděpodobnosti v lichých buňkách rovny 0) a nebudou se dále měnit.
+
+Pravděpodobnosti pozice myši po sudém počtu pohybů ustálí na jiné sadě hodnot
+("sudý" stacionární stav mající pravděpodobnosti v sudých buňkách rovny 0) a
+ani tyto se nebudou dále měnit.
+
+Vektor pravděpodobností vypočtený nahoře pomocí vlastních čísel ukazuje průměr
+těchto "sudých" a "lichých" stacionárních stavů (kouzlo vlastních čísel).
+
+## Výpočet stacionárního rozdělení pro matici $\mathbb P*\mathbb P$
+
+Pokud bychom chtěli získat stacionární rozdělení pro liché a sudé pohyby
+zvlášť, musíme vypočítat vlastní čísla a vektory pro matici 
+$\mathbb P*\mathbb P$, která popisuje přechody mezi stavy po dvou pohybech.
+
+```{julia}
+# vypocet stacionarniho stavu pro matici P
+F = eigen(P * P)
+# normalizace vlastních vektorů
+λ = F.values        # vlastní čísla
+V = F.vectors       # sloupce jsou vlastní vektory (už normalizované)
+
+
+idx = findfirst(isapprox.(λ, 1; atol=1e-12, rtol=1e-12))
+v1 = V[:, idx]
+
+p_star = v1 / sum(v1)
+println("Stacionární rozdělení p*: ")
+clean(x; tol=1e-12) = abs(x) < tol ? 0.0 : x
+for i in 1:length(p_star)
+    println(i, " -> ", round(clean(p_star[i]); digits=3))
+end
+sum_p_star = sum(p_star)
+println("Součet komponent stacionárního rozdělení: ", sum_p_star)
+
+println("Kontrola p_odd*=P.p* (\"lichý\" stacionární stav): ")
+p_star_odd = P * p_star
+for i in 1:length(p_star)
+    println(i, " -> ", round(clean(p_star_odd[i]); digits=3))
+
+end
+
+```
+
+"sudý" stacionární stav získáme vynásobením "lichého" stacionárního stavu
+maticí $\mathbb P$:
+
+```{julia}
+println("Kontrola p_even*=P.p_odd*: (\"sudý\" stacionární stav): ")
+p_star_even = P * p_star_odd
+for i in 1:length(p_star)
+    println(i, " -> ", round(clean(p_star_even[i]); digits=3))
+
+end
+```
+
+## Závěr 
+
+V tomto příkladu jsme viděli, jak lze pomocí Markovových řetězců
+analyzovat pravděpodobnosti pozice myši v bludišti po různém počtu pohybů.
+Zjistili jsme, že pravděpodobnosti pozice myši konvergují k stacionárnímu
+rozdělení, které lze získat jako normovaný vlastní vektor matice přechodů. V
+našem případě jsme také zjistili, že existují dva stacionární stavy - jeden pro
+liché pohyby a druhý pro sudé pohyby, což je zajímavá vlastnost našeho
+bludiště.

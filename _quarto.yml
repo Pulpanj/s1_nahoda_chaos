@@ -123,6 +123,9 @@ format:
       body-width: 1200px
       margin-width: 50px
       gutter-width: 1.5rem      
+  # typst:
+  #   template-partials:
+  #     - definitions.typ
 
 css: styles.css
 # template: html.template

@@ -1,0 +1,59 @@
+digraph blechy {
+    rankdir = LR;
+    node [fontsize=8;size=10;shape=circle;fixedsize=true];
+    graph [compound = true; border = 0;fontsize=6];
+    edge [fontsize=6];
+    0[label="Rn=0"];
+    1[label="Rn=1"];
+    2[label="Rn=2"];
+    3[label="Rn=3"];
+    4[label="Rn=4"];
+    5[label="Rn=5"];
+    6[label="Rn=6"];
+    7[label="Rn=7"];
+    8[label="Rn=8"];
+    9[label="Rn=9"];
+    10[label="Rn=10"];
+
+    0  -> 1[label="P[1,2]=1.0"];
+
+    1->0 [label="P[2,1]=0.1"];
+    1->2 [label="P[2,3]=0.9"];
+
+    2->1 [label="P[3,2]=0.2"];
+    2->3 [label="P[3,4]=0.8"];
+
+    3->2 [label="P[4,3]=0.3"];
+    3->4 [label="P[4,5]=0.7"];
+
+    4->3 [label="P[5,4]=0.4"];
+    4->5 [label="P[5,6]=0.6"];
+
+    5->4 [label="P[6,5]=0.5"];
+    5->6 [label="P[6,7]=0.5"];
+
+
+    6->5 [label="P[7,6]=0.6"];
+    6->7 [label="P[7,8]=0.4"];
+
+    7->6 [label="P[8,7]=0.7"];
+    7->8 [label="P[8,9]=0.3"];
+    
+    8->7 [label="P[9,8]=0.8"];
+    8->9 [label="P[9,10]=0.2"];
+
+    9->8 [label="P[10,9]=0.9"];
+    9->10 [label="P[10,11]=0.1"];
+
+    10->9 [label="P[11,10]=1.0"];
+
+        // }
+    subgraph {
+                    rank = same;
+                    0;4;8  
+    }
+    subgraph {
+                    rank = same;
+                    10;
+    }
+}

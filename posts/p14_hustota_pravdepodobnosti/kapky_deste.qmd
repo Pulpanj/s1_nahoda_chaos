@@ -1,0 +1,310 @@
+---
+title: "Kolik spadne kapek deště"
+date: "2026-03-09"
+updated: "2026-03-14"
+description: "Kolik kapek deště spadne na malou misku za dobu $t$? Analýza pomocí Poissonova rozdělení."
+draft: false
+categories: ["Náhodná proměnná", "Poissonův proces","Přednáška 14"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p14_hustota_pravdepodobnosti/kapky_deste.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "kapky_deste"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Kolik kapek  deště spadne na malou misku do času $t$?
+
+## Zadání
+
+Opět jako v si (jako v [První kapka deště](prvni_kapka_deste.qmd), kde byl
+popsán Poissonův proces) představme, že stojíme na zahradě a vidíme, že začíná
+pršet. Pršet začalo náhle, ale prší pomalu a pravidelně, a průměrný počet kapek
+100 kapek za sekundu na 1 m². Nyní nás zajímá, kolik kapek dopadne na malou
+sázecí misku v záhoně (miska má plochu 10 cm²) za nějakou dobu $t$ (např. 100
+sekund).
+
+Je to jiná otázka než v předchozím příkladu [První kapka
+deště](prvni_kapka_deste.qmd), kde nás zajímal čas do dopadu první kapky na
+misku. Nicméně na tento problém navážeme, protože Poissonův proces,
+exponenciální rozdělení odvozené při modelování doby do první kapky deště a
+předpoklad nezávislosti časů dopadu více kapek (analyzovaný v
+nesmrtelnych_bytostech ) jsou základem pro analyzu náhodné proměnné
+reprezentujících počet kapek v určitém čase.
+
+
+## Střední hodnota počtu kapek dopadajících na misku do času $t$ 
+
+Počet kapek $N(t)$, které dopadaly na misku do času $t$ je náhodná proměnná s hodnotami $N(t) = 0, 1, 2, \ldots$. 
+Označme pravděpodobnost, že do času $t$ dopadne právě $k$ kapek na misku jako $p_k(t)$, t.j. 
+
+$$
+p_k(t) = P(N(t) = k),
+$$
+
+kde $N(t)$ je počet kapek do času $t$.
+
+Očekávaný počet kapek, které dopadnou na misku je roven průměrnému počtu kapek
+za sekundu $\lambda$ dopadajících na plochu misky vynásobený časem $t$, tj.:
+
+$$
+\begin{equation}
+𝐸[𝑁(t)]=\lambda \cdot t
+\end{equation}
+$$
+
+Což je vzorec pro střední hodnotu Poissonova procesu pro čas $t$, kde parametr 𝜆 je je
+v našem příkladě roven:
+
+$$
+\begin{equation}
+\lambda=\frac{100}{100 . 100 [{cm}^2]} \cdot 10 [{cm}^2]=0.1 \text{ [kapek za sekundu]}
+\end{equation}
+$$
+
+
+a průměrný (očekávaný) počet kapek na misce za 100 sekund je tedy:
+$$
+\begin{equation}
+𝐸[𝑁(100)]=0.1⋅100=10 \text{[kapek]}
+\end{equation}
+$$
+
+Očekávaný počet kapek na misce je ale náhodná proměnná a k jejímu odvození lze
+použít vlastnosti Poissonova procesu (nezávislost intervalů mezi dopady
+jednotlivých kapek a nezávislost průměrné četnosti kapek v čase).
+
+## Odvození Poissonovým rozdělení počtu kapek čase $t$
+
+
+Základní vlastnost Poissonova procesu říká:
+
+- v malém intervalu $\Delta t$ nastane **1 událost** s pravděpodobností  
+$$
+p_{+1}=\lambda \Delta t 
+$$
+
+- a nastane **0 událostí** s pravděpodobností  
+$$
+p_{0}=1 - \lambda \Delta t 
+$$
+
+Označme $p_k(t)$ pravděpodobnost, že v čase $t$ je počet kapek roven nějakému (nezápornému)  $k$.   
+
+- Jak se může stát, že v čase $t+\Delta t$ nastalo $k$ událostí? Jsou pouze dvě možnosti:
+
+    1. Už bylo $k$ událostí v čase $t$  a v intervalu $(t, t+\Delta t)$ **nepřibyla žádná**:
+$$
+p_k^{(1)}(t+\Delta t)=p_k(t)+(1 - \lambda \Delta t)
+$$
+    2. Bylo $k-1$ událostí v čase $t$  a v intervalu $(t, t+\Delta t)$ **přibyla jedna**:
+$$
+p_k^{(2)}(t+\Delta t)_2=p_{k-1}(t)+(\lambda \Delta t)
+$$
+    3. Sečteme obě možnosti
+$$
+\begin{align}
+p_k(t+\Delta t)=p_k^{(1)}(t+\Delta t)+ p_k^{(2)}(t+\Delta t) \\
+p_k(t+\Delta t)=p_k(t)(1 - \lambda \Delta t) + p_{k-1}(t)(\lambda \Delta t)
+\end{align}
+$$
+
+- a odtud již lze odvodit diferenciální rovnici
+
+    1. Odečteme $p_k(t)$ a vydělíme $\Delta t$
+$$
+\frac{p_k(t+\Delta t) - p_k(t)}{\Delta t}
+= -\lambda p_k(t) + \lambda p_{k-1}(t) 
+$$
+
+    1. a limitou $\Delta t \to 0$ (což vyloučí, že během $\Delta t$ nastanou 2 či více události) dostaneme diferenciální rovnici
+
+$$
+\begin{align}
+p_{k}'(t) = -\lambda \, p_k(t) + \lambda \, p_{k-1}(t)
+\end{align}
+$${#eq-ode} 
+
+kde:
+
+- Člen  $-\lambda p_k(t)$ odpovídá pravděpodobnosti, že opustíme stav „k událostí“ tím, že přijde další událost.
+- Člen $\lambda p_{k-1}(t)$ popisuje pravděpodobnost, že do stavu „k událostí“ přejdeme z „k−1 událostí“
+
+Je to vlastně popis pro Markovovský proces s přechody $k-1 \to k$ (viz. [Myš v bludišti](../p4_markovuv_proces/mys_v_bludisti.qmd)).
+
+
+## Řešení diferenciální rovnici indukcí
+
+Rovnici  ([-@eq-ode]) lze snadno řešit pro $k=0$, kdy druhý člen je roven 0 (do stavu s 0 událostí nelze přejít ze stavu -1 událostí) a nebo intuitivně využit výsledků analýzy [První kapka deště](prvni_kapka_deste.qmd), kde bylo odvozena kumulativní funkce pravděpodobnosti $F(t) = (1 - e^{-\lambda t})$ do kdy spadne první kapka. Pravděpodobnost žádné kapky je tedy
+
+
+$$
+\begin{equation}
+p_0(t) =1-F(t)=e^{-\lambda t}
+\end{equation}
+$${#eq-ode0} 
+
+Dosazením  [-@eq-ode0] do [-@eq-ode] pro $k=1$ dostaneme:
+
+$$
+\begin{align}
+p_{1}'(t) = -\lambda \,p_1(t) + e^{-\lambda t}
+\end{align}
+$${#eq-ode10} 
+
+která má (pro $p_{1}(0)=0$) řešení:
+
+$$
+\begin{equation}
+p_1(t) = \lambda t\, e^{-\lambda t}
+\end{equation}
+$${#eq-ode1} 
+
+
+Opětovným dosazením [-@eq-ode1] do [-@eq-ode]  dostaneme pro $k=1$:
+
+$$
+\begin{equation}
+p_{2}'(t) = -\lambda \,p_2(t) +  \lambda t\, e^{-\lambda t}
+\end{equation}
+$$
+
+kterou by bylo nutno opět řešit s podmínkou $p_{2}(0)=0$, a pak pokračovat na rovnici pro $p_{2}'(t)$ atd..
+
+Pro obecné $p_{k}$ je řešení rovno:
+
+$$
+\begin{equation}
+p_k(t) = e^{-\lambda t} \frac{(\lambda t)^k}{k!}.
+\end{equation}
+$$
+
+To jde ověřit derivací
+
+$$
+p_k'(t)
+= e^{-\lambda t}\frac{d}{dt}\left(\frac{(\lambda t)^k}{k!}\right)
+- \lambda e^{-\lambda t}\frac{(\lambda t)^k}{k!}.
+$$
+
+$$
+\frac{d}{dt}\left(\frac{(\lambda t)^k}{k!}\right)
+= \frac{k(\lambda t)^{k-1}\lambda}{k!}
+= \lambda \frac{(\lambda t)^{k-1}}{(k-1)!}.
+$$
+
+$$
+\begin{align}
+p_k'(t)
+= e^{-\lambda t}\lambda \frac{(\lambda t)^{k-1}}{(k-1)!}
+- \lambda e^{-\lambda t}\frac{(\lambda t)^k}{k!} 
+\end{align}
+$${#eq-odek} 
+
+Rovnice [-@eq-odek] vyhovuje rovnici [-@eq-ode]
+$$
+\begin{align}
+p_k'(t)=-\lambda p_k(t) + \lambda p_{k-1}(t)\\
+=
+- \lambda e^{-\lambda t}\frac{(\lambda t)^k}{k!} 
+ + e^{-\lambda t}\lambda \frac{(\lambda t)^{k-1}}{(k-1)!}
+\end{align}
+$$
+
+
+
+
+Počet kapek $N(t)$ dopadajících na misku do času $t$ je tedy náhodná proměnná, která má **Poissonovo rozdělení** s parametrem $\lambda t$ a její pravděpodobnostní funkce je dána vzorcem:
+$$
+P(N(t) = k) = \frac{(\lambda t)^k e^{-\lambda t}}{k!} \quad \text{pro } k = 0, 1, 2, \ldots
+$$
+
+
+
+Graficky můžeme znázornit pravděpodobnostní funkci pro počet kapek dopadajících na misku do času $t$:
+
+```{julia}
+#| echo: true
+#| output: false  #asis
+using Plots
+using SpecialFunctions
+using DataFrames, PrettyTables
+
+
+λ = 0.1        # rate
+t = 100.0      # time
+ks = 1:20      # values of k
+
+p(k) = (λ * t)^k * exp(-λ * t) / factorial(k)
+
+probs = p.(ks)
+df = DataFrame(k=collect(ks), p_i=probs)
+```
+
+```{julia}
+#| echo: false
+#| output: asis
+println("**Poissonovo rozdělení λ = $λ, t = $t**\n")
+
+
+pretty_table(df;
+    backend=:markdown,
+    formatters=[
+        fmt__printf("%d", [1]), fmt__printf("%4.5f", [2])
+    ],
+    alignment=[:r, :r],
+    column_labels=[
+        "k", "P(N(t)=k)"
+    ],
+    show_row_number_column=false,
+)
+
+```
+
+```{julia}
+#| echo: false
+#| output: true  #asis
+g = plot(ks, probs;
+    seriestype=:stem,
+    marker=:circle,
+    xlabel="k",
+    ylabel="P(N(t)=k)",
+    title="Poissonovo rozdělení λ = $λ, t = $t",
+    legend=false)
+display(g)
+```
+A lze take zobrazit jake jsou pravděpodobnosti různých počtů kapek v čase:
+
+
+
+```{julia}
+#| echo: false
+#| output: true  #asis
+using Plots
+
+λ = 0.1
+ks = [0, 1, 5, 10, 15, 20, 25]
+ts = range(0, 400; length=400)   # time axis
+
+p(k, λ, t) = (λ * t)^k * exp(-λ * t) / factorial(big(k))
+
+plt = plot(xlabel="t - čas[sec]", ylabel="P(N(t)=k)",
+    title="Poissonovo rozdělení jako funkce času (λ = $λ)",
+    legend=:top,
+    minorgrid=true,
+    size=(800, 800)
+)
+
+for k in ks
+    plot!(plt, ts, p.(k, λ, ts);
+        label="k = $k")
+end
+
+plt
+
+```

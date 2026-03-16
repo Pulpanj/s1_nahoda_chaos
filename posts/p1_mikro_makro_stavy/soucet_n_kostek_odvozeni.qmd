@@ -153,6 +153,6 @@ $$
 
 ::: {.callout-tip title="Otázka" icon=false color=green}
 
-**Jak dokázat,že $P(K) konverguje k normálnímu rozložení ??**
+**Jak dokázat,že $P(K)$ konverguje k normálnímu rozložení ??**
 
 :::

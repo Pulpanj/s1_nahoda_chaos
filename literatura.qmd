@@ -58,11 +58,26 @@ book_list = [
         "cover" => "/images/stats_full.png"
     ),
     OrderedDict(
+        "Název" => "A Collection of Dice Problems",
+        "Autor" => "Matthew M. Conroy",
+        "PDF" => "https://www.madandmoonly.com/doctormatt/mathematics/dice1.pdf",
+        "URL" => "https://www.madandmoonly.com/doctormatt/index.htm",
+        "Rok" => "September 13, 2025",
+        # "Poznámka" => "LibreTexts je online version, která obsahuje i další materiály, včetně cvičení a řešení.",
+        #"cover" => "/images/stats_full.png"
+    ),
+    OrderedDict(
+        "Název" => "Elchanan Mossel’s dice problem",
+        "Autor" => "Jimmy Jin",
+        "PDF" => "https://www.yichijin.com/files/elchanan.pdf",
+        "Rok" => "May 2018",
+        #"cover" => "/images/stats_full.png"
+    ), OrderedDict(
         "label" => "Přednáška 4,5 (Nelineární dynamika a chaos)",
     ),
     OrderedDict(
         "Název" => "Understanding Nonlinear Dynamics",
-        "Autor" => "",
+        "Autor" => "Daniel Kaplan,Leon Glass",
         # "Reference" => "",
         "PDF" => "https://www.academia.edu/88608923/Understanding_Nonlinear_Dynamics",
         "URL" => "https://link.springer.com/book/10.1007/978-1-4612-0823-5",

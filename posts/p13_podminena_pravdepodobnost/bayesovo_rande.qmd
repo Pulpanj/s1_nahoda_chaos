@@ -25,11 +25,12 @@ format:
 
 Mladý pan Bayes se rozhodl jít na rande. On i jeho potenciální partnerka Anička
 bydlí na kolejích na Strahově a dohodnou se, že se setkají u sochy na Petříně u
-sochy Karla Hynka Máchy. Oba mají mnoho jiných zájmů a tak neví kdy přesně
-dorazí, ale slibili si, určitě nekdy mezi 18:00 a 19:00 tam budou. Pan Bayes je
+sochy Karla Hynka Máchy. Oba mají mnoho jiných zájmů a tak neví, kdy přesně
+dorazí, ale slibili si, že určitě někdy mezi 18:00 a 19:00 tam budou. Pan Bayes je
 ochoten čekat na Aničku maximálně 15 minut, pak se radši bude věnovat nějakému
-matematickému problému. Anička má více nápadníku a tak je na pana Bayese
+matematickému problému. Anička má více nápadníku, a tak je na pana Bayese
 ochotna čekat maximálně 5 minut.
+
 
 ## Zadání
 
@@ -45,11 +46,21 @@ a jak se tato pravděpodobnost změní, pokud přijde mezi 18:00 a 18:10 ?
 
 ## Grafické znázornění problému
 
-Doby příchodu pana Bayese a Aničky můžeme znázornit v grafu, kde na ose x bude čas příchodu pana Bayese a na ose y čas příchodu Aničky. Oba časy budou v minutách od 18:00, takže interval bude od 0 do 60 minut. Každý bod v tomto grafu bude reprezentovat konkrétní kombinaci časů příchodu pana Bayese a Aničky (a intervalů, kdy budou čekat). Například bod (10, 5) bude znamenat, že pan Bayes přišel v 18:05 a Anička přišla v 18:10. 
+Doby příchodu pana Bayese a Aničky můžeme znázornit v grafu, kde na ose x bude
+čas příchodu pana Bayese a na ose y čas příchodu Aničky. Oba časy budou v
+minutách od 18:00, takže interval bude od 0 do 60 minut. Každý bod v tomto
+grafu bude reprezentovat konkrétní kombinaci časů příchodu pana Bayese a Aničky
+(a intervalů, kdy budou čekat). Například bod (10, 5) bude znamenat, že pan
+Bayes přišel v 18:05 a Anička přišla v 18:10.
 
-Rande se bude konat, pokud se časy příchodu pana Bayese a Aničky budou překrývat, což znamená, že rozdíl mezi nimi bude menší než 15 minut pro pana Bayese a menší než 5 minut pro Aničku. To znamená, že rande se bude konat, pokud bude bod v grafu ležet v obdélníkové oblasti, kde jsou splněny tyto podmínky (a obdélníkem prochází přímka $T_a = T_b$). 
+Rande se bude konat, pokud se časy příchodu pana Bayese a Aničky budou
+překrývat, což znamená, že rozdíl mezi nimi bude menší než 15 minut pro pana
+Bayese a menší než 5 minut pro Aničku. To znamená, že rande se bude konat,
+pokud bude bod v grafu ležet v obdélníkové oblasti, kde jsou splněny tyto
+podmínky (a obdélníkem prochází přímka $T_a = T_b$).
 
-Grafické znázornění jiných časů příchodu $T_a=18:25$, $T_b=18:35$, ukazuje situaci kdy se rande neuskuteční.
+Grafické znázornění jiných časů příchodu $T_a=18:25$, $T_b=18:35$, ukazuje
+situaci kdy se rande neuskuteční.
 
 ```{julia}
 #| echo: false
@@ -541,7 +552,10 @@ display(p)
 
 ```
 
-Pravděpodobnost rande je i v tomto případě poměr plochy oblasti, ve které se rande koná, k ploše oblasti, ve které pan Bayes může přijít mezi 18:20 a 18:30. Výpočet vypočte plocha (uříznutého) zeleného lichoběžníku k ploše oranžového obdélníku .
+Pravděpodobnost rande je i v tomto případě poměr plochy oblasti, ve které se
+rande koná, k ploše oblasti, ve které pan Bayes může přijít mezi 18:00 a 18:10.
+Výpočet vypočte plocha (uříznutého) zeleného lichoběžníku k ploše oranžového
+obdélníku .
 
 $$
 \begin{equation}
@@ -549,13 +563,12 @@ p(rande)=\frac{(5+15) \cdot 10-\frac{5 \cdot 5}{2}}{10 \cdot 60}=\frac{187.5}{60
 \end{equation}
 $$
 
-## Závěr 
+## Podmíněná pravděpodobnost 
 
-Nechoďte na rande včas...
-
-Celý tento příklad ukazuje co je podmíněná pravděpodobnost.
-
-Její definice 
+Poslední příklad ukazuje demonstruje co je
+podmíněná pravděpodobnost. Definice pro podmíněnou pravděpodobnost říká, že
+pravděpodobnost události A za předpokladu, že nastala událost B, je dána
+vztahem:
 
 $$
 \begin{equation}
@@ -563,9 +576,26 @@ p(A|B)=\frac{p(A \cap B)}{p(B)}
 \end{equation}
 $$
 
-je v nasem posledním případě interpretována jako pravděpodobnost, že se rande uskuteční (A), pokud pan Bayes přijde mezi 18:20 a 18:30 (B). Tato pravděpodobnost se vypočítá jako poměr plochy oblasti, ve které se rande koná (A ∩ B), k ploše oblasti, ve které pan Bayes může přijít mezi 18:20 a 18:30 (B).
+V našem posledním případě je $p(A|B)$ interpretováno jako pravděpodobnost, že
+se rande uskuteční (A), pokud pan Bayes přijde mezi 18:00 a 18:10 (B).
 
-Pravděpodobnost $p(B)$ je tedy pravděpodobnost, že pan Bayes přijde mezi 18:20 a 18:30, což je poměr délky intervalu (10 minut) k celkovému intervalu (60 minut), tedy $\frac{10}{60}$. 
+Pravděpodobnost $p(A|B)$ byla vypočtena jako poměr plochy oblasti, ve které se
+rande koná (A ∩ B), k ploše oblasti, ve které pan Bayes může přijít mezi 18:00
+a 18:10 (B).
 
-Pravděpodobnost $p(A \cap B)$ je pak poměr plochy oblasti, ve které se rande koná když pan Bayes přijde mezi 18:20 a 18:30, k ploše celého čtverce, což je $\frac{187.5}{3600}$.
+Pokud využijeme definici podmíněné pravděpodobnosti, můžeme tento výpočet
+zapsat jako:
+
+- Pravděpodobnost $p(B)$ je tedy pravděpodobnost, že pan Bayes přijde mezi
+18:00 a 18:10, což je poměr délky intervalu (10 minut) k celkovému intervalu
+(60 minut), tedy $\frac{10}{60}$.
+
+- Pravděpodobnost $p(A \cap B)$ je pak poměr plochy oblasti, ve které se rande
+koná když pan Bayes přijde mezi 18:00 a 18:10, k ploše celého čtverce, což je
+$\frac{187.5}{3600}$.
+
+
+## Závěr 
+
+Nechoďte na rande včas...
 

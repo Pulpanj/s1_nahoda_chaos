@@ -1,7 +1,7 @@
 ---
 title: "Psy a Blechy"
 date: "2025-10-07"
-updated: "2025-12-06"
+updated: "2026-03-01"
 description: "O skákání blech mezi 2 psy aneb Ehrenfestův model"
 draft: false
 categories: ["Mikrostav","Makrostav", "Přednáška 1" ]
@@ -28,14 +28,21 @@ všechny blechy sedí na levém psu. Pak vylosujeme náhodné číslo od 1 do 10
 blecha vylosovaného čísla přeskočí na druhého psa. Pak pokračujeme s druhým
 losování přeskokem blechy atd.
 
+
 ```{dot}
 //| file: psy_a_blechy.dot
 //| fig-width: 4.2
 //| fig-height: 6.3
 ``` 
 
-Popsaný model vyvoje počtu blech na pravém psu se nazývá Ehrenfestův (urnový) model.
+
+Popsaný model vyvoje počtu blech na pravém psu se nazývá **Ehrenfestův (urnový) model**.
 Analyzuje se v něm počet blech na pravém psu $R_n$ po $n$ krocích.
+
+
+```{=typst}
+#pagebreak()
+```
 
 Simulaci tohoto procesu ukazuje následující kód:
 ```{julia}
@@ -58,7 +65,7 @@ function onerun(; num_particles = 10, left_side = 10, num_steps = 100)
 	end
 	return R
 end
-num_steps = 40
+num_steps = 12
 R = onerun(num_particles = 10, left_side = 0, num_steps = num_steps)
 println(R)
 ```
@@ -78,9 +85,14 @@ for i in 1:num_simulations
     ylabels[2*i-1] = "[#$(i)]"
     ylabels[2*i] = "0"
 end;
-pl = plot(; size=(1200, 800), legend=:outerright, framestyle=:natural,
+pl = plot(; size=(1200, 800),
+    legend=:outerright, framestyle=:natural,
     ylim=(0, num_simulations * num_particles),
-    yticks=((-(num_particles / 2)):(num_particles/2):((num_simulations-1+0.5)*(num_particles)), ylabels),
+    yticks=(
+        (-(num_particles / 2)):(num_particles/2):(
+            (num_simulations-1+0.5)*(num_particles)
+        ), ylabels
+    ),
     ylabel="R[n] - počet blech na psu napravo",
     xlabel="n-časový krok", grid=:on, minorgrid=false,
     left_margin=[5mm 5mm], bottom_margin=5mm,
@@ -90,18 +102,26 @@ pl = plot(; size=(1200, 800), legend=:outerright, framestyle=:natural,
 
 for Nsim in 1:num_simulations
     left_side = num_particles
-    R = onerun(num_particles=num_particles, left_side=num_particles, num_steps=num_steps)
-    # println(R)
-    pl = plot!(1:(num_steps+1), R .+ num_particles * (Nsim - 1); label="Simulace $Nsim", lw=1, show=true)
+    R = onerun(num_particles=num_particles,
+        left_side=num_particles, num_steps=num_steps
+    )
+    pl = plot!(
+        1:(num_steps+1), R .+ num_particles * (Nsim - 1);
+        label="Simulace $Nsim", lw=1, show=true
+    )
 end
 pl
+```
+
+```{=typst}
+#pagebreak()
 ```
 
 ## Mikrostavy a makrostavy modelu psů a blech
 
 Podobně jako u házení kostkami lze u tohoto modelu definovat mikrostavy a marrostavy. 
 Mikrostavem je vývoj počtu blech od počátečního okamžiku do n-tého časového kroku kdy pozorujeme 
-makrostav $R_n$ (ten nabívá hodnot $R_n \in (0,k$), kde k je počet blech).
+makrostav $R_n$ (ten nabívá hodnot $R_n \in (0,N$), kde N je počet blech).
 
 Celkový počet mikrostavů (možných drah od okamžiku 0 do n-tého časového kroku ) je roven:
 
@@ -112,31 +132,31 @@ O=2^n
 \end{equation}
 $$
 
-Což odpovídá možnému vývoji v každém z $n$ kroků (buď se počet blech na pravém
-psu zvýší nebo sníží). Multiplicita $M$ makrostavu $R_n$  je rovna počtu kombinací
-kdy v $k$ krocích z $n$ kroku blecha skočí na pravého psa.
-
+Což odpovídá všem možným kombinacím skoků blech v každém z $n$ kroků (kdy se buď 
+počet blech na pravém psu zvýší nebo sníží). Multiplicita $M(R_n=k)$ makrostavu,
+kdy $R_n$ je rovno přesně k, je rovna počtu kombinací kdy v $k$ krocích z $n$
+kroků blecha skočí na pravého psa. Tento počet kombinací je dán binomickým koeficientem:
 
 $$
 \begin{equation}
-M=\binom nk=\frac{n!}{k!(n-k)!}
+M(R_n=k)=\binom n{k}=\frac{n!}{k!(n-k)!}
 \end{equation}
 $$
 
 
+Pravděpodobnost směru přeskoku v kroku $n+1$  závisí na počtu blech $R_{n}$ v předchozím kroku:
 
-Pravděpodobnost přeskoku $p_n$ v kroku $n$  závisí na počtu blech $R_{n-1}$ v předchozím kroku:
-
+Pravděpodobnost přeskoku na levého psa (tedy snížení počtu blech na pravém psu o 1) je:
 $$
 \begin{equation}
-p_n^+=1-\frac{R_{n-1}}{N} \implies  R_n=R_{n-1}+1
+p^-=\frac{R_{n}}{N} \implies  R_{n+1}=R_{n}-1
 \end{equation}
 $$
 
-
+a pravděpodobnost přeskoku na pravého psa (tedy zvýšení počtu blech na pravém psu o 1) je:
 $$
 \begin{equation}
-p_n^-=1-\frac{R_{n-1}}{N} =1-p_n^+ \implies  R_n=R_{n-1}-1
+p^+=1-p^-=1-\frac{R_{n}}{N} \implies  R_{n+1}=R_{n}+1
 \end{equation}
 $$
 
@@ -145,3 +165,135 @@ jednotlivé mikrostavy mají různou pravděpodobnost. Pro výpočet pravděpodo
 makrostavu je nutno využít Markovovy řetězce.
 
 
+## Markovův řetězec pro model psů a blech
+
+Proces skákání blech mezi psy lze modelovat jako Markovův řetězec, kde stavy odpovídají počtu blech na pravém psu. Přechodové pravděpodobnosti mezi stavy jsou dány vzorci pro $p_n^+$ a $p_n^-$ uvedenými výše. 
+
+
+```{julia}
+using LinearAlgebra
+using Printf
+
+const N = 10
+# const S = 0:N
+
+function ehrenfest_transition_matrix(N::Int)
+    P = zeros(Float64, N + 1, N + 1)  # states 0..Rn
+
+    for Rn in 0:N
+        p_minus = Rn / N
+        p_plus = 1- p_minus
+        if Rn != N
+            P[begin+Rn+1, begin+Rn] = p_plus
+        end
+        if Rn != 0
+            P[begin+Rn-1, begin+Rn] =p_minus
+        end
+    end
+
+    return P
+end
+
+P = ehrenfest_transition_matrix(N)
+println("Přechodová matice P: ")
+println("R[n]            ", round.(Int.(0:N), digits=0))
+println("-"^72)
+for i in 0:size(P, 1)-1
+    println("R[n+1] = ", @sprintf("%4d", i), "-> ", round.(P[i+1, :], digits=5))
+end
+```
+
+```{=typst}
+#pagebreak()
+```
+
+Této matici přechodů odpovídá následující graf, v kteréM čísla uzlů představují počet blech na pravém psu a hrany jsou označeny přechodovými pravděpodobnostmi z matice $P$.
+
+**Přechodový graf Ehrenfestova modelu (N = 10)**
+
+```{dot}
+//| file: markov_psi_blechy.dot
+//| fig-width: 4.5
+//| fig-height: 4.5
+
+``` 
+
+
+
+Přístup využívající Markovův řetězec nám umožňuje analyzovat dlouhodobé chování systému, jako je
+například stacionární rozdělení počtu blech na pravém psu.
+
+To lze získat jako
+normovaný vlastní vektor přechodové matice 
+([viz. Myš v bludišti](../p4_markovuv_proces/mys_v_bludisti.qmd)). Tento přístup nám poskytuje hlubší
+pochopení dynamiky modelu psů a blech a umožňuje nám předpovídat
+pravděpodobnosti různých makrostavů v dlouhodobém horizontu.
+
+Následující program vypočte stacionární pravděpodobností rozdělení počtu blech na pravém psu
+
+```{julia}
+# vypocet stacionarniho stavu pro matici P
+F = eigen(P)
+# normalizace vlastních vektorů
+λ = F.values        # vlastní čísla
+V = F.vectors       # sloupce jsou vlastní vektory 
+
+idx = findfirst(isapprox.(λ, 1; atol=1e-12, rtol=1e-12))
+v1 = V[:, idx]
+
+p_star = v1 / sum(v1)
+println("Stacionární rozdělení p*:")
+clean(x; tol=1e-12) = abs(x) < tol ? 0.0 : x
+for i in 1:length(p_star)
+    println(i, " -> ", round(clean(p_star[i]); digits=6))
+end
+sum_p_star = sum(p_star)
+println("Součet komponent stacionárního rozdělení: ", sum_p_star)
+
+```
+
+
+**Stacionární rozdělení $p^*[R[n]]$ - pravděpodobnost počtu blech $R[n]$ na pravém psu**
+
+```{julia}
+#| echo: false
+#| output: true  #asis
+
+using Plots
+p = plot(p_star,
+    seriestype=:bar,
+    xlabel="R[n] - počet blech na pravém psu",
+    ylabel="p*[R[n]] ",
+    legend=false,
+    xticks=(0:1:10),
+    yticks=(0:0.05:0.25),
+    size=(500, 400)
+)
+display(p)
+```
+
+
+```{=typst}
+#pagebreak()
+```
+
+**Kontrola stacionarity**
+
+Nyní zkontrolujeme, že stacionární rozdělení $p^*$ je skutečně fixním bodem
+přechodové matice $\mathbb P$, tedy že $p^* = P \cdot p^*$. Pokud tomu tak je,
+znamená to, že pokud se systém nachází v rozdělení $p^*$, zůstane v něm i po
+aplikaci přechodové matice, což je klíčová vlastnost stacionárního rozdělení.
+
+A vskutku, pokud vynásobíme $p_{next}^* = P \cdot p^*$, zjistíme, že $p_{next}^*$
+je velmi blízké $p^*$, což potvrzuje, že $p^*$ je stacionární rozdělení pro náš
+Markovův řetězec modelu psů a blech.
+
+```{julia}
+println("Kontrola P.p*: ")
+p_star = P * p_star
+for i in 1:length(p_star)
+    println("R[",@sprintf("%2d", i), "]-> ", round(clean(p_star[i]); digits=6))
+
+end
+
+```
