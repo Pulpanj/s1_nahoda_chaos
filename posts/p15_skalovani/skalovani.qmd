@@ -1,0 +1,206 @@
+---
+title: "Škálovaní "
+date: "2026-03-17"
+updated: "2026-03-18"
+description: "Jak škáluje stupnice v různých funkcích ?"
+draft: false
+categories: ["Škálování", "Rozdělení bez střední hodnoty","Přednáška 15"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p15_skalovani/skalovani.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "skalovani"
+        output-ext: "pdf"
+        engine: typst
+---
+
+## Co je škálování
+
+Pokud známe hodnoty funkce $f(x)$ v intervalu $x \in (a,b)$, pak změnou škály o
+faktor $\lambda$ rozumíme výpočet hodnot 
+
+$$
+\begin{equation}
+f(\lambda \, x) \quad \text{v intervalu } (a,\lambda \,b) 
+\end{equation}
+$$
+
+Grafy funkci $f(x)$ a $f(\lambda \, x)$ mají  shodný tvar (až na měřítka na osách Y a Y) 
+**pouze pokud funkce $f(x)$ má  tvar:**
+
+
+$$
+\begin{equation}
+f(x)=c  \cdot  x^\alpha
+\end{equation}
+$$
+
+
+
+## Funkce pro zobrazení škálování funkce
+```{julia}
+##| echo: true
+#| output: true  #asis
+#| code-fold: true
+
+using Plots, LaTeXStrings
+
+
+function plot_lambdas(
+    fx, lambdas;
+    a=nothing, b=nothing,
+    layout=nothing,
+    title="fx for various λ",
+    colors=[:green, :red, :blue, :orange]
+)
+    n = length(lambdas)
+    layout === nothing && (layout = (ceil(Int, n / 2), 2))
+
+    plt = plot(layout=layout, legend=true, plot_title=title,
+        size=(800, 800)
+    )
+
+    for (i, λ) in enumerate(lambdas)
+        xa = isnothing(a) ? λ : a
+        xb = isnothing(b) ? 2λ : a + λ * b
+        xs = range(xa, xb; length=15)
+        ys = fx.(xs)
+
+        plot!(
+            plt[i],
+            xs,
+            ys,
+            color=colors[i],
+            minorgrid=true,
+            marker=:circle,
+            markersize=(5 - i) * 3,
+            markerstrokecolor=:transparent,
+            markerstrokewidth=0,
+            label="λ = $λ"
+        )
+    end
+    for (i, λ) in enumerate(lambdas)
+        xa = isnothing(a) ? λ : λ * a
+        xb = isnothing(b) ? 2λ : λ * b
+
+        xs = range(xa, xb; length=15)
+        ys = fx.(xs)
+
+        ys_min = minimum(ys)
+        ys_max = maximum(ys)
+
+        ys = (ys .- ys_min) ./ (ys_max - ys_min)
+        xs_min = minimum(xs)
+        xs_max = maximum(xs)
+        xs = (xs .- xs_min) ./ ((xs_max - xs_min))
+        xticks_positions = range(minimum(xs), maximum(xs); length=6)
+        yticks_positions = range(minimum(ys), maximum(ys); length=6)
+        plot!(
+            plt[n+1],
+            xs,
+            ys,
+            color=colors[i],
+            marker=:circle,
+            markersize=(5 - i) * 3,
+            label="λ = $λ",
+            xticks=(xticks_positions, fill("", length(xticks_positions))),
+            yticks=(yticks_positions, fill("", length(yticks_positions))),
+            markerstrokewidth=0,
+            minorgrid=true,
+            xgrid=true
+        )
+    end
+
+    display(plt)
+end
+
+
+```
+
+```{=typst}
+#pagebreak()
+```
+
+## Škálování mocninných funkcí
+
+```{julia}
+plot_lambdas(
+    x -> x^2,
+    [1, 0.2, 0.4],
+    a=0, b=10,
+    title=L"f(\lambda \cdot x)=(\lambda \cdot x)^2"
+)
+```
+
+```{=typst}
+#pagebreak()
+```
+
+```{julia}
+plot_lambdas(
+    x -> x^2,
+    [1, 2, 4],
+    a=0, b=10,
+    title=L"f(\lambda \cdot x)=(\lambda \cdot x)^2"
+)
+```
+
+```{=typst}
+#pagebreak()
+```
+
+```{julia}
+plot_lambdas(x -> x^2.5,
+    [1, 2, 4],
+    a=0,    b=10,
+    title=L"f(\lambda \cdot x)=(\lambda \cdot x)^{2.5}"
+)
+```
+
+
+
+```{=typst}
+#pagebreak()
+```
+
+```{julia}
+plot_lambdas(x -> x^0.5,
+    [1, 2, 4],
+    a=0,    b=10,
+    title=L"f(\lambda \cdot x)=\sqrt{\lambda \cdot x}"
+)
+```
+
+```{=typst}
+#pagebreak()
+```
+
+## Škálování exponenciálních funkcí
+
+```{julia}
+plot_lambdas(x -> exp(x),
+    [1, 0.2, 0.4],
+    a=0,
+    b=10,
+    title=L"f(\lambda \cdot x)=e^{(\lambda \cdot x)}"
+)
+```
+
+```{=typst}
+#pagebreak()
+```
+
+```{julia}
+plot_lambdas(x -> exp(-x),
+    [1, 2, 4],
+    a=0.1,
+    b=2,
+    title=L"f(\lambda \cdot x)=e^{(-\lambda \cdot x)}"
+)
+```
+
+```{erd}

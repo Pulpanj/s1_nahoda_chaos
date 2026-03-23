@@ -72,7 +72,9 @@ book_list = [
         "PDF" => "https://www.yichijin.com/files/elchanan.pdf",
         "Rok" => "May 2018",
         #"cover" => "/images/stats_full.png"
-    ), OrderedDict(
+    ), 
+    
+    OrderedDict(
         "label" => "Přednáška 4,5 (Nelineární dynamika a chaos)",
     ),
     OrderedDict(
@@ -157,6 +159,27 @@ book_list = [
         "cover" => "/images/almgren.jpg"
     ),
 
+    OrderedDict(
+        "Název" => "Plateau's Problem An Invitation to Varifold Geometry  ",
+        "Autor" => "Frederick J. Almgren, Jr, Kenneth J. Brakke and John M. Sullivan",
+        "Reference" => "STUDENT MATHEMATICAL LIBRARY Volume 13 ",
+        "PDF" => "https://www.ams.org/books/stml/013/stml013-endmatter.pdf",
+        # "URL" => "https://www.scribd.com/document/472537596/The-science-of-soap-films-and-soap-bubbles-by-Cyril-Isenberg-pdf",
+        "Rok" => "2000",
+        "cover" => "/images/almgren.jpg"
+    ),
+   OrderedDict(
+        "label" => "Přednáška 15 (Rozdělení pravděpodobnosti bez střední hodnoty,Škálování"
+   ),
+    OrderedDict(
+        "Název" => "Power laws, Pareto distributions and Zipf’s law",
+        "Autor" => "M.E.J. NEWMAN",
+        "Reference" => "Contemporary Physics, Vol. 46, No. 5, September–October 2005, 323 – 351",
+        "PDF" => "https://www.cs.cornell.edu/courses/cs6241/2019sp/readings/Newman-2005-distributions.pdf",
+    #     "URL" => "",
+        "Rok" => "2005",
+    #     "cover" => "/images/.jpg"
+    ),
     # OrderedDict(
     #     "Název" => "",
     #     "Autor" => "",
@@ -166,6 +189,7 @@ book_list = [
     #     "Rok" => "",
     #     "cover" => "/images/.jpg"
     # ),
+
 ]
 generate_book_list(book_list)
 ```

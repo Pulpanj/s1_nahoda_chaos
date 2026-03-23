@@ -4,7 +4,7 @@ date: "2025-10-13"
 updated: "2026-03-13"
 description: "Analýza pořadí házení kostkou: kdy, poprvé padne 6-ka ?"
 draft: false
-categories: ["Náhodná proměnná", "Seminář 2", "Odvození" ]
+categories: ["Náhodná proměnná", "Hádanka","Seminář 2", "Odvození" ]
 # image: "image.jpg"
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p2_nahodna_promenna/clovece_nezlob_se.pdf) "
 
@@ -299,7 +299,7 @@ Existuje jednodušší odvozeni, které vubec nevyžaduje použití nekonečné 
 ale využívá pouze vlastnosti střední hodnoty:
 
 Nechť $K$ je náhodná veličina označující pořadí hodu, kdy poprvé padne 6-ka a
-její střední hodnota $\mathbb{E}[K]=x$. Pokud hodíme kostkou poprv0, tak je
+její střední hodnota $\mathbb{E}[K]=x$. Pokud hodíme kostkou poprvé, tak je
 pravděpodobnost, že padne 6-ka $\frac{1}{6}$ a v tomto případě $K=1$. Pokud
 nepadne 6-ka, což se stane s pravděpodobností $\frac{5}{6}$, tak se dostaneme
 do stejné situace jako na začátku, ale s tím rozdílem, že už jsme provedli

@@ -38,7 +38,8 @@ draft: false
 - krivky
     - retezovka
     - Brachistochrona 
-    - evolventy
+    - evolventy involventy
+
 -   Minimalni plochy
     - ~~2 bubliny~~
     - rotujici retezovka
@@ -48,20 +49,25 @@ draft: false
     -   ~~soucet hodu k kostek~~
     -   ~~doba cekani na prvni sestku~~
     -   pravdepodobnost alespon jedne 6-ky pri hodu k kostkami (Demetre)
+    - stredni pocet hodu do sekvence 6-6
+    - stredni pocet hodu do 6, ale jen kdyz predchozi hody jsou liche
     -   uloha se satnarkou a klobouky
 -   Bayes rule
     -   TV soutez s 3 dvermi
 -   Statistika
     -   Bernouliho process
-    -   Poisonovo rozdeleni priklad s vanocnim testem (limita bernouliho)
-    -   vymirani slechtickych jmen
-    -   zakon velkych cisel
--   Markovovy retezce
-    -   model psu a blech
-    -   pravdepodobnosti stavu
+    - https://en.wikipedia.org/wiki/Geometric_distribution (bernouli x fury distribution)
     -   nahodna prochazka
         -   pravdepodobnost navratu
         -   pocet zmen znamenka
+        -   volebni protokol - pravdepodobnost, ze A bude vzdy vyhravat nad B (reseni (a-b)/(a+b))
+        - 2 autobusy na 2 strany jezdi 10 a 50 minutu - jaka je pravdepodobnost jizdy vpravo vlevo
+    -   ~~Poisonovo rozdeleni priklad s vanocnim testem (limita bernouliho)~~
+    -   vymirani slechtickych jmen
+    -   zakon velkych cisel
+-   Markovovy retezce
+    -   ~~model psu a blech~~
+    -   ~~pravdepodobnosti stavu~~
 -   Dynamika
     -   Linearni dynamika s diskretnim casem
     -   ~~Nelinearni dynamika s diskretnim casem~~
@@ -89,15 +95,19 @@ draft: false
     - entropie pro idealni plyn (spojitá energie)
 
 -   Matematika
+        - geometrie
+            - pruseciky tecen 3 kruznic (leží na přímce)
+            - dukaz pythagorovy vety (ctverec + dukaz zalozeny na skalovani plocha=zvetseni **2 )
+        - lin algebra
+            - vlastni cisla matice vysvetleni (na 2d matici)
     -   dukaz nekonecneho poctu prvocisel
     -   pingeon princip 
-    - dukaz pythagorovy vety (ctverec + dukaz zalozeny na skalovani plocha=zvetseni **2 )
 
 - Bubliny
     -   minimalni plochy klasicke
     -   od minimalnich ploch ke křivosti a diferenciálním rovnicim
     
-- machacek
-- markov retezec prepaid karet
-- informacni entropie pro prirazovani fraud pripadu spravedlive
-- pruseciky tecen 3 kruznic (leží na přímce)
+- napady z praxe
+    - ~~machacek~~
+    - markov retezec prepaid karet
+    - informacni entropie pro prirazovani fraud pripadu spravedlive

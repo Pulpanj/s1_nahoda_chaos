@@ -22,9 +22,13 @@ format:
 
 ## Zadání
 
-Představme si, že stojíme na zahradě a vidíme,že začíná pršet. Pršet začalo náhle, ale prší pomalu a pravidelně, a průměrný počet kapek 100 kapek za sekundu na 1 m².
+Představme si, že stojíme na zahradě a vidíme, že začíná pršet. Pršet začalo
+náhle, ale prší pomalu a pravidelně. Průměrný počet kapek je 100 kapek za
+sekundu na 1 m².
 
-Zajímá nás, jak dlouho bude trvat, než spadne první kapka deště na malou sázecí misku v záhoně (miska má plochu 10 cm²). Tento čas můžeme modelovat jako náhodnou proměnnou, která nám říká, jak dlouho budeme čekat.
+Zajímá nás, jak dlouho bude trvat, než spadne první kapka deště na malou sázecí
+misku v záhoně (miska má plochu 10 cm²). Tento čas můžeme modelovat jako
+náhodnou proměnnou, která nám říká, jak dlouho budeme čekat.
 
 Otázky, které si můžeme položit:
 
@@ -34,11 +38,19 @@ Otázky, které si můžeme položit:
 
 ## Spojitá náhodná proměnná
 
-Doba $T$ do první kapky deště na misku je spojitá náhodná proměnná nabývající kladných hodnot. Spojitou náhodnou proměnnou můžeme charakterizovat pomocí **kumulativní funkce pravděpodobnosti** $F(t)$ (cumulative distribution function - cdf), která nám říká, jaká je pravděpodobnost, že náhodná proměnná nabude hodnoty menší nebo rovné určité hodnotě (v našem příkladě tedy času $t$).
+Doba $T$ do první kapky deště na misku je spojitá náhodná proměnná nabývající
+kladných hodnot. Spojitou náhodnou proměnnou můžeme charakterizovat pomocí
+**kumulativní funkce pravděpodobnosti** $F(t)$ (cumulative distribution
+function - cdf), která nám říká, jaká je pravděpodobnost, že náhodná proměnná
+nabude hodnoty menší nebo rovné určité hodnotě (v našem příkladě tedy času
+$t$).
 
-Dále můžeme charakterizovat náhodnou proměnnou pomocí její **hustoty pravděpodobnosti** $f(t)$ (probability density function - pdf), která nám říká, jak je pravděpodobné, že náhodná proměnná nabude určité hodnoty.
+Dále můžeme charakterizovat náhodnou proměnnou pomocí její **hustoty
+pravděpodobnosti** $f(t)$ (probability density function - pdf), která nám říká,
+jak je pravděpodobné, že náhodná proměnná nabude určité hodnoty.
 
-Vztah mezi kumulativní funkcí pravděpodobnosti $F(t)$ a hustotou pravděpodobnosti $f(t)$ je dán vztahem: 
+Vztah mezi kumulativní funkcí pravděpodobnosti $F(t)$ a hustotou
+pravděpodobnosti $f(t)$ je dán vztahem:
 
 $$
 F(t) = \int_{-\infty}^{t} f(x) dx
@@ -52,13 +64,17 @@ $$
 
 ## Doba do první kapky jako náhodná proměnná
 
-Předpokládejme, že kapky deště padají náhodně a nezávisle na sobě, a že průměrný počet kapek $\lambda$ dopadajících na misku za jednotku času je konstantní. V našem případě je $\lambda$ dáno počtem kapek za sekundu na misku, což je: 
+Předpokládejme, že kapky deště padají náhodně a nezávisle na sobě, a že
+průměrný počet kapek $\lambda$ dopadajících na misku za jednotku času je
+konstantní. V našem případě je $\lambda$ dáno počtem kapek za sekundu na misku,
+což je:
 
 $$
 \lambda = \text{počet kapek za sekundu na 1 m²} \times \text{plocha misky v m²} = 100 \times 0.0010 = 0.1 \text{ kapek za sekundu}
 $$
 
-Tento proces se nazývá **Poissonův proces** s intenzitou $\lambda$, kde $\lambda$ je průměrný počet kapek dopadajících na misku za jednotku času.
+Tento proces se nazývá **Poissonův proces** s intenzitou $\lambda$, kde
+$\lambda$ je průměrný počet kapek dopadajících na misku za jednotku času.
 
 Pravděpodobnost, že do času $t$ nedopadne žádná kapka je F(t). Pravděpodobnost
 , že během malého času $\Delta t$ dopadne na misku právě jedna kapka, je
@@ -71,7 +87,8 @@ $$
 F(t+\Delta t) = F(t) + \lambda (1 - F(t))\Delta t 
 $$
 
-kde $1 - F(t)$ je pravděpodobnost, že do času $t$ nedopadla žádná kapka (tedy že stále čekáme na první kapku).
+kde $1 - F(t)$ je pravděpodobnost, že do času $t$ nedopadla žádná kapka (tedy
+že stále čekáme na první kapku).
 
 a po úpravě dostáváme:
 
@@ -87,7 +104,9 @@ $$
 \lim_{\Delta t \to 0} \frac{F(t+\Delta t)-F(t)}{\Delta t}=\frac{dF(t)}{dt}= \lambda (1 - F(t))
 $$
 
-Tuto diferenciální rovnici s počáteční podmínkou $F(0) = 0$ (protože pravděpodobnost, že do času 0 dopadne kapka, je 0) můžeme řešit následujícím způsobem:
+Tuto diferenciální rovnici s počáteční podmínkou $F(0) = 0$ (protože
+pravděpodobnost, že do času 0 dopadne kapka, je 0) můžeme řešit následujícím
+způsobem:
 
 - Přepíšeme rovnici do separovaného tvaru:
 
@@ -126,7 +145,9 @@ $$
 $$
 
 - Upravíme na explicitní tvar pro $F(t)$
-Vynásobíme (-1), přejmenujeme konstantu (C) na (C') a na obě strany aplikujeme exponenciální funkci:
+
+Vynásobíme (-1), přejmenujeme konstantu (C) na (C') a na obě strany aplikujeme
+exponenciální funkci:
 
 $$
 |1 - F| = e^{C'} e^{-\lambda t}.
@@ -153,13 +174,17 @@ F(0) = 1 - A e^{0} = 1 - A = 0
 A = 1 
 $$
 
-Kumulativní funkce pravděpodobnosti $F(t)$ pro dobu do první kapky deště je tedy dána vzorcem:
+Kumulativní funkce pravděpodobnosti $F(t)$ pro dobu do první kapky deště je
+tedy dána vzorcem:
 
 $$
 F(t) = (1 - e^{-\lambda t}) \quad  \text{pro } t \geq 0
 $$
 
-A hustota pravděpodobnosti $f(t)$ je dána derivací kumulativní funkce pravděpodobnosti. Doba do první kapky T v Poissonově procesu s intenzitou $\lambda$ má **exponenciální rozdělení** s parametrem $\lambda$. Její hustota pravděpodobnosti je dána vzorcem: 
+A hustota pravděpodobnosti $f(t)$ je dána derivací kumulativní funkce
+pravděpodobnosti. Doba do první kapky T v Poissonově procesu s intenzitou
+$\lambda$ má **exponenciální rozdělení** s parametrem $\lambda$. Její hustota
+pravděpodobnosti je dána vzorcem:
 
 $$
 f_T(t) =  \frac{dF(t)}{dt} = \lambda e^{-\lambda t} \quad \text{pro } t \geq 0
@@ -167,7 +192,8 @@ $$
 
 ## Grafické znázornění hustoty pravděpodobnosti
 
-Nyní můžeme graficky znázornit kumulativní funkci pravděpodobnosti $F(t)$ a hustotu pravděpodobnosti $f(t)$ pro dobu do první kapky deště.  
+Nyní můžeme graficky znázornit kumulativní funkci pravděpodobnosti $F(t)$ a
+hustotu pravděpodobnosti $f(t)$ pro dobu do první kapky deště.
 
 ```{julia}
 #| echo: false
@@ -210,12 +236,15 @@ display(g)
 ``` 
 
 
-## Odpovědi na otázky
-1.  Pravděpodobnost, že první kapka spadne na misku do 5 sekund, je dána kumulativní funkcí pravděpodobnosti $F(5)$:
+## Odpovědi na otázky 
+
+1. Pravděpodobnost, že první kapka spadne na misku do 5
+sekund, je dána kumulativní funkcí pravděpodobnosti $F(5)$:
 $$
 P(T \leq 5) = F(5) = 1 - e^{-\lambda \cdot 5} = 1 - e^{-0.1 \cdot 5} \approx 0.3935
 $$
-1.  Pravděpodobnost, že první kapka spadne na misku do 10 sekund, je dána kumulativní funkcí pravděpodobnosti $F(10)$:
+1. Pravděpodobnost, že první kapka spadne na misku do 10 sekund, je dána
+kumulativní funkcí pravděpodobnosti $F(10)$:
 $$
 P(T \leq 10) = F(10) = 1 - e^{-\lambda \cdot 10} = 1 - e^{-0.1 \cdot 10} \approx 0.6321
 $$
