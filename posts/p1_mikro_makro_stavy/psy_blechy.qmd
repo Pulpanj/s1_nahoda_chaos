@@ -70,6 +70,36 @@ R = onerun(num_particles = 10, left_side = 0, num_steps = num_steps)
 println(R)
 ```
 
+Graf vývoje počtu blech na pravém psu v závislosti na časových krocích pro dvě realizace tohoto procesu:
+
+
+```{julia}
+# --- Vykreslení výsledků ---
+num_steps = 1000
+num_runs = 3
+num_particles = 30
+# Vytvoření objektu grafu
+plt = plot(
+    title="Simulace Ehrenfestova modelu (počet částic=$(num_particles), n_max=$(num_steps))",
+    xlabel="n-časový krok",
+    ylabel="R[n] - počet blech na psu napravo",
+    legend=:topright,
+    ylim=(0, num_particles), # Zajistí, že osa y pokrývá celý rozsah počtu částic
+    size=(900, 600)
+)
+
+# Vykreslení každého běhu
+for i in 1:num_runs
+    R = onerun(num_particles=num_particles, left_side=0, num_steps=num_steps)
+    plot!(plt, 0:num_steps, R, label="Běh č. $(i)", linewidth=1.5)
+end
+
+# Zobrazení grafu
+display(plt)
+```
+
+
+
 Pokud provedeme tento pokus opakovaně získáme několik realizací tohoto procesu. 
 
 ```{julia}
@@ -297,3 +327,45 @@ for i in 1:length(p_star)
 end
 
 ```
+
+Stacionární rozdělení v případe modelu psů a blech je symetrické kolem stavu $R[n] = N/2$ (tedy 5 blech na pravém psu) a má tvar zvonu, což odráží fakt, že nejpravděpodobnější makrostavy jsou ty, kde je přibližně stejný počet blech na obou psech. Tento výsledek je v souladu s intuicí, protože v dlouhodobém horizontu by se měly blechy rovnoměrně rozdělovat mezi oba psy, pravděpodobnost počtu blech na pravém psu po velkém počtu kroků tedy odpovídá binomickému rozdělení s parametry $n$ a $p=0.5$ (po velkém počtu kroků každá blecha bude na pravém psu s pravděpodobností 0.5). 
+
+
+```{julia}
+using Distributions
+using Plots
+
+n = 10          # počet pokusů
+p = 0.5         # pravděpodobnost úspěchu
+d = Binomial(n, p)
+
+x = 0:n
+y = pdf.(d, x)
+
+gr=bar(x, y,
+    xlabel="k",
+    ylabel="P(X = k)",
+    title="Binomické rozdělení (n = $n, p = $p)",
+    legend=false,
+    xticks=(0:1:10),
+    yticks=(0:0.05:0.25),
+    size=(500, 400)
+)
+display(gr)
+```
+
+Kod následujícího programu porovná pravděpodobnosti získané z Markovova řetězce s pravděpodobnostmi binomického rozdělení pro $n=10$ a $p=0.5$.
+
+```{julia}
+
+println("Pravděpodobnosti pro k = 0 až 10:")
+println(y)
+for k in 0:n
+    println("P(X = ", @sprintf("%2d", k), ") = ", round(pdf(d, k); digits=6),
+        "   rozdíl {P(X = ", @sprintf("%2d", k), ")-R[", @sprintf("%2d", k), "]} = ",
+        round(pdf(d, k) - p_star[k+1]; digits=6))
+end
+```
+
+
+ 

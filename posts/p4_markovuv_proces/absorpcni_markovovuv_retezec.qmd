@@ -1,0 +1,299 @@
+---
+title: "Náhodná procházka opilého námořníka"
+date: "2026-03-25"
+updated: "2026-03-26"
+description: "Opilý námořník se náhodně motá přes hospody až nakonec do domu své ženy nebo milenky."
+draft: false
+categories: ["Markovovy řetězce","Odvození", "Přednáška 4"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p4_markovuv_proces/absorpcni_markovovuv_retezec.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "absorpcni_markovovuv_retezec"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Absorpční Markovův řetězec
+
+Pokud Markovův řetězec obsahuje alespoň jeden absorpční stav, pak se realizace tohoto řetězce nakonec vždy dostane do jednoho z těchto stavů a zůstane v něm navždy. Absorpční stav je takový stav, ze kterého není možné odejít (neexistuje žádný přechod z tohoto stavu do jiného stavu). Počet průchodů nějakým stavem $E[N]$ v markovově řetězci, který má absorpční stav, je odvozena v [Grinstead and Snell’s Introduction to Probability (kapitola 11.2)](../../literatura.qmd).
+
+## Příklad - náhodná procházka opilého námořníka
+
+Postup výpočtu $E[N]$ ukážeme na příkladu z knihy, který popisuje náhodnou
+procházku opilého námořníka, který vyjde z hospody a náhodně se pohybuje buď o
+vlevo nebo vpravo. V obou směrech je na cestě další hospoda, do které námořník
+na zapadne. Dále od hospod jsou domy, kde bydlí námořníkova žena (směr vpravo)
+a nebo námořníkova milenka (směr vlevo).
+
+Každopádně námořník po čase vyjde z jakekoliv ze (tří) hospod a opět se náhodně
+vydá napravo nebo nalevo (s pravděpodobností 1/2) a tento proces se opakuje
+(námořník se může vrátit zpět do původní pozice, a pak jít znovu  vpravo nebo
+vlevo, vždy s pravděpodobností 1/2). Nakonec se ale dostane do jednoho z domů,
+kde bydlí námořníkova žena nebo námořníkova milenka, kde jeho noční tah skončí.
+
+Jak dlouho bude trvat, než se námořník dostane do jednoho z těchto domů?
+
+## Markovův řetězec náhodné procházky opilého námořníka
+
+Proces náhodné procházky opilého námořníka můžeme modelovat pomocí
+následujícího Markovova řetězce:
+
+```{dot caption="Řetězec náhodné procházky opilého námořníka"}
+//| file: opily_namornik.dot
+//| fig-width: 7
+//| fig-height: 0.9
+
+``` 
+ 
+ jehož stavy reprezentují pozice námořníka (hospody, domy) a přechody mezi stavy reprezentují pohyb námořníka s příslušnými pravděpodobnostmi. Stavy S4 a S5 jsou absorpční stavy, protože jakmile se námořník dostane do jednoho z těchto stavů, zůstane v něm navždy (neexistuje žádný přechod z těchto stavů do jiného stavu).
+ Matice přechodů tohoto markovova řetězce můžeme zapsat ve tvaru:
+
+$$
+\begin{equation}
+\mathbb P =
+{
+\begin{pmatrix}
+P(S1 \to S1) & P(S1 \to S2) & P(S1 \to S3) & P(S1 \to S4) & P(S1 \to S5) \\
+P(S2 \to S1) & P(S2 \to S2) & P(S2 \to S3) & P(S2 \to S4) & P(S2 \to S5) \\
+P(S3 \to S1) & P(S3 \to S2) & P(S3 \to S3) & P(S3 \to S4) & P(S3 \to S5) \\
+P(S4 \to S1) & P(S4 \to S2) & P(S4 \to S3) & P(S4 \to S4) & P(S4 \to S5) \\
+P(S5  \to S1) & P(S5 \to S2) & P(S5 \to S3) & P(S5 \to S4) & P(S5 \to S5) \\
+\end{pmatrix}
+}=
+\begin{pmatrix}
+0 & \frac{1}{2} & \frac{1}{2} & 0  & 0 \\
+\frac{1}{2} & 0 & 0 & \frac{1}{2} & 0 \\
+\frac{1}{2} & 0 & 0 & 0 &  \frac{1}{2} \\
+0 & 0  & 0 &  \frac{1}{2}  & 0  \\
+0 & 0  & 0 & 0 & \frac{1}{2}  \\
+\end{pmatrix}
+\end{equation}
+$$
+
+
+
+## Kanonická forma matice přechodů
+
+Postup výpočtu středního počtu průchodů nějakým stavem $E[N]$ v Markovově
+řetězci, který má absorpční stav, je odvozena v [Grinstead and Snell’s
+Introduction to Probability (kapitola 11.2)](../../literatura.qmd). 
+
+Základem tohoto postupu je přesunutí absorpčních stavů na poslední řádek a
+sloupec matice přechodů (této formě matice $\mathbb P$ se říká **kanonická forma
+matice přechodů**) a následné rozdělení této matice na 4 části, které
+reprezentují přechody mezi neabsorpčními stavy (matice $\mathbb Q$), přechody z
+neabsorpčních stavů do absorpčních stavů (matice $\mathbb R$), přechody z absorpčních
+stavů do neabsorpčních stavů (matice $\mathbb 0$) a přechody mezi absorpčními stavy
+(matice $I$).
+
+$$
+\mathbb P=
+\begin{pmatrix}  
+  \mathbb Q & \mathbb R \\
+  \mathbb 0 & \mathbb I
+\end{pmatrix}
+$$
+
+
+<!-- $$
+\mathbb P=
+\begin{pmatrix}  
+\begin{array}{c|c}
+  \mathbb Q & \mathbb R \\
+  \hline
+  \mathbb 0 & \mathbb I
+\end{array}
+\end{pmatrix}
+$$ -->
+
+
+kde 
+
+- $\mathbb Q$ je matice přechodů mezi neabsorpčními stavy,
+- $\mathbb R$ je matice přechodů z neabsorpčních stavů do absorpčních stavů,
+- $\mathbb 0$ je matice nulová matice rozměru počet neabsorpčních stavů x počet neabsorpčních stavů
+- $\mathbb I$ je jednotková matice stejného rozměru jako počet absorpčních stavů.
+
+
+V našem případě, kdy stavy S4 a S5 jsou absorpční, nemusíme přeuspořádat matici
+přechodů $\mathbb P$ (je již v do kanonické formě její rozdělení na části $\mathbb Q$,
+$\mathbb R$, $\mathbb 0$ a $\mathbb I$ je následovné:
+
+
+$$
+\mathbb Q=
+\begin{pmatrix}  
+0 & \frac{1}{2} & \frac{1}{2} \\
+\frac{1}{2} & 0 & 0 \\
+\frac{1}{2} & 0 & 0 
+\end{pmatrix} \quad
+$$
+$$
+\mathbb R=
+\begin{pmatrix} 
+0 & 0 \\
+\frac{1}{2}  & 0 \\
+0 & \frac{1}{2}  
+\end{pmatrix} \quad
+$$
+$$
+\mathbb 0=
+\begin{pmatrix} 
+0 & 0 & 0 \\
+0 & 0 & 0 
+\end{pmatrix} 
+$$
+$$
+\mathbb I=
+\begin{pmatrix} 
+1 & 0 \\
+0 &  1
+\end{pmatrix}
+$$
+
+
+## Fundamentální matice 
+
+Čas do dosažení absorpčního stavu (v našem případě do domu námořníkovi ženy
+nebo milenky) je dán střední hodnotou počtu průchodů neabsorpčními stavy, než
+se dostaneme do absorpčního stavu. Tato střední hodnota počtu průchodů
+neabsorpčními stavy je dána **fundamentální maticí** $\mathbb N$ definované
+následujícím vztahem:
+
+$$
+\begin{equation}
+\mathbb N = (I - \mathbb Q)^{-1} 
+\end{equation}  
+$$
+
+kde 
+
+- $I$ je jednotková matice stejného rozměru jako počet neabsorpčních stavů,
+- $\mathbb Q$ je matice přechodů mezi neabsorpčními stavy.
+
+Matice $\mathbb N$ představuje střední hodnotu počtu průchodů neabsorpčními
+stavy, než se dostaneme do absorpčního stavu. Konkrétně prvek $\mathbb N_{ij}$
+této matice představuje střední hodnotu počtu průchodů stavem $j$ před
+absorpcí, když začneme ve stavu $i$ a realizace končí v absorpčním stavu.
+
+Výpočet $\mathbb N$ pro náš příklad:
+
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+
+using LinearAlgebra
+Q = [
+    0.0 0.5 0.5;
+    0.5 0.0 0.0;
+    0.5 0.0 0.0
+]
+
+I3 = Matrix{Float64}(I, 3, 3)
+N = (I3 - Q) \ I3
+println("Matice N =")
+round.(N, digits=2)
+```
+
+Matice $\mathbb N$ je definuje střední hodnotou počtu průchodů neabsorpčními stavy S1, S2 a S3, než se dostaneme do absorpčního stavu. Prvek matice $\mathbb N_{i,j}$ představuje střední hodnotu počtu průchodů stavem $j$ před absorpcí, když začneš ve stavu $i$ a realizace končí v absorpčním stavu. Například $\mathbb N_{1,2}$ představuje střední hodnotu počtu průchodů stavem S1 před absorpcí, když začneme ve stavu S2 a realizace končí v absorpčním stavu (S4 nebo S5).
+
+### Očekávané časy do absorpce ze stavů S1, S2 a S3 
+
+Očekávané časy do absorpce ze stavů S1, S2 a S3  jsou dány součtem prvků v řádcích matice $\mathbb N$ odpovídajících těmto stavům. Tedy:    
+
+$$
+\begin{equation}
+T=\mathbb N \mathbf c,
+\end{equation}
+$$
+
+kde
+
+$$
+\begin{equation}
+c=
+\begin{pmatrix}
+1 \\
+1 \\
+1
+\end{pmatrix}
+\end{equation}
+$$
+
+Výpočet očekávaných časů do absorpce ze stavů S1, S2 a S3:
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+ones3 = ones(3)
+T = N * ones3
+println("T =")
+println(round.(T, digits=2))
+```
+
+říká že:
+
+- ze stavu 1: jsou očekávané 4 kroky do absorpce  
+- ze stavu 2: jsou očekávané 2 kroky do absorpce 
+- ze stavu 3: jsou očekávané 2 kroky do absorpce 
+
+
+### Absorpční pravděpodobnosti 
+
+Dalším zajímavým aspektem absorpčních Markovových řetězců jsou
+pravděpodobnosti, s jakou se realizace tohoto řetězce dostane do jednotlivých
+absorpčních stavů. Tyto pravděpodobnosti jsou dány maticí $B$ definovanou
+následujícím vztahem:
+
+$$
+\begin{equation}        
+B = N R
+\end{equation}
+$$
+
+
+kde 
+
+$N$ je fundamentální matice a $R$ je matice přechodů z neabsorpčních stavů
+do absorpčních stavů. Prvek $B_{i,j}$ této matice představuje pravděpodobnost,
+že realizace markovova řetězce, která začíná ve stavu $i$ a končí v absorpčním
+stavu, skončí v absorpčním stavu $j$.
+
+Výpočet matice $B$ pro náš příklad:
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+
+using LinearAlgebra
+R = [
+    0.0 0.0;
+    0.5 0.0;
+    0.0 0.5
+]
+
+B = N * R
+println("B =")
+round.(B, digits=2)
+
+```
+
+Výsledek je nutno interpretovat následovně:
+
+- řádek 1: ze stavu 1 skončíme s pravděpodobností $\frac{1}{2}$ v absorpčním
+stavu 4 a $\frac{1}{2}$ ve stavu 5
+
+- řádek 2: ze stavu 2 skončíme s pravděpodobností $\frac{3}{4}$ v absorpčním
+stavu 4 a $\frac{1}{4}$ ve stavu 5
+
+- řádek 3: ze stavu 3 skončíme s pravděpodobností $\frac{1}{4}$ v absorpčním
+stavu 4 a $\frac{3}{4}$ ve stavu 5
+

@@ -25,7 +25,7 @@ faktor $\lambda$ rozumíme výpočet hodnot
 
 $$
 \begin{equation}
-f(\lambda \, x) \quad \text{v intervalu } (a,\lambda \,b) 
+f(\lambda \, x) \quad \text{v intervalu } (\lambda a,\lambda b) 
 \end{equation}
 $$
 
@@ -43,7 +43,7 @@ $$
 
 ## Funkce pro zobrazení škálování funkce
 ```{julia}
-##| echo: true
+#| echo: true
 #| output: true  #asis
 #| code-fold: true
 
@@ -65,7 +65,7 @@ function plot_lambdas(
     )
 
     for (i, λ) in enumerate(lambdas)
-        xa = isnothing(a) ? λ : a
+        xa = isnothing(a) ? λ : λ * a
         xb = isnothing(b) ? 2λ : a + λ * b
         xs = range(xa, xb; length=15)
         ys = fx.(xs)
@@ -170,7 +170,7 @@ plot_lambdas(x -> x^2.5,
 ```{julia}
 plot_lambdas(x -> x^0.5,
     [1, 2, 4],
-    a=0,    b=10,
+    a=1,    b=10,
     title=L"f(\lambda \cdot x)=\sqrt{\lambda \cdot x}"
 )
 ```

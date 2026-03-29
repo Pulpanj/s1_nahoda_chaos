@@ -53,6 +53,8 @@ website:
             href: https://quarto.org/docs/get-started/hello/vscode.html
           - text: Julia language
             href: https://julialang.org/
+          - text: Spouštění pythonu v prostředí Colab.google.com
+            href: ./howto/Minimalni_python.qmd
       - icon: file-earmark-person
         href: ./aboutme.qmd
         text: " "

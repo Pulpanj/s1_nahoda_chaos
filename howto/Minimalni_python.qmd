@@ -1,0 +1,49 @@
+---
+title: "Jak začít programovat v jazyce python"
+date: "2025-03-29"
+updated: "2026-03-29"
+description: "Instrukce pro spouštění pythonu s minimálním usilím v prostředí Colab.google.com"
+draft: false
+
+
+engine: julia
+
+lang: cs
+
+format:
+    html: 
+        code-fold: false
+        toc: false
+        number-sections: false
+        page-layout: article
+        grid:
+            sidebar-width: 300px
+            body-width: 800px
+            margin-width: 50px
+            gutter-width: 1.5rem      
+
+    # ipynb: default
+
+---
+
+
+Tato poznámka obsahuje minimální instrukce pro spouštění pythonu v prostředí 
+Colab.google.com. Colab je online platforma, která umožňuje spouštět pythonový kód bez nutnosti instalace pythonu na vašem počítači. Stačí mít přístup k internetu a můžete začít programovat v pythonu okamžitě.
+
+## Jak začít
+1. Otevřete webový prohlížeč a přejděte na adresu [colab.google.com](https://colab.google.com/).
+2. Přihlaste se pomocí svého Google účtu.   
+3. Klikněte na "New Notebook" (Nový sešit) pro vytvoření nového pythonového sešitu.
+4. V novém sešitu můžete začít psát pythonový kód do buněk. Každá buňka může obsahovat kód, který můžete spustit stisknutím klávesy Shift + Enter.
+5. Můžete také přidávat textové buňky pro poznámky nebo vysvětlení kódu. Stačí kliknout na "Text" (Text) a začít psát.
+6. Colab podporuje mnoho knihoven a nástrojů pro datovou vědu, strojové učení a další oblasti. Můžete je snadno importovat a používat ve svých projektech.
+7. Nezapomeňte pravidelně ukládat svůj sešit, abyste neztratili svou práci. Colab automaticky ukládá vaše změny, ale můžete také kliknout na "File" (Soubor) a poté "Save" (Uložit) pro jistotu.
+8. Pokud chcete sdílet svůj sešit s ostatními, můžete kliknout na "Share" (Sdílet) a nastavit oprávnění pro přístup k vašemu sešitu.
+
+## Příklad
+
+- Zde je jednoduchý příklad Colab sešitu s minimální sadou pythonového kódu, který můžete otevřít kliknutím na následující odkaz 
+[Colabu](https://colab.research.google.com/drive/1Fpv_wCRzxeZ0rKmxrGiPMU4gBabOTgNJ#scrollTo=yL0IfNSeRjgQ)
+
+- Sešit si mužete prohlédnout jako PDF soubor (který obsahuje tento kód a jeho výstup) kliknutím na následující odkaz: [Minimalni_python.pdf](./Minimalni_python.ipynb.pdf).
+- Sešit si take mužete s Colabu stáhnout ve formátu Jupyter notebooku, a tak si jej případně spouštět lokálně na PC (po instalaci např. Visual Studio Code)

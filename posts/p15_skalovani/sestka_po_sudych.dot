@@ -3,18 +3,15 @@ digraph blechy {
     fontsize=7;
     node [fontsize=6 size=3];
     edge [fontsize=6];
-    0[label="nastav\nK=0" color=green];
-    K[label="další hod\nK=K+1"color=blue];
-    1[label="1,3,5"];
-    6[label="6\nkonec" color=red];
-    2[label="2,4"];
+    1[label="S1\npadla\n1,3,5\nnastav\nK=0";color=green];
+    2[label="S2\npadla 2,4\ndalší hod\nK=K+1"color=blue];
+    6[label="S3\npadla 6\nkonec" color=red];
 
-    0  -> K[label="P=1"];
-    K  -> 6[label="P=1/6" color=red];
-    K->2[label="P=1/3"];
-    K  -> 1[label="P=1/2"];
-    1->0[label="P=1"];
-    2->K[label="P=1/2" color=blue];
-    2->1[label="P=1/2" color=green];
+    2->2[label="P=2/6" color=blue];
+    2  -> 6[label="P=1/6" color=red];
+    2  -> 1[label="P=3/6"];
+    1->1[label="P=3/6";color=green];
+    1->2[label="P=2/6"];
+    1->6[label="P=1/6" color=red];
     label = "Sekvence hodů";
 }

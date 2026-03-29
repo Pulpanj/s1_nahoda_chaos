@@ -72,9 +72,7 @@ book_list = [
         "PDF" => "https://www.yichijin.com/files/elchanan.pdf",
         "Rok" => "May 2018",
         #"cover" => "/images/stats_full.png"
-    ), 
-    
-    OrderedDict(
+    ), OrderedDict(
         "label" => "Přednáška 4,5 (Nelineární dynamika a chaos)",
     ),
     OrderedDict(
@@ -157,9 +155,7 @@ book_list = [
         # "URL" => "https://www.scribd.com/document/472537596/The-science-of-soap-films-and-soap-bubbles-by-Cyril-Isenberg-pdf",
         "Rok" => "2000",
         "cover" => "/images/almgren.jpg"
-    ),
-
-    OrderedDict(
+    ), OrderedDict(
         "Název" => "Plateau's Problem An Invitation to Varifold Geometry  ",
         "Autor" => "Frederick J. Almgren, Jr, Kenneth J. Brakke and John M. Sullivan",
         "Reference" => "STUDENT MATHEMATICAL LIBRARY Volume 13 ",
@@ -168,17 +164,28 @@ book_list = [
         "Rok" => "2000",
         "cover" => "/images/almgren.jpg"
     ),
-   OrderedDict(
+    OrderedDict(
         "label" => "Přednáška 15 (Rozdělení pravděpodobnosti bez střední hodnoty,Škálování"
-   ),
+    ),
     OrderedDict(
         "Název" => "Power laws, Pareto distributions and Zipf’s law",
         "Autor" => "M.E.J. NEWMAN",
         "Reference" => "Contemporary Physics, Vol. 46, No. 5, September–October 2005, 323 – 351",
         "PDF" => "https://www.cs.cornell.edu/courses/cs6241/2019sp/readings/Newman-2005-distributions.pdf",
-    #     "URL" => "",
+        #     "URL" => "",
         "Rok" => "2005",
-    #     "cover" => "/images/.jpg"
+        #     "cover" => "/images/.jpg"
+    ), OrderedDict(
+        "label" => "Přednáška 16 (Simulace a self-organizované systémy)"
+    ),
+    OrderedDict(
+        "Název" => "The Persian Immortals: A classical case of self-organization",
+        "Autor" => "Giorgos Kanellopoulos; Dimitrios Razis; Ko van der Weele",
+        "Reference" => " American Journal of Physics 88, 263 (2020); doi: 10.1119/10.0000834",
+        # "PDF" => "",
+        "URL" => "https://pubs.aip.org/aapt/ajp/article-abstract/88/4/263/1043002/The-Persian-Immortals-A-classical-case-of-self?redirectedFrom=fulltext",
+        "Rok" => "2020",
+            "cover" => "/images/m_cover.jpeg"
     ),
     # OrderedDict(
     #     "Název" => "",

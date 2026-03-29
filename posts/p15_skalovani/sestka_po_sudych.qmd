@@ -1,7 +1,7 @@
 ---
 title: "První šestka po sudých "
 date: "2026-03-17"
-updated: "2026-03-18"
+updated: "2026-03-28"
 description: "Jaký je střední počet hodů kostkou do první šestky pokud počítáme jen hody, kde padá sudý počet ok  ?"
 draft: false
 categories: ["Hádanka", "Náhodná proměnná","Přednáška 15"]
@@ -28,10 +28,10 @@ počet ok, tak celou sadu hodů budeme ignorovat. Znamená to, že např. poslou
 
 
 
-## Řešení 
+## Řešení pomocí geometrické náhodné veličiny
 
 Pokud se zamyslíme nad házením požadované posloupnosti tak je nutno házet jen (opakujících se) sekvence  2 a 4 
-a dokud je tato sekvence porušena (padne (6,1,3,5). Přestože je pravděpodobnost 6-ky rovna 1/4 (6 a (1,3,5) ) v našem případě pokud poslední hod je cokoliv z (1,3,5) tak se celá posloupnost stejne ignoruje.
+a dokud je tato sekvence porušena (padne (6,1,3,5). Přestože je pravděpodobnost 6-ky rovna 1/4 (6 a (1,3,5) ) v našem případě pokud poslední hod je cokoliv z (1,3,5) tak se celá posloupnost stejně ignoruje.
 Celá úloha se tak převede na nalezení střední hodnoty $E[k]$ délky $K$ řady "úspěšných" pokusů s $p=1/3
 až do prvního "neúspěchu" (tj. (1,3,5,6)).
 
@@ -52,21 +52,189 @@ E[K]=\frac{1}{p}=\frac{3}{2}
 $$
 
 
+## Řešení pomocí rekurence
 
+Analogicky jako v řešení [Člověče nezlob se](../p2_nahodna_promenna/clovece_nezlob_se.qmd) můžeme využít rekurentní vztah pro střední hodnotu $E[K]=x$. Zde je nutno rozlišit dvě situace:
+
+- padne 6 nebo lichý počet ok (1,3,5) s pravděpodobností $\frac{4}{6}$ a v tomto případě $K=1$. (Poznámka: i když padne 6-ka, tak se celá posloupnost stejně ignoruje, protože musí být před ní jen sudé počty ok)
+- padne 2 nebo 4 s pravděpodobností $\frac{2}{3}$ a v tomto případě se dostaneme do stejné situace jako na začátku, ale s tím rozdílem, že už jsme provedli jeden hod, takže $K$ bude o 1 větší než na začátku. 
+
+Rekurentní vztah je tedy: 
+
+
+$$
+\begin{align}
+x &= \frac{4}{6} \cdot 1 + \frac{2}{6} \cdot (x + 1) \\
+x&= \frac{4}{6} + \frac{2}{6} \cdot x + \frac{2}{6} \\
+x&= 1 + \frac{2}{6} \cdot x
+\end{align}
+$$ 
+
+A po úpravě dostaneme:
+
+$$
+x =\mathbb{E}[K]= \frac{2}{6} 
+$$
+
+$$
+\begin{equation}
+E[K]=\frac{1}{p}=\frac{3}{2}
+\end{equation}
+$$
+
+
+## Řešení pomocí Markovova řetězce 
+
+**následující mi nedává správné výsledky, ale nechci ho mazat, protože věřím, že najdu chybu**
+
+Kromě předchozích řešení lze tento problém lze modelovat pomocí Markovova řetězce a využít tak výpočet střední hodnoty počtu hodů do první šestky pomocí fundamentální matice.
+
+Házení požadované posloupnosti můžeme modelovat i pomocí markovova řetězce, kde:  
+
+- stav S1 reprezentuje je (nový) počáteční stav, kdy jen nastavíme $K=0$ 
+- stav S2 reprezentuje stav, kdy jdeme na další hod (počet hodů se zvýší o 1, $K=K+1$ ). 
+- stav S3 reprezentuje situaci, kdy padl lichý počet ok (1,3,5) a celou posloupnost ignorujeme (vrácením se do stavu S1)
+- stav S4 reprezentuje situaci, kdy padla 2 nebo 4 a pokračujeme v házení (vrácením se do stavu S1)
+- stav S5 reprezentuje situaci, kdy padla 6 a celá posloupnost končí (konec markovova řetězce, protože se dostaneme do absorpčního stavu).
+
+Tento markovův řetězec i s jeho pravděpodobnostmi přechodů můžeme reprezentovat pomocí následujícího grafu:
+ 
 ```{dot}
 //| file: sestka_po_sudych.dot
-//| fig-width: 4
+//| fig-width: 3
 //| fig-height: 6.2
 
 ``` 
 
-<!-- Pokud hodíme kostkou poprvé, pak je
 
-- pravděpodobnost, že padne lichý počet ok (1,3,5) roven  $\frac{1}{2}$ celou posloupnost ignorujeme
-- pravděpodobnost, že padne 6-ka $\frac{1}{6}$ a v tomto případě $K=1$. 
-- Pokud nepadne 6-ka, ale 2,4, $\frac{1}{3}$, tak se s pravděpodobností $\frac{1}{2}$ 
-(pravděpodobnost dalšího hodu s lichým počtem ok je také $\frac{1}{2}$0   
-dostaneme
-do stejné situace jako na začátku, ale s tím rozdílem, že už jsme provedli
-jeden hod, takže $K$ bude o 1 větší než na začátku. Tedy:
--->
+Pokud označíme $K$ jako počet hodů do první šestky, ten je pak v dané realizaci
+Markovova řetězce $K$ reprezentován počtem průchodů stavem S2, kdy se počet
+hodů zvyšuje o 1 minus počet průchodů stavem S1, kdy se posloupnost ignoruje (a
+$K$ se nastav dané realizaci Markovova řetězce znovu nastavuje na 0).
+
+**tohle je asi špatný předpoklad, ale nechci to mazat, protože věřím, že najdu chybu**
+
+Střední hodnota počtu hodů do první šestky $E[K]$ je tedy rovna rozdílu
+středního počtu průchodů stavem S2 a středního počtu průchodů stavem S1, pokud
+se realizace markovova řetězce zahajujeme ve stavu S1 (počáteční stav) a
+realizujeme je až do stavu S5 (konec). Tedy:
+
+
+$$
+\begin{equation}
+E[K] = E[N2] - E[N1]
+\end{equation}
+$$
+
+kde 
+
+- $E[N1]$ je střední počet průchodů stavem S1, když začneme v S1.
+- $E[N2]$ je střední počet průchodů stavem S2, když začneme v S1.
+
+
+### Výpočet středního počtu průchodů 
+
+Postup výpočtu středního počtu průchodů nějakým stavem $E[N]$ v Markovově řetězci, který má absorpční stav, je odvozena v [Náhodná procházka opilého námořníka](../p4_markovuv_proces/absorpcni_markovovuv_retezec.qmd).
+
+Matice přechodů tohoto Markovova řetězce pro házení do první šestky po sudých hodnotách je rovna:
+
+$$
+\mathbb P =
+\begin{pmatrix}
+P(S1 \to S1) & P(S1 \to S2) & P(S1 \to S3)  \\
+P(S2 \to S1) & P(S2 \to S2) & P(S2 \to S3)  \\
+P(S3 \to S1) & P(S3 \to S2) & P(S3 \to S3)  
+\end{pmatrix}
+=
+\begin{pmatrix}
+3/6 & 2/6 & 1/6 \\
+3/6 & 2/6 & 1/6 \\
+0 & 0 & 1 
+\end{pmatrix}
+$$
+
+
+Postup výpočtu středního počtu průchodů nějakým stavem $E[N]$ v Markovově řetězci, který má absorpční stav, je odvozena v [Náhodná procházka opilého námořníka](../p4_markovuv_proces/absorpcni_markovovuv_retezec.qmd).
+
+Protože pouze stav S5 je absorpční (a protože tento stav je na posledním řádku a sloupci matice přechodů) je 
+matice $\mathbb Q$, která reprezentuje přechody mezi neabsorpčními stavy S1, S2, S3 a S4, rovna:
+$$
+\mathbb Q=
+\begin{pmatrix}
+3/6 & 2/6  \\
+3/6 & 2/6  
+\end{pmatrix}
+$$
+
+Matice $\mathbb N$ středních počtů průchodů neabsorpčními stavy S1, S2, S3 a S4, než se dostaneme do absorpčního stavu S5, je rovna:
+$$
+\mathbb N = (\mathbb I - \mathbb Q)^{-1}
+$$
+
+Po výpočtu inverze matice $(\mathbb I - \mathbb Q)$ dostaneme:
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+
+using LinearAlgebra
+Q = [
+    3/6.  2/6. ;
+    3/6.  2/6.
+]
+
+I2 = Matrix{Float64}(I, 2, 2)
+N = (I2 - Q) \ I2
+println("Matice N =")
+round.(N, digits=2)
+```
+
+$\mathbb N_{1,2}$ představuje střední hodnotu počtu průchodů stavem S1 před absorpcí, když začneme ve stavu S2 a realizace končí v absorpčním stavu.  
+
+<!-- Výpočet očekávaných časů do absorpce ze stavů S1, S2 a S3,S4  jsou dány součtem prvků v řádcích matice $\mathbb N$ odpovídajících těmto stavům. Tedy: -->
+
+Výpočet očekávaných časů do absorpce ze stavů S1, S2:
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: false
+ones2 = ones(2)
+T = N * ones2
+println("T =")
+println(round.(T, digits=2))
+```
+
+<!-- to znamená, že:
+
+- ze stavu 1: jsou očekávané 4 kroky do absorpce  
+- ze stavu 2: jsou očekávané 2 kroky do absorpce 
+- ze stavu 3: jsou očekávané 2 kroky do absorpce  -->
+
+<!-- 
+Pocet průchodů stavem S2 je roven $E[N2]=\mathbb N_{1,2}$ a počet průchodů
+stavem S1 je roven $E[N1]=\mathbb N_{1,1}$. Střední hodnota počtu hodů do první
+šestky $E[K]$ je tedy rovna rozdílu středního počtu průchodů stavem S2 a
+středního počtu průchodů stavem S1(pokud se realizace markovova řetězce
+zahajujeme ve stavu S1 (počáteční stav) a realizujeme je až do stavu S5
+(konec). Tedy:
+
+$$
+\begin{equation}
+E[K] = E[N2] - E[N1]
+\end{equation}  
+$$
+Po dosazení hodnot z matice $\mathbb N$ dostaneme:
+$$
+\begin{equation}
+E[K] = 1.5 - 0. 5 = 1.5
+\end{equation}  
+$$
+
+A po úpravě dostaneme:  
+$$
+\begin{equation}        
+E[K] =\frac{1}{p}=\frac{3}{2}
+\end{equation}
+$$ -->
+
