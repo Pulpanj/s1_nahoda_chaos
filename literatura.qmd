@@ -155,15 +155,16 @@ book_list = [
         # "URL" => "https://www.scribd.com/document/472537596/The-science-of-soap-films-and-soap-bubbles-by-Cyril-Isenberg-pdf",
         "Rok" => "2000",
         "cover" => "/images/almgren.jpg"
-    ), OrderedDict(
-        "Název" => "Plateau's Problem An Invitation to Varifold Geometry  ",
-        "Autor" => "Frederick J. Almgren, Jr, Kenneth J. Brakke and John M. Sullivan",
-        "Reference" => "STUDENT MATHEMATICAL LIBRARY Volume 13 ",
-        "PDF" => "https://www.ams.org/books/stml/013/stml013-endmatter.pdf",
-        # "URL" => "https://www.scribd.com/document/472537596/The-science-of-soap-films-and-soap-bubbles-by-Cyril-Isenberg-pdf",
-        "Rok" => "2000",
-        "cover" => "/images/almgren.jpg"
-    ),
+    ), 
+    # OrderedDict(
+    #     "Název" => "Plateau's Problem An Invitation to Varifold Geometry  ",
+    #     "Autor" => "Frederick J. Almgren, Jr, Kenneth J. Brakke and John M. Sullivan",
+    #     "Reference" => "STUDENT MATHEMATICAL LIBRARY Volume 13 ",
+    #     "PDF" => "https://www.ams.org/books/stml/013/stml013-endmatter.pdf",
+    #     # "URL" => "https://www.scribd.com/document/472537596/The-science-of-soap-films-and-soap-bubbles-by-Cyril-Isenberg-pdf",
+    #     "Rok" => "2000",
+    #     "cover" => "/images/almgren.jpg"
+    # ),
     OrderedDict(
         "label" => "Přednáška 15 (Rozdělení pravděpodobnosti bez střední hodnoty,Škálování"
     ),
@@ -185,8 +186,29 @@ book_list = [
         # "PDF" => "",
         "URL" => "https://pubs.aip.org/aapt/ajp/article-abstract/88/4/263/1043002/The-Persian-Immortals-A-classical-case-of-self?redirectedFrom=fulltext",
         "Rok" => "2020",
-            "cover" => "/images/m_cover.jpeg"
+        "cover" => "/images/m_cover.jpeg"
     ),
+    OrderedDict(
+        "Název" => "Self-Organized Criticality: An Explanation of 1/f Noise",
+        "Autor" => "Per Bak, Chao Tang, and Kurt Wiesenfeld",
+        "Reference" => " PHYSICAL REVIEW LETTERS, VOLUME 59, NUMBER 4, 25 JULY 1987",
+        "URL" => "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.59.381",
+        "PDF" => "https://jeti.uni-freiburg.de/studenten_seminar/stud_sem05/bak.pdf",
+        "Rok" => "1987",
+        # "cover" => "/images/m_cover.jpeg"
+    ),
+    OrderedDict(
+        "Název" => "A sandpile experiment and its implications for self-organized criticality and
+characteristic earthquake",
+        "Autor" => "Naoto Yoshioka",
+        "Reference" => " PEarth Planets Space, 55, 283–289, 2003",
+        "URL" => "https://link.springer.com/article/10.1186/BF03351762",
+        "PDF" => "https://link.springer.com/content/pdf/10.1186/BF03351762.pdf",
+        "Rok" => "1987",
+        # "cover" => "/images/m_cover.jpeg"
+    ),
+
+
     # OrderedDict(
     #     "Název" => "",
     #     "Autor" => "",

@@ -1,0 +1,152 @@
+---
+title: "Perské armáda a evoluce "
+date: "2026-03-30"
+updated: "2026-04-01"
+description: "Proč je perská armáda odolnější než obyvatelstvo z kterého se rekrutuje ?"
+draft: false
+categories: ["Samoorganizující se kritično","Přednáška 16"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p16_self_organizing_criticality/perska_armada.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "perska_armada"
+        output-ext: "pdf"
+        engine: typst
+---
+
+## Popis proces
+
+Tato úloha je o tom jak se jednoduchý systém může sám organizovat na základě
+velice jednoduchých pravidel. Úloha je založena na výdeji perské armády která
+má 10 000 mužů a ti to mají jeden parametr kterému říkáme **odolnost**.
+
+Odolnost každého muže je v rozmezí od nuly do jedné a na počátku je nastavena
+rovnoměrně. To znamená že pravděpodobnost že je někdo má jakoukoliv odolnost od
+nuly do jedné je pro všechny shodná.
+
+Pak nastává situace, kdy armáda začíná bojovat a v tom okamžiku ztrácí 3
+bojovníky. Pravidlo pro ztráty je jednoduché:
+
+-  armada ztratí nejslabšího ze všech z pohledu odolnosti 
+ - a pak dva náhodně vybrané bojovníky (kteří mohou mít jakoukoliv odolnost od 0 to 1).
+ 
+A protože perská říše velká je armáda doplněná dalšími třemi bojovníky kteří
+jsou vybráni z obyvatelstva. A obyvatelstvo opět má rovnoměrné rozložení
+odolnosti v intervalu od nuly do jedné.
+
+Poté co se armáda doplní bojuje dál a celý cyklus ztráty 3 bojovníků se
+opakuje, to znamená ztratí opět tři bojovníky jednoho toho nejslabšího z
+pohledu odolnosti a pak dva náhodně. Ti jsou doplněni z obyvatelstva, a boj
+pokračuje dale.
+
+## Simulace procesu
+
+Co se stane jestliže tento cyklus boje a doplnění bojovníků budeme opakovat mnohokrát za sebou ?
+
+Je to docela překvapivé ale jak ukazuje následující simulace rozložení odolnosti v perské armádě se změní s rovnoměrného intervalu od 0 do jedné na rovnoměrné v intervalu od jedné třetiny do jedné.
+
+
+Samozřejmě tento práh není absolutní protože vždy se o našem doplnění mohou
+náhodně objevit vojáci s nízkou odolností pod tímto prahem tito ale v dalších
+několika krocích většinou zmizí a mužstvo bude mít odolnost nad prahem do až do
+jedné. Tento jev se nazývá samoorganizující kritičnost a je to jeden z
+nejdůležitějších konceptů v teorii komplexních systémů.
+
+Následující program demonstruje popsaný proces:
+
+```{julia}
+#| echo: false
+#| output: true  #asis
+#| code-fold: false
+
+using Random
+using StatsBase, Plots
+
+function persani()
+    x = rand(10000)
+    ctimes = 0
+
+    function cycle(times)
+        for k in 1:times
+            # index nejmenšího prvku
+            imin = argmin(x)
+            ctimes = ctimes + 1
+
+
+            # dva další náhodné indexy (mohou být stejné, pokud nechceš, řekni)
+            i2 = rand(1:length(x))
+            i3 = rand(1:length(x))
+
+            # nahrazení třemi novými náhodnými hodnotami
+            x[imin] = rand()
+            x[i2] = rand()
+            x[i3] = rand()
+        end
+        p = histogram(
+            x,
+            bins=100,          # počet binů (můžeš změnit)
+            xticks=0:0.1:1, xlabel="Hodnota náhodné veličiny odolnost",
+            xlim=(0, 1),
+            ylabel="Frekvence",
+            title="Histogram odolnosti po $ctimes cyklech",
+            size=(600, 400),
+            legend=false,
+        )
+        display(p)
+        # ECDF funkce
+        F = ecdf(x)
+
+        # jemná osa
+        xs = range(minimum(x), maximum(x), length=500)
+
+        # vykreslení CDF
+        p = plot(xs, F.(xs),
+            xticks=0:0.1:1,
+            xlim=(0, 1),
+            xlabel="Hodnota náhodné veličiny odolnost",
+            ylabel="Kumulativní frekvence",
+            title="Kumulativní frekvence odolnosti po $ctimes cyklech",
+            legend=false,
+            size=(600, 400),
+            lw=2)
+        display(p)
+    end
+
+    cycle(0)
+    cycle(100)
+    cycle(900)
+    cycle(9000)
+    cycle(10000)
+end
+persani()
+
+```
+
+Výsledek ukazuje, že armáda se během boje vylepšuje z pohledu odolnosti. Je to krásná
+ukázka jak primitivní jednoduchoučké pravidlo způsobí samoorganizaci nějakého
+systému.
+
+
+Simulaci můžeme modifikovat například tím že budeme v pokoji vyřazovat dva
+nejslabší a dva náhodně vybrané bojovníky a tak dále. Díky tomu se opět změní
+rozložení odolnosti v armádě z původního rovnoměrného rozdělení od nuly do
+jedné na nějaké jiné které začíná na nějakém prahu. 
+
+## Závěr
+
+Samoorganizace perské armády je příkladem jevu, kdy jednoduché pravidlo, které
+se opakuje mnohokrát způsobí že systém se sám organizuje do nějakého kritického
+stavu. Objevují zajímavé vlastnosti jako například rozdělení odolnosti v našem
+případě přestane být rovnoměrné
+
+Tento koncept se objevuje v mnoha různých oblastech od fyziky přes biologii až
+po sociální vědy a pomáhá nám pochopit jak se komplexní systémy chovají a jak
+se vyvíjejí. Jak by se na tento proces díval Charles Darwin, když přemýšlel o
+evoluci odehrávající se během mnoha generací.
+
+
+

@@ -1,0 +1,35 @@
+---
+title: "Sypaní písku na hromadu"
+date: "2026-03-30"
+updated: "2026-04-01"
+description: "Co se děje při simulaci sypaní písku na hromadu, a jak to modeluje stále se zvětšující se fluktuace ?"
+draft: true
+categories: ["Samoorganizující se kritičnost","Přednáška 16"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p16_self_organizing_criticality/sypani_pisku_na_hromadu.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "sypani_pisku_na_hromadu"
+        output-ext: "pdf"
+        engine: typst
+---
+
+## Zadání hádanky
+
+podobně jako jsme analyzovali perskou armádu která na základě jednoduchých pravidel vytvářela jistou organizaci která pak vlastně držela jako nový stav.
+
+rovnou úlohou kterou analyzovali někdy na počátku 80 let fyzici z Lawrence Liverpool Laboratory bylo sypání zrníček Písku na hromadu.model spočívá v tom že se pomalu sypou zrníčka náhodně na čtvercovou plochu a zrníčka se na sobě na sobě drží a když jejich výška respektive rozdíl výšky daného bodu A výšky sousedních bodů dosáhne nějaké velikosti například 4 pak se daný bod a jeho zrnka Písku přesunou na sousední
+
+jestliže simulaci Provádíme pro velký počet zrníček pak se samozřejmě celá plocha průběžně zaplňuje ale jistém okamžiku dojde k tomu že se vytváří ve středu čtvercového plochy vrchol který se peril periodicky lépe řečeno náhodně sesypává dolů.
+algoritmus aktualizace stavu je v tomto případě založen na přepočtu všech pozic na čtvercové síti To znamená že 1 buňka která bude vyšší než všechny okolní může způsobit změnu ve svých sousedních buňkách a ty následně ve svých dalších sousedních buňkách a tak dále. změna se proto šíří prakticky po celém od čtvercovém podstavě.
+smyslem simulací v tomto případě je analýza kolik zrníček písku se daném kroku přesune z jedné buňky na jinou. tento model ukázal že velikost respektive počet zrníček Písku které v daném kroku změní svoji polohu vytváří laviny uvozovkách jejichž velikost se mění a může být od změny jednoho políčka až po následnou změnu noha políček která se šíří prakticky po celém poctavě.
+
+autoři v 80 letech ukázali že velikost těchto Lavin splňuje pravděpodobnostní rozdělení 1/f to jest že má rozdělení zmocnění typů pravděpodobnostních rozdělení.
+
+simulaci ze popsat následující mi pravidly z klasického článku autoři Bak at all.
+Zajímavé je že v 80 letech po publikaci původního simulačního článku i seriózní výzkumné instituce začaly expedimentálně ověřovat Jak velké lavinky vytváří Písek který pomalu sypou na kruhovou podstavu a jejich pozorování potvrdilo že zákon mocnin 1/f opravdu funguje.
+

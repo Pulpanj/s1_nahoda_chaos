@@ -1,0 +1,469 @@
+---
+title: "Pořadové statistiky "
+date: "2026-03-30"
+updated: "2026-04-01"
+description: "Pořadové statistiky pro házení kostkou"
+draft: false
+categories: ["Hádanka", "Náhodná proměnná","Přednáška 15"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p15_skalovani/poradove_statistiky.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "poradove_statistiky"
+        output-ext: "pdf"
+        engine: typst
+---
+
+## Úvod 
+
+V jedné z úvodních lekcí jsme analyzovali jak se mikrostavy definované počty ok
+na házených kostkách realizují jako nějaký makrostav (ten byl definován jako
+součet ok na kostkách, nebo jako skóre ve hře
+[Machacek](../p1_mikro_makro_stavy/machacek_a_termodynamika.qmd)0.
+
+- x1 je následujících tabulkách počet ok na první kostce.
+- x2 je následujících tabulkách počet ok na druhé kostce   
+
+```{julia}
+#| echo: false
+#| output: false
+using Colors
+function twodimtable(fmt; data=nothing,
+    mapfce=nothing,
+    rowlabels=nothing, collabels=nothing,
+    lulabel="x1/x2",
+    thcolor=(1, 1, 1), thbgcolor=(0.5, 0.5, 0.5)
+)
+    if !isnothing(mapfce)
+        data = [mapfce(i, j) for i in 1:6, j in 1:6]
+    end
+    rowlabels = collect(rowlabels === nothing ? (1:size(data, 1)) : rowlabels)
+    collabels = collect(collabels === nothing ? (1:size(data, 2)) : collabels)
+
+    function htmltable()
+        # hex_thcolor = hex(RGB(thcolor...))
+        # hex_thbgcolor = hex(RGB(thbgcolor...))
+        println("""
+            <style>
+            .twodimstyle, .twodimstyle th, .twodimstyle td {
+                border: 3px solid black;
+                border-collapse: collapse;
+            }
+            .twodimstyle td {
+                padding: 4px;
+                text-align: center;
+            }
+            .twodimstyle th {
+                padding: 4px;
+                text-align: center;
+                background-color: #$(hex(RGB(thbgcolor...)));
+                color:  #$(hex(RGB(thcolor...)));
+            }
+            </style>
+
+            <table class="twodimstyle">
+            """)
+        println("<tr><th>$lulabel</th>")
+        for (j, c) in enumerate(collabels)
+            println("<th>$c</th>")
+        end
+        println("</tr>")
+        for (i, r) in enumerate(rowlabels)
+            println("<tr><th>$r</th>")
+            for (j, c) in enumerate(collabels)
+                println("<td>$(data[i, j])</td>")
+            end
+            println("</tr>")
+        end
+        println("</table>")
+    end
+
+    function typsttable()
+        function printcell(d, color, bgcolor)
+            println("table.cell(fill: rgb(\"#$(hex(RGB(bgcolor...)))\"), inset: 4pt,
+            text(fill: rgb(\"#$(hex(RGB(color...)))\"),[$(d)])),")
+        end
+        colcnt = size(data, 2) + 1
+        println("""
+            ```{=typst}
+                #table(
+                columns: $colcnt,
+                align: center,
+                //columns: (
+                //5fr, 10fr, auto, 5fr
+                //),
+            """)
+        printcell(lulabel, thcolor, thbgcolor)
+        for (j, c) in enumerate(collabels)
+            printcell(c, thcolor, thbgcolor)
+        end
+        for (i, r) in enumerate(rowlabels)
+            printcell(r, thcolor, thbgcolor)
+            for (j, c) in enumerate(collabels)
+                printcell((data[i, j]), (0, 0, 0), (1, 1, 1))
+            end
+        end
+        println(")")
+        println("```")
+    end
+    if fmt == "html"
+        htmltable()
+    else
+        typsttable()
+    end
+end
+
+using Plots, StatsBase
+
+function hist(data, label)
+    data_vec = vec(data) #./ 36
+    # Frequency table
+    freq = countmap(data_vec)
+    cats = sort(collect(keys(freq)))          # numeric categories
+    vals = [freq[c] for c in cats]            # correct
+    cat_labels = string.(cats)                # for x-axis
+    probs = vals ./ length(data_vec)
+
+    # Bar plot with bars centered above labels AND all labels shown
+    p = bar(
+        1:length(cats), probs,
+        xticks=(1:length(cats), cat_labels),   # force all labels, aligned with bars
+        normalize=:pdf,
+        xlabel="Skóre ze 2 kostek",
+        ylabel="Pravděpodobnost",
+        title="Distribuce skóre $label",
+        bar_width=0.8,
+        size=(400, 300),
+        legend=false,
+    )
+    xs = 1:length(cats)
+    ys = probs
+    labels = " ".*string.(round.(ys, digits=3))
+
+    ann = [
+        (x, 0, Plots.text(lbl, :black, 7,:left,rotation=90))
+        for (x, y, lbl) in zip(xs, ys, labels)
+    ]
+
+    annotate!(ann)
+    display(p)
+end
+```
+
+
+
+:::: {.columns}
+<!-- =========================== -->
+
+::: {.column width="45%"}
+<!--  -->
+
+
+
+Součet počtu ok na 2 kostkách:
+```{julia}
+#| echo: true
+#| output: false
+#| code-fold: false
+
+sums = [i + j for i in 1:6, j in 1:6];
+```
+
+
+::: {.content-visible when-format="typst"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("typst", data=sums)
+```
+:::
+
+::: {.content-visible when-format="html"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("html", data=sums)
+```
+:::
+
+```{julia}
+#| echo: false
+#| output: true
+hist(sums, "součet ok")
+```
+
+<!--  -->
+:::
+
+::: {.column width="10%"}
+<!-- empty column to create gap -->
+:::
+
+::: {.column width="45%"}
+<!--  -->
+Skóre ve hře [Machacek](../p1_mikro_makro_stavy/machacek_a_termodynamika.qmd): 
+```{julia}
+#| echo: true
+#| output: false
+#| code-fold: false
+
+mach = [max(i, j) * 10 + min(i, j) for i in 1:6, j in 1:6];
+```
+
+::: {.content-visible when-format="typst"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("typst", data=mach)
+```
+:::
+
+::: {.content-visible when-format="html"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("html", data=mach)
+```
+:::
+
+```{julia}
+#| echo: false
+#| output: true
+hist(mach, "Macháček")
+```
+
+<!--  -->
+:::
+<!-- =========================== -->
+::::
+
+```{=typst}
+#pagebreak()
+``` 
+
+## Pořadové statistiky
+
+To je nejjednodušší příklad který ukazuje jak se mikrostavy mapují na
+makrostav a, že dává smysl analyzovat četnost základních mikrostahů, které
+odpovídají nějakému makrostavu. Kromě součtu počtu ok na dvou kostkách lze jako transformaci,
+která definuje nějaký makrostav,  ovšem můžeme použít i jiné transformace mikrostavů.
+
+Například zcela jednoduchou transformací je minimum nebo maximum počtu ok na jakekoliv kostce.
+
+
+
+:::: {.columns}
+<!-- =========================== -->
+
+::: {.column width="45%"}
+<!--     -->
+
+
+Minimum z počtu ok na 2 kostkách:
+
+```{julia}
+#| echo: true
+#| output: false
+#| code-fold: false
+
+minOk = [min(i, j) for i in 1:6, j in 1:6];
+```
+
+
+::: {.content-visible when-format="typst"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("typst", data=minOk)
+```
+:::
+
+::: {.content-visible when-format="html"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("html", data=minOk)
+```
+:::
+
+
+```{julia}
+#| echo: false
+#| output: true
+hist(minOk, "Minimum z ok")
+```
+
+<!--     -->
+:::
+
+
+::: {.column width="10%"}
+<!-- mezera -->
+:::
+::: {.column width="45%"}
+<!--     -->
+
+Maximum z počtu ok na 2 kostkách:
+```{julia}
+#| echo: true
+#| output: false
+#| code-fold: false
+
+maxOk = [max(i, j) for i in 1:6, j in 1:6];
+```
+
+
+::: {.content-visible when-format="typst"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("typst", data=maxOk)
+```
+:::
+
+::: {.content-visible when-format="html"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("html", data=maxOk)
+```
+:::
+
+
+```{julia}
+#| echo: false
+#| output: true
+hist(maxOk, "Maximum z ok")
+```
+
+<!--     -->
+:::
+<!-- =========================== -->
+::::
+
+```{=typst}
+#pagebreak()
+``` 
+
+Průměr z minima a maxima počtu ok na 2 kostkách (střed) je jinou
+statistikou odvozenou z hodnot dvou náhodných proměnných.
+
+Další možnou statistikou je rozsah (manglicky Range), to jest rozdíl mezi
+největší a nejmenším nahozeným počtem ok.
+
+
+
+:::: {.columns}
+<!-- =========================== -->
+::: {.column width="45%"}
+<!--     -->
+
+Střed Ok na n kostkách 
+```{julia}
+#| echo: true
+#| output: false
+#| code-fold: false
+
+function stredOk(i, j)
+    min(i, j) + (max(i, j) - min(i, j)) / 2
+end
+stred = [stredOk(i, j) for i in 1:6, j in 1:6];
+```
+
+::: {.content-visible when-format="typst"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("typst", data=stred)
+```
+:::
+
+::: {.content-visible when-format="html"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("html", data=stred)
+```
+:::
+
+```{julia}
+#| echo: false
+#| output: true
+hist(stred, "Střed ok")
+
+```
+
+<!--     -->
+:::
+
+::: {.column width="10%"}
+<!-- mezera -->
+:::
+
+::: {.column width="45%"}
+<!--     -->
+Rozsah Ok na n kostkách:
+```{julia}
+#| echo: true
+#| output: false
+#| code-fold: false
+
+function rozsahOk(i, j)
+    max(i, j) - min(i, j)
+end
+rozsah = [rozsahOk(i, j) for i in 1:6, j in 1:6];
+```
+
+::: {.content-visible when-format="typst"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("typst", data=rozsah)
+```
+:::
+
+::: {.content-visible when-format="html"}
+
+```{julia}
+#| echo: false
+#| output: asis
+twodimtable("html", data=rozsah)
+```
+:::
+
+
+```{julia}
+#| echo: false
+#| output: true
+hist(rozsah, "Rozsah z ok")
+```
+
+<!--     -->
+:::
+<!-- =========================== -->
+::::
+
+## Shrnutí
+
+Podobně jako jsme si zavedli pořadové statistiky pro házení kostkami, můžeme
+pořadové statistiky definovat i pro spojité náhodné proměnné, které ovšem
+vykazují trochu jiné chování. Pořadí může být může mít neomezeně hodnot
+a mohou které se od sebe liší jakkoli málo.
+
+Pořadové statistiky jsou ukázkou transformace náhodných proměnných na jinou
+náhodnou promennou.

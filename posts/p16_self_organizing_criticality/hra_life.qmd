@@ -1,0 +1,36 @@
+---
+title: "Perské armáda a evoluce "
+date: "2026-03-30"
+updated: "2026-04-01"
+description: "Proč je perská armáda odolnější než obyvatelstvo z kterého se rekrutuje ?"
+draft: true
+categories: ["Celulární automaty","Přednáška 16"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p16_self_organizing_criticality/hra_life.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "hra_life"
+        output-ext: "pdf"
+        engine: typst
+---
+
+## Zadání hádanky
+
+někdy v 80 letech matematik John conway vymyslel následující hru definovanou pomocí automatů.
+hra se odehrává na nekonečně velkém čtverečků které mají bílou nebo černou barvu a na počátku je toto nekonečně Velké Pole nastaveno na několik černých čtverečků jako počáteční pozice.
+
+V prvním kroku ale všech následujících se vyhodnocuje sousedé každého Polička následující způsoben zaprvé
+jedna jestliže sousedé nějaké buňky jsou naživu pak buňka se stane následujícím kroku mrtvou závorce bílou jestliže počet sousedních buněk je jedna naživu smrt osamění
+za druhé jestliže buňka má čtyři živé sousedy pak zemře smrt přelidnění
+jestliže buňka má od 2 do 4 sousedů pak přežívá
+
+Tak to jsou všechna pravidla v každém kroku se pro každou buňku počte její následující stav a tento stav se pak najednou pro všechny buňky nastaví na hracím ploše.
+
+tato hra má fascinující vlastnosti protože lze samozřejmě nastavit počáteční stav tak že všechny buňky časem vymřou ale co je nejdůležitější Existuje mnoho počátečních stavů které generují různé periodické chování například jakoby tvorbu nových obláčků které se pomalu vzdalují z počátečního zluku živý buněk nebo neustále rostoucí kolonie živých buněk které pomalu rostou a zaplňují celou plochu.
+
+Čau conway byl geniální matematik který trochu litoval že se stal nejvíce populárním Díky této hře a nikoliv Díky svým několika dalším nádherným nápadům. za zmínku určitě stojí jeho výmysl který následně popsal Nut Donald Knot jako zajímavá čísla která mají svá vlastní pravidla a jsou naprosto uzavřena z pohledu svých definic.
+
