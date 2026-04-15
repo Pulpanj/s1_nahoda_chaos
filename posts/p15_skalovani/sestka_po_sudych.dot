@@ -3,15 +3,23 @@ digraph blechy {
     fontsize=7;
     node [fontsize=6 size=3];
     edge [fontsize=6];
-    1[label="S1\npadla\n1,3,5\nnastav\nK=0";color=green];
-    2[label="S2\npadla 2,4\ndalší hod\nK=K+1"color=blue];
-    6[label="S3\npadla 6\nkonec" color=red];
+    S1[label="S1\n1,3,5\nznovu\nzačít\n visits=4" color=green];
+    S2[label="S2\nkolikrát padla 1,3,5\n visits=3" color=green];
+    S3[label="S3\n2,4\n visits=2"; color=blue];
+    S4[label="S4\nkolikrat 2,4\n visits=2/3"; color=blue];
+    S5[label="S5\n6 rovnou\n visits=2/3"; color=red];
+    S6[label="S6\n6 po 1,2\n visits=1/3"; color=red];
+    S7[label="S7\n6"; color=red];
 
-    2->2[label="P=2/6" color=blue];
-    2  -> 6[label="P=1/6" color=red];
-    2  -> 1[label="P=3/6"];
-    1->1[label="P=3/6";color=green];
-    1->2[label="P=2/6"];
-    1->6[label="P=1/6" color=red];
+    S1  -> S2[label="P=1/2";color=green];
+    S2  -> S1[label="P=1" color=green];
+    S1  -> S3[label="P=1/3" color=green];
+    S3  -> S4[label="P=1/3" color=blue];
+    S3  -> S2[label="P=1/2" color=blue];
+    S4->S3[label="P=1";color=blue];
+    S1->S5[label="P=1/6"; color=red];
+    S3->S6[label="P=1/6"; color=red];
+    S5->S7[label="P=1"; color=red];
+    S6->S7[label="P=1";color=red];
     label = "Sekvence hodů";
 }

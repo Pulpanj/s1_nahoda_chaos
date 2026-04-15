@@ -1,9 +1,9 @@
 ---
-title: "Perské armáda a evoluce "
+title: "Hra života "
 date: "2026-03-30"
-updated: "2026-04-01"
-description: "Proč je perská armáda odolnější než obyvatelstvo z kterého se rekrutuje ?"
-draft: true
+updated: "2026-04-14"
+description: "Jak lze simulovat téměř jakékoliv pohyblivé  obrázky na čtvercové síti bílých a černých čtverečků"
+draft: false
 categories: ["Celulární automaty","Přednáška 16"]
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p16_self_organizing_criticality/hra_life.pdf)"
 
@@ -18,19 +18,233 @@ format:
         engine: typst
 ---
 
-## Zadání hádanky
+## Popis hry života
 
-někdy v 80 letech matematik John conway vymyslel následující hru definovanou pomocí automatů.
-hra se odehrává na nekonečně velkém čtverečků které mají bílou nebo černou barvu a na počátku je toto nekonečně Velké Pole nastaveno na několik černých čtverečků jako počáteční pozice.
+Někdy v 80 letech matematik John conway vymyslel následující hru definovanou
+pomocí celulárního automatu. Hra se odehrává na nekonečně velkém čtverečků
+které mají bílou nebo černou barvu, reprezentujících buňku naživu (černou)nebo
+mrtvou (bílou). Na počátku je na tomto nekonečném poli čtverečků nastaveno jen
+několik černých čtverečků jako počáteční pozice.
 
-V prvním kroku ale všech následujících se vyhodnocuje sousedé každého Polička následující způsoben zaprvé
-jedna jestliže sousedé nějaké buňky jsou naživu pak buňka se stane následujícím kroku mrtvou závorce bílou jestliže počet sousedních buněk je jedna naživu smrt osamění
-za druhé jestliže buňka má čtyři živé sousedy pak zemře smrt přelidnění
-jestliže buňka má od 2 do 4 sousedů pak přežívá
+V prvním kroku (ale i všech následujících) se vyhodnocují sousedé každého
+polička následující způsobem:
 
-Tak to jsou všechna pravidla v každém kroku se pro každou buňku počte její následující stav a tento stav se pak najednou pro všechny buňky nastaví na hracím ploše.
+- Každá živá buňka s méně než dvěma živými sousedy zemře.
+- Každá živá buňka se dvěma nebo třemi živými sousedy zůstává žít.
+- Každá živá buňka s více než třemi živými sousedy zemře.
+- Každá mrtvá buňka s právě třemi živými sousedy oživne.
 
-tato hra má fascinující vlastnosti protože lze samozřejmě nastavit počáteční stav tak že všechny buňky časem vymřou ale co je nejdůležitější Existuje mnoho počátečních stavů které generují různé periodické chování například jakoby tvorbu nových obláčků které se pomalu vzdalují z počátečního zluku živý buněk nebo neustále rostoucí kolonie živých buněk které pomalu rostou a zaplňují celou plochu.
 
-Čau conway byl geniální matematik který trochu litoval že se stal nejvíce populárním Díky této hře a nikoliv Díky svým několika dalším nádherným nápadům. za zmínku určitě stojí jeho výmysl který následně popsal Nut Donald Knot jako zajímavá čísla která mají svá vlastní pravidla a jsou naprosto uzavřena z pohledu svých definic.
+Tak to jsou všechna pravidla a v každém kroku se pro každou buňku spočte její
+následující stav a tento stav se pak najednou pro všechny buňky nastaví na
+"hracím" ploše.
+
+Tato hra má fascinující vlastnosti, protože lze nejen nastavit počáteční stav
+tak že všechny buňky časem vymřou, ale co je nejdůležitější existuje mnoho
+počátečních stavů, které v následujících krocích generují různé periodické chování například:
+
+- periodickou tvorbu nových obláčků (živých buněk), které se pomalu vzdalují z počátečního shluku živých buněk 
+- nebo neustále rostoucí kolonie živých buněk které pomalu rostou a zaplňují celou plochu.
+
+
+## Implementace hry života 
+
+Následující kód je primitivni implementaci hry života:
+
+```{julia}
+#| echo: true
+#| output: falsae
+#| code-fold: true
+
+using Plots
+
+# 8 sousedů
+neighbors(x, y) = (
+    (x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
+    (x - 1, y), (x + 1, y),
+    (x - 1, y + 1), (x, y + 1), (x + 1, y + 1)
+)
+
+# jeden krok Conwayova života s pevnými hranicemi
+function life_step(alive::Set{Tuple{Int,Int}}, xmin, xmax, ymin, ymax)
+    new_alive = Set{Tuple{Int,Int}}()
+
+    # kandidáti = živé buňky + jejich sousedi
+    candidates = Set{Tuple{Int,Int}}()
+    for (x, y) in alive
+        push!(candidates, (x, y))
+        for n in neighbors(x, y)
+            push!(candidates, n)
+        end
+    end
+
+    # pravidla
+    for (x, y) in candidates
+        # ignoruj buňky mimo svět
+        if x < xmin || x > xmax || y < ymin || y > ymax
+            continue
+        end
+
+        neigh_alive = count(n -> n in alive, neighbors(x, y))
+
+        if (x, y) in alive
+            if neigh_alive == 2 || neigh_alive == 3
+                push!(new_alive, (x, y))
+            end
+        else
+            if neigh_alive == 3
+                push!(new_alive, (x, y))
+            end
+        end
+    end
+
+    return new_alive
+end
+
+# vykreslení světa: čtverce + mřížka
+function plot_world!(p, alive; title="Game of Life", xmin=0, xmax=100, ymin=0, ymax=100, cellsize=1, step=1)
+    plot!(p,
+        legend=false,
+        axis=false,          # vypne osy
+        grid=true,           # necháme mřížku
+        aspect_ratio=1,
+        xticks=xmin:1:xmax,
+        yticks=ymin:1:ymax,
+        xlims=(xmin, xmax),
+        ylims=(ymin, ymax),
+        title=title,
+    )
+
+    # vykreslení každé živé buňky jako polygon (čtverec)
+    for (x, y) in alive
+        x0 = x #- 0.5 * cellsize
+        y0 = y #- 0.5 * cellsize
+        xs = [x0, x0 + cellsize, x0 + cellsize, x0]
+        ys = [y0, y0, y0 + cellsize, y0 + cellsize]
+
+        plot!(p, xs, ys, seriestype=:shape, fillcolor=:black, linecolor=:black, step=step)
+    end
+
+    return p
+end
+
+# hlavní funkce
+function life_game(initial_cells, steps; xmin=0, xmax=100, ymin=0, ymax=100, step=1)
+    alive = Set(initial_cells)
+
+    # spočítáme rozměry mřížky
+    n = length(steps) + 1
+    cols = ceil(Int, sqrt(n))
+    rows = ceil(Int, n / cols)
+
+    p = plot(layout=(rows, cols), size=(300 * cols, 300 * rows))
+
+    plot_world!(p[1], alive;
+        title="Počáteční stav",
+        xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, step=step)
+
+    # spočítáme rozměry mřížky
+    n = length(steps)
+    cols = ceil(Int, sqrt(n))
+    rows = ceil(Int, n / cols)
+    s_last = 0
+
+    for (i, s) in enumerate(steps)
+        for _ in s_last+1:s
+            alive = life_step(alive, xmin, xmax, ymin, ymax)
+        end
+        plot_world!(p[i+1], alive;
+            title="Stav po kroku $s",
+            xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, step=step)
+        s_last = s 
+    end
+    display(p)
+end
+
+
+```
+
+Test periodického vzoru: 
+
+```{julia}
+initial = [(5, 5), (6, 5), (7, 5)]   # glider-like start
+steps = [1,2,3]
+life_game(initial, steps; xmin=0, xmax=10, ymin=0, ymax=10, step=3)
+```
+
+Následují dva známé vzory hry života:  
+
+### Kluzák
+
+
+```{julia}
+# posune seznam buněk o (dx, dy)
+function offset(cells, dx, dy)
+    return [(x + dx, y + dy) for (x, y) in cells]
+end
+
+function pattern_glider(dx=0, dy=0)
+    #  . # .
+    #  . . #
+    #  # # #
+    cells = [
+        (1, 0), (2, 1), (0, 2), (1, 2), (2, 2)
+    ]
+    return offset(cells, dx, dy)
+end
+
+initial = pattern_glider(5, 5)
+steps = [50, 100, 150,250,350]
+
+life_game(initial, steps; xmin=0, xmax=100, ymin=0, ymax=100, step=3)
+
+```
+
+### Periodický pulsar
+
+```{julia}
+function pattern_pulsar(dx=0, dy=0)
+    cells = [
+        (2, 0), (3, 0), (4, 0), (8, 0), (9, 0), (10, 0),
+        (0, 2), (5, 2), (7, 2), (12, 2),
+        (0, 3), (5, 3), (7, 3), (12, 3),
+        (0, 4), (5, 4), (7, 4), (12, 4),
+        (2, 5), (3, 5), (4, 5), (8, 5), (9, 5), (10, 5), (2, 7), (3, 7), (4, 7), (8, 7), (9, 7), (10, 7),
+        (0, 8), (5, 8), (7, 8), (12, 8),
+        (0, 9), (5, 9), (7, 9), (12, 9),
+        (0, 10), (5, 10), (7, 10), (12, 10),
+        (2, 12), (3, 12), (4, 12), (8, 12), (9, 12), (10, 12)
+    ]
+    return offset(cells, dx, dy)
+end
+initial = pattern_pulsar(40, 40)
+# collect(50:10:100)
+steps = [1, 2, 3, collect(i for i in 1:10)]
+steps = collect(1:1:8)
+
+ life_game(initial, steps; xmin=0, xmax=100, ymin=0, ymax=100, step=3)
+
+```
+
+Existují sbírky "videí" vývoje her života s [různými počátečními stavy](https://conwaylife.com/).
+
+
+## Závěr
+
+Hra život má spoustu odvozených následovníků, všechny jsou založeny na
+celulárním automatu s definovanými pravidly změnu stavu. Pravidlo se popisuje
+sadou čísel oddělených lomítkem, čísla před lomítkem říkají kolik sousedů musí
+buňka mít, aby přežila, čísla za lomítkem říkají kolik sousedů potřebuje mrtvá
+buňka k ožití. Písmena jsou zkratky anglických výrazů to survive a to be born.
+Konkrétní pravidla pro shora popsanou hru života jsou tedy označována jako
+S23/B3.
+
+John Conway byl geniální matematik, který trochu litoval že se stal nejvíce
+populárním díky této hře a nikoliv díky seriozním matematickým výsledkům.
+Za zmínku určitě stojí jeho, alespoň trochu pro laiky srozumitelný, výmysl
+[nadreálných čísel](https://cs.wikipedia.org/wiki/Nadre%C3%A1ln%C3%A9_%C4%8D%C3%ADslo), 
+který následně popsal Donald Knuth ve sve [novele Surreal
+Numbers](https://people.math.harvard.edu/~knill/teaching/mathe320_2015_fall/blog15/surreal1.pdf).
+Nadreálná čísla jsou mají svá vlastní pravidla ale jsou naprosto korektně
+uzavřena z pohledu svých definic.
 

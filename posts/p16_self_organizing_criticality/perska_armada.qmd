@@ -1,7 +1,7 @@
 ---
-title: "Perské armáda a evoluce "
+title: "Perská armáda a evoluce "
 date: "2026-03-30"
-updated: "2026-04-01"
+updated: "2026-04-07"
 description: "Proč je perská armáda odolnější než obyvatelstvo z kterého se rekrutuje ?"
 draft: false
 categories: ["Samoorganizující se kritično","Přednáška 16"]
@@ -24,36 +24,41 @@ Tato úloha je o tom jak se jednoduchý systém může sám organizovat na zákl
 velice jednoduchých pravidel. Úloha je založena na výdeji perské armády která
 má 10 000 mužů a ti to mají jeden parametr kterému říkáme **odolnost**.
 
-Odolnost každého muže je v rozmezí od nuly do jedné a na počátku je nastavena
-rovnoměrně. To znamená že pravděpodobnost že je někdo má jakoukoliv odolnost od
-nuly do jedné je pro všechny shodná.
+Odolnost každého bojovníka je náhodná hodnota v rozmezí od nuly do jedné a na
+počátku je v armádě rozdělená rovnoměrně. To znamená že pravděpodobnost že je někdo má
+nějakou odolnost (od nuly do jedné) je pro všechny hodnoty odolnosti shodná.
 
 Pak nastává situace, kdy armáda začíná bojovat a v tom okamžiku ztrácí 3
 bojovníky. Pravidlo pro ztráty je jednoduché:
 
--  armada ztratí nejslabšího ze všech z pohledu odolnosti 
- - a pak dva náhodně vybrané bojovníky (kteří mohou mít jakoukoliv odolnost od 0 to 1).
- 
+- armada ztratí nejslabšího ze všech z pohledu odolnosti 
+- a pak dva náhodně vybrané bojovníky (kteří mohou mít jakoukoliv odolnost od 0 to 1).
+
 A protože perská říše velká je armáda doplněná dalšími třemi bojovníky kteří
 jsou vybráni z obyvatelstva. A obyvatelstvo opět má rovnoměrné rozložení
 odolnosti v intervalu od nuly do jedné.
 
 Poté co se armáda doplní bojuje dál a celý cyklus ztráty 3 bojovníků se
-opakuje, to znamená ztratí opět tři bojovníky jednoho toho nejslabšího z
+opakuje, to znamená že armáda ztratí opět tři bojovníky, jednoho toho nejslabšího z
 pohledu odolnosti a pak dva náhodně. Ti jsou doplněni z obyvatelstva, a boj
-pokračuje dale.
+pokračuje dále.
+
+Co se stane jestliže tento cyklus boje a doplnění bojovníků budeme opakovat
+mnohokrát za sebou ?
+
 
 ## Simulace procesu
 
-Co se stane jestliže tento cyklus boje a doplnění bojovníků budeme opakovat mnohokrát za sebou ?
+Je to docela překvapivé, ale jak ukazuje následující simulace rozložení
+odolnosti v perské armádě se změní z rovnoměrného intervalu od 0 do 1 na
+rovnoměrné v intervalu od jedné třetiny do jedné.
 
-Je to docela překvapivé ale jak ukazuje následující simulace rozložení odolnosti v perské armádě se změní s rovnoměrného intervalu od 0 do jedné na rovnoměrné v intervalu od jedné třetiny do jedné.
+Samozřejmě, tento práh není absolutní, protože vždy se po  doplnění mohou
+náhodně objevit vojáci s  odolností pod tímto prahem,  ti ale v dalších
+několika krocích většinou zmizí, a tak mužstvo bude mít většinově odolnost
+rozloženou rovnoměrně nad prahem do až do 1.
 
-
-Samozřejmě tento práh není absolutní protože vždy se o našem doplnění mohou
-náhodně objevit vojáci s nízkou odolností pod tímto prahem tito ale v dalších
-několika krocích většinou zmizí a mužstvo bude mít odolnost nad prahem do až do
-jedné. Tento jev se nazývá samoorganizující kritičnost a je to jeden z
+Tento jev se nazývá samoorganizující kritičnost a je to jeden z
 nejdůležitějších konceptů v teorii komplexních systémů.
 
 Následující program demonstruje popsaný proces:
@@ -66,25 +71,68 @@ Následující program demonstruje popsaný proces:
 using Random
 using StatsBase, Plots
 
-function persani()
-    x = rand(10000)
+function persani(
+    n,          # velikost perske armady
+    k;          # počet nahrazovaných bojovníků
+    kmin=1,     # počet nejslabsích nahrazovaných bojovníků
+    cykly=[0]   # seznam cyklů ktere zobrazovat
+)
+    x = rand(n)
     ctimes = 0
 
+    function pick_unique_indices(n, x, k, kmin)
+        @assert 1 ≤ kmin ≤ k ≤ n
+
+        idxs = Vector{Int}(undef, k)
+
+        # 1) kmin nejmenších indexů
+        mins = partialsortperm(x, 1:kmin)   # rychlé pro malé kmin
+        @inbounds idxs[1:kmin] = mins
+
+        filled = kmin
+
+        # 2) náhodné indexy bez opakování
+        while filled < k
+            r = rand(1:n)
+
+            # kontrola duplicity (k je malé → rychlé)
+            ok = true
+            @inbounds for i in 1:filled
+                if idxs[i] == r
+                    ok = false
+                    break
+                end
+            end
+
+            if ok
+                filled += 1
+                idxs[filled] = r
+            end
+        end
+
+        return idxs
+    end
+
+
+
     function cycle(times)
-        for k in 1:times
+        for i in 1:times
             # index nejmenšího prvku
             imin = argmin(x)
             ctimes = ctimes + 1
 
 
-            # dva další náhodné indexy (mohou být stejné, pokud nechceš, řekni)
-            i2 = rand(1:length(x))
-            i3 = rand(1:length(x))
+            n = length(x)
+            @assert k ≤ n "k nesmí být větší než délka vektoru"
 
-            # nahrazení třemi novými náhodnými hodnotami
-            x[imin] = rand()
-            x[i2] = rand()
-            x[i3] = rand()
+            # index minima
+            imin = argmin(x)
+
+            # vybereme (k-1) náhodných indexů z množiny bez minima
+            idxs = pick_unique_indices(n, x, k, kmin)
+
+            # nahradíme novými náhodnými hodnotami
+            x[idxs] .= rand(k)
         end
         p = histogram(
             x,
@@ -92,7 +140,11 @@ function persani()
             xticks=0:0.1:1, xlabel="Hodnota náhodné veličiny odolnost",
             xlim=(0, 1),
             ylabel="Frekvence",
-            title="Histogram odolnosti po $ctimes cyklech",
+            title="""
+            Histogram odolnosti po $ctimes cyklech\n
+            n=$n k=$k kmin=$kmin
+            """,
+            titlefont=10,
             size=(600, 400),
             legend=false,
         )
@@ -109,44 +161,87 @@ function persani()
             xlim=(0, 1),
             xlabel="Hodnota náhodné veličiny odolnost",
             ylabel="Kumulativní frekvence",
-            title="Kumulativní frekvence odolnosti po $ctimes cyklech",
+            title="""
+            Kumulativní frekvence odolnosti po $ctimes cyklech\n
+            n=$n k=$k kmin=$kmin
+            """,
+            titlefont=10,
             legend=false,
             size=(600, 400),
             lw=2)
         display(p)
     end
 
-    cycle(0)
-    cycle(100)
-    cycle(900)
-    cycle(9000)
-    cycle(10000)
+    for v in cykly
+        cycle(v)
+    end
+
 end
-persani()
+persani(10000, 3, kmin=1, cykly=[0, 100, 900, 9000, 10000])
 
 ```
 
-Výsledek ukazuje, že armáda se během boje vylepšuje z pohledu odolnosti. Je to krásná
-ukázka jak primitivní jednoduchoučké pravidlo způsobí samoorganizaci nějakého
-systému.
+Výsledek ukazuje, že armáda se během boje vylepšuje z pohledu odolnosti. Až na
+dočasné vyjimky, které v dalším kole zmizí, distribuce odolnosti po mnoha
+bojich začíná na hodnotě 1/3.
 
+Je to krásná ukázka jak primitivní jednoduchoučké pravidlo způsobí
+samoorganizaci nějakého systému.
 
-Simulaci můžeme modifikovat například tím že budeme v pokoji vyřazovat dva
-nejslabší a dva náhodně vybrané bojovníky a tak dále. Díky tomu se opět změní
+## Modifikace s různým počtem nahrazovaných bojovníků
+
+Simulaci můžeme modifikovat, například tím že budeme v pokoji vyřazovat
+nejslabšího a 4 náhodně vybrané bojovníky a tak dále. Díky tomu se opět změní
 rozložení odolnosti v armádě z původního rovnoměrného rozdělení od nuly do
-jedné na nějaké jiné které začíná na nějakém prahu. 
+1 na nějaké jiné, které začíná na prahu 1/5.
+
+
+```{julia}
+persani(10000, 5, cykly=[20000])
+```
+
+Můžeme take vyřazovat více jak jednoho nejslabšího bojovníka, např. 3 nejslabší
+a další 3 náhodně vybrané:
+
+```{julia}
+persani(10000, 6, kmin=3, cykly=[ 20000])
+```
+
+A takto se rozložení vyvine pokud budeme vyřazovat 4 nejslabší
+a další 2 náhodně vybrané:
+
+```{julia}
+persani(10000, 6, kmin=4, cykly=[ 20000])
+```
+
+
+## Výsledek
+
+Experimentálně jsme našli práh distribuce ustavene po mnoha cyklech jako
+
+$$
+\begin{equation}
+Prah(odolnost)=\frac{k_{min}}{k}
+\end{equation}
+$$
+
+kde
+
+- $k_{min}$ je počet nejslabších nahrazených bojovníků
+- $k$ je počet všech nahrazených bojovníků
+
 
 ## Závěr
 
 Samoorganizace perské armády je příkladem jevu, kdy jednoduché pravidlo, které
-se opakuje mnohokrát způsobí že systém se sám organizuje do nějakého kritického
-stavu. Objevují zajímavé vlastnosti jako například rozdělení odolnosti v našem
-případě přestane být rovnoměrné
+když se opakuje mnohokrát způsobí že systém se sám organizuje do nějakého kritického
+stavu. Objevují se zajímavé vlastnosti, jako například rozdělení odolnosti v našem
+případě přestane být rovnoměrné, ale začíná na nějakém prahu.
 
 Tento koncept se objevuje v mnoha různých oblastech od fyziky přes biologii až
 po sociální vědy a pomáhá nám pochopit jak se komplexní systémy chovají a jak
-se vyvíjejí. Jak by se na tento proces díval Charles Darwin, když přemýšlel o
-evoluci odehrávající se během mnoha generací.
+se vyvíjejí. 
 
-
+__Jak by se na tento proces díval Charles Darwin, když přemýšlel o
+evoluci odehrávající se během mnoha generací ?__
 

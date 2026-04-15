@@ -1,10 +1,10 @@
 ---
 title: "Pořadové statistiky "
 date: "2026-03-30"
-updated: "2026-04-01"
+updated: "2026-04-03"
 description: "Pořadové statistiky pro házení kostkou"
 draft: false
-categories: ["Hádanka", "Náhodná proměnná","Přednáška 15"]
+categories: ["Náhodná proměnná","Přednáška 15"]
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p15_skalovani/poradove_statistiky.pdf)"
 
 engine: julia
@@ -31,91 +31,7 @@ součet ok na kostkách, nebo jako skóre ve hře
 ```{julia}
 #| echo: false
 #| output: false
-using Colors
-function twodimtable(fmt; data=nothing,
-    mapfce=nothing,
-    rowlabels=nothing, collabels=nothing,
-    lulabel="x1/x2",
-    thcolor=(1, 1, 1), thbgcolor=(0.5, 0.5, 0.5)
-)
-    if !isnothing(mapfce)
-        data = [mapfce(i, j) for i in 1:6, j in 1:6]
-    end
-    rowlabels = collect(rowlabels === nothing ? (1:size(data, 1)) : rowlabels)
-    collabels = collect(collabels === nothing ? (1:size(data, 2)) : collabels)
-
-    function htmltable()
-        # hex_thcolor = hex(RGB(thcolor...))
-        # hex_thbgcolor = hex(RGB(thbgcolor...))
-        println("""
-            <style>
-            .twodimstyle, .twodimstyle th, .twodimstyle td {
-                border: 3px solid black;
-                border-collapse: collapse;
-            }
-            .twodimstyle td {
-                padding: 4px;
-                text-align: center;
-            }
-            .twodimstyle th {
-                padding: 4px;
-                text-align: center;
-                background-color: #$(hex(RGB(thbgcolor...)));
-                color:  #$(hex(RGB(thcolor...)));
-            }
-            </style>
-
-            <table class="twodimstyle">
-            """)
-        println("<tr><th>$lulabel</th>")
-        for (j, c) in enumerate(collabels)
-            println("<th>$c</th>")
-        end
-        println("</tr>")
-        for (i, r) in enumerate(rowlabels)
-            println("<tr><th>$r</th>")
-            for (j, c) in enumerate(collabels)
-                println("<td>$(data[i, j])</td>")
-            end
-            println("</tr>")
-        end
-        println("</table>")
-    end
-
-    function typsttable()
-        function printcell(d, color, bgcolor)
-            println("table.cell(fill: rgb(\"#$(hex(RGB(bgcolor...)))\"), inset: 4pt,
-            text(fill: rgb(\"#$(hex(RGB(color...)))\"),[$(d)])),")
-        end
-        colcnt = size(data, 2) + 1
-        println("""
-            ```{=typst}
-                #table(
-                columns: $colcnt,
-                align: center,
-                //columns: (
-                //5fr, 10fr, auto, 5fr
-                //),
-            """)
-        printcell(lulabel, thcolor, thbgcolor)
-        for (j, c) in enumerate(collabels)
-            printcell(c, thcolor, thbgcolor)
-        end
-        for (i, r) in enumerate(rowlabels)
-            printcell(r, thcolor, thbgcolor)
-            for (j, c) in enumerate(collabels)
-                printcell((data[i, j]), (0, 0, 0), (1, 1, 1))
-            end
-        end
-        println(")")
-        println("```")
-    end
-    if fmt == "html"
-        htmltable()
-    else
-        typsttable()
-    end
-end
+include("../../include/render_table.jl")
 
 using Plots, StatsBase
 
@@ -142,10 +58,10 @@ function hist(data, label)
     )
     xs = 1:length(cats)
     ys = probs
-    labels = " ".*string.(round.(ys, digits=3))
+    labels = " " .* string.(round.(ys, digits=3))
 
     ann = [
-        (x, 0, Plots.text(lbl, :black, 7,:left,rotation=90))
+        (x, 0, Plots.text(lbl, :black, 7, :left, rotation=90))
         for (x, y, lbl) in zip(xs, ys, labels)
     ]
 
@@ -179,7 +95,7 @@ sums = [i + j for i in 1:6, j in 1:6];
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("typst", data=sums)
+render_table("typst", data=sums)
 ```
 :::
 
@@ -188,7 +104,7 @@ twodimtable("typst", data=sums)
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("html", data=sums)
+render_table("html", data=sums)
 ```
 :::
 
@@ -221,7 +137,7 @@ mach = [max(i, j) * 10 + min(i, j) for i in 1:6, j in 1:6];
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("typst", data=mach)
+render_table("typst", data=mach)
 ```
 :::
 
@@ -230,7 +146,7 @@ twodimtable("typst", data=mach)
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("html", data=mach)
+render_table("html", data=mach)
 ```
 :::
 
@@ -283,7 +199,7 @@ minOk = [min(i, j) for i in 1:6, j in 1:6];
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("typst", data=minOk)
+render_table("typst", data=minOk)
 ```
 :::
 
@@ -292,7 +208,7 @@ twodimtable("typst", data=minOk)
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("html", data=minOk)
+render_table("html", data=minOk)
 ```
 :::
 
@@ -328,7 +244,7 @@ maxOk = [max(i, j) for i in 1:6, j in 1:6];
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("typst", data=maxOk)
+render_table("typst", data=maxOk)
 ```
 :::
 
@@ -337,7 +253,7 @@ twodimtable("typst", data=maxOk)
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("html", data=maxOk)
+render_table("html", data=maxOk)
 ```
 :::
 
@@ -387,7 +303,7 @@ stred = [stredOk(i, j) for i in 1:6, j in 1:6];
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("typst", data=stred)
+render_table("typst", data=stred)
 ```
 :::
 
@@ -396,7 +312,7 @@ twodimtable("typst", data=stred)
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("html", data=stred)
+render_table("html", data=stred)
 ```
 :::
 
@@ -433,7 +349,7 @@ rozsah = [rozsahOk(i, j) for i in 1:6, j in 1:6];
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("typst", data=rozsah)
+render_table("typst", data=rozsah)
 ```
 :::
 
@@ -442,7 +358,7 @@ twodimtable("typst", data=rozsah)
 ```{julia}
 #| echo: false
 #| output: asis
-twodimtable("html", data=rozsah)
+render_table("html", data=rozsah)
 ```
 :::
 

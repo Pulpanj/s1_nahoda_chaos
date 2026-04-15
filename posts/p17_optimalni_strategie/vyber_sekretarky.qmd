@@ -1,0 +1,549 @@
+---
+title: "Výběr sekretářky "
+date: "2026-04-13"
+updated: "2026-04-14"
+description: "Jak lze simulovat téměř jakékoliv pohyblivé  obrázky na čtvercové síti bílých a černých čtverečků"
+draft: false
+categories: ["Optimální strategie","Odvození","Přednáška 17"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p17_optimalni_strategie/vyber_sekretarky.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "vyber_sekretarky"
+        output-ext: "pdf"
+        engine: typst
+---
+
+## Popis problému
+
+Představme si následující výběrové řízení:
+
+Máme N kandidátek na pozici sekretářky, které mají každá různou úroveň
+schopností. Úroveň schopností je reprezentována číslem od 1 do N. Proces výběru
+má následující charakteristiky a pravidla:
+
+- kandidátky jsou jednotlive jedna po druhé zvány na pohovory
+- pořadí v jakém jsou kandidátky zvány je náhodné, žádná kandidatka se nevrací
+- zaměstnavatel má interview s několika počátečními  kandidátkami (mající pořadí 1,2,3..M-1), kde si vyhodnotí úroveň jejich schopností, ale tyto kandidátky nepřijme.
+- následně provádí další pohovory (s kandidatkami pořadí M, M+1...N) 
+- pokud při pohovoru  zaměstnavatel zjistí, že kandidátka má doposud nejvyšší schopnosti tak ji příjme.
+- pokud předchozí podmínka nenastane musí zaměstnavatel vybrat posledni kandidátku.
+
+Stručně vyjádřeno:
+
+- Prvních M kandidátů jen pozoruj  
+    – nikoho nevybírej
+    – zapamatuj si nejlepšího z nich
+- Potom vyber prvního kandidáta, který je lepší než všichni předchozí
+
+Otázky k procesu:
+
+- jaká je pravděpodobnost, že bude takto vybrána nejschopnější sekretářka ?
+- jak volit M (počet kandidátek, které jsou je otestovány) tak aby pravděpodobnost výběru nejschopnější sekretářky byla maximální ?
+
+## Analýza problému
+
+Musíme analyzovat všechny možné permutace kandidátek, které budeme označovat jejich hodnocením schopností 1..N 
+Počet možných permutací N kandidatek je roven $N!$.
+
+Pokud M=1 (tj. není testováno žádné předběžné testování a proto se jenom vybírá
+první kandidátka ) je $p_{best}=1/N$.
+
+Případy pro M>1 se pokusme se zanalyzovat situaci pro 4 kandidátkami.
+
+Pokud budeme napřed testovat 2 první kandidátky (M=3), tak třetí kandidátku vybereme jenom pokud její hodnocení bude vyšší než hodnocení prvních dvou kandidátek. Pokud ne pak pokračujeme s další kandidátkou. 
+Pokud kandidátky budou přicházet v pořadí schopnosti  
+
+- [1,3,2,4] pak 1,3 jsou jen testovány, 2 není lepší než testované (1,3) a proto se pozve i 4   
+- [1,2,4,3] pak 1,2 jsou jen testovány, 4 je lepší než testované (1,2) a proto se vybere hned  4   
+- [1,2,3,4] pak 1,2 jsou jen testovány, 3 je lepší než testované (1,2) a proto se vybere hned  3   
+- [1,4,3,2] pak 1,4 jsou jen testovány, 3 nen9 lepší než testované (1,4) a proto se se pozve i 2  (a ta se již musí vybrat)
+
+Algoritmus lze jednoduše naprogramovat:
+
+```{julia}
+using Statistics,Combinatorics
+
+function secretary_trial(n, m; order)
+
+    # fáze pozorování
+    if m > 1
+        best_seen = maximum(order[1:m-1])
+    else
+        best_seen = 0
+    end
+    # println("best_seen=$(best_seen)")
+    vybrana = 0
+    for i in m:n
+        # println(i, order[i],vybrana)
+        if order[i] > best_seen
+            # println("hit")
+            vybrana = i    # vybrali jsme doposud nejlepší
+            break
+        end
+    end
+    if vybrana == 0
+        vybrana = n  # musime vybrat posledni 
+    end
+    return vybrana
+end
+```
+
+
+
+```{julia}
+secretary_trial(4, 3, order=[1, 2, 4, 3])
+```
+
+```{=typst}
+#pagebreak()
+``` 
+
+A lze snadno projít a vyhodnotit všechny možné permutace: 
+
+```{julia}
+function tiskni_vyber_ze_vsech_permutaci(N, M)
+    perms = collect(permutations(1:N))
+    println("Výsledky výběru ze všech permutací  N=$N a M=$M")
+    for order in perms
+        vybrana = secretary_trial(N, M, order=order)
+        println("pořadí: $order, vybrana kandidatka v pořadí $vybrana mající schopnost $(order[vybrana]), je nejlepší $(order[vybrana]==N)")
+    end
+end
+tiskni_vyber_ze_vsech_permutaci(4, 3)
+```
+
+
+```{julia}
+tiskni_vyber_ze_vsech_permutaci(4, 2)
+
+```
+
+
+Analýza pravděpodobnosti správného výběru v závislosti na M:
+
+
+```{julia}
+#| echo: true
+#| output: false  #asis
+#| code-fold: false
+
+function analyze_outcome(N)
+    perms = collect(permutations(1:N))
+    p = zeros(N)  # pole pravděpodobnosti při daném M
+    s = zeros(N, N)  # s(M,j) = pravděpodobnosti výběru kandidáta se schopnostmi j  při daném M
+
+    for M in 1:N
+        for order in perms
+            vybrana = secretary_trial(N, M, order=order)
+            s[M, order[vybrana]] += 1
+            if order[vybrana] == N
+                p[M] += 1
+            end
+        end
+    end
+    p = p ./ size(perms)
+    plot_p_bar(p, N)
+    s = s ./ size(perms)
+    m = size(s, 2)
+    weights = collect(1:m)
+    avg_s = s * weights
+    return s, avg_s
+end;
+```
+
+
+```{julia}
+#| echo: false
+#| output: false
+
+using Random
+using Plots, PrettyTables
+using Measures
+using DataFrames
+
+# include("../../include/render_table.jl")
+
+function plot_p_bar(p, N; ticks_step=1, val_labels=true)
+
+    # najdeme index maxima
+    imax = argmax(p)
+
+    # vytvoříme barvy pro každý sloupec
+    colors = fill(:steelblue, length(p))
+    colors[imax] = :red   # nejvyšší sloupec zvýrazníme
+
+    gr = bar(
+        p,
+        xticks=0:ticks_step:N,
+        xlabel="M - Výběr začíná od ",
+        ylabel="Pravděpodobnost výběru nejlepší",
+        legend=false,
+        size=(800, 300),
+        left_margin=5mm,
+        bottom_margin=5mm,
+        ylims=(0, 0.5),
+        labelvalues=true,
+        # bar_width=0.3,
+        color=colors)
+    if val_labels
+        xs = 1:N
+        ys = p
+        labels = " " .* string.(round.(p, digits=3))
+        ann = [
+            (x, y, Plots.text(lbl, :black, 7, :left, rotation=90))
+            for (x, y, lbl) in zip(xs, ys, labels)
+        ]
+    else
+        xs = [imax]
+        ys = p[imax]
+        p = [p[imax]]
+        labels = " " .* string(round(ys, digits=3))
+        # print(xs, ys, labels)
+        ann = (xs, ys, Plots.text(labels, :black, 7, :left, rotation=90))
+    end
+
+    annotate!(ann)
+    display(gr)
+
+    # output table
+    println("\n- Pravděpodobnost výběru nejlepší dle počtu testovaných\n")
+    ncol = length(p)
+    df = DataFrame(permutedims(p), :auto)
+    df.rowid = ["p(best)"]
+    # přesuneme rowid na první místo
+    df = select!(df, :rowid, Not(:rowid))
+
+    if val_labels
+        column_labels = vcat(
+            "M",
+            [string(i) for i in collect(1:ncol)],
+        )
+    else
+        print(imax)
+        column_labels = ["M_best","M="*string(imax)]
+    end
+
+    pretty_table(
+        df;
+        backend=:markdown,
+        formatters=[
+            fmt__printf("%3.3f", collect(2:ncol+1))
+        ],
+        column_labels=column_labels,
+        show_row_number_column=false,
+    )
+    println()
+end
+
+
+
+function show_ps_avg_s(s, avg)
+
+    N = size(s, 1)
+
+    # DataFrame z matice s
+    colnames = [string(i) for i in 1:N]
+    df = DataFrame(s, Symbol.(colnames))
+
+    # přidáme poslední sloupec avg
+    df.avg = avg
+
+    # přidáme řádkový index 1..N
+    df.rowid = ["M=" * string(i) for i in collect(1:N)]
+    # přesuneme rowid na první místo
+    df = select!(df, :rowid, Not(:rowid))
+    println("\n- Pravděpodobnost výběru s-té nejlepší dle počtu testovaných\n")
+
+    pretty_table(
+        df;
+        backend=:markdown,
+        formatters=[
+            fmt__printf("%3.3f", collect(2:N+2))
+        ],
+        # alignment=[:l, :c, :c],
+        # row_labels=["M=" * string(i) for i in collect(1:N)],
+        column_labels=vcat(
+            "P(s)",
+            ["s=" * string(i) for i in collect(1:N)],
+            "průměr(s)"
+        ),
+        show_row_number_column=false,
+    )
+    println()
+
+    gr = bar(
+        avg,
+        xticks=0:1:N,
+        xlabel="M - Výběr začíná od ",
+        ylabel="Průměrná schopnost výbrané",
+        legend=false,
+        size=(800, 300),
+        left_margin=5mm,
+        bottom_margin=5mm
+    )
+    display(gr)
+end
+
+```
+
+```{=typst}
+#pagebreak()
+``` 
+
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+
+show_ps_avg_s(
+analyze_outcome(4)...
+ )
+
+
+```
+
+
+```{=typst}
+#pagebreak()
+``` 
+
+Pro větší počty kandidátek  existují následující optimální počty M:
+
+
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+show_ps_avg_s(
+    analyze_outcome(5)...
+);
+```
+
+
+```{=typst}
+#pagebreak()
+``` 
+
+
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+show_ps_avg_s(
+    analyze_outcome(8)...
+);
+```
+
+```{=typst}
+#pagebreak()
+``` 
+
+
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+show_ps_avg_s(
+    analyze_outcome(10)...
+);
+```
+
+```{=typst}
+#pagebreak()
+``` 
+
+## Analytické řešení
+„Problém nejlepšího výběru“ (sekretářky) lze řešit i bez simulací **matematicky**.
+
+
+### Zadání problému
+
+- Máš $N$ kandidátů v náhodném pořadí.  
+- Každého vidíš jen jednou, po odmítnutí se už nevrátí.  
+- Umíš je **porovnávat** (víš, kdo je lepší), ale neznáš absolutní „skóre“.  
+- Cíl: maximalizovat pravděpodobnost, že vybereš **globálně nejlepšího**.
+
+Strategie:  
+Zvolíš číslo $r$ (počet prvních kandidátů, které jen pozoruješ, $M=r+1$) a pak:
+
+1. Prvních $r$ kandidátů **vždy odmítneš**, jen si zapamatuješ nejlepšího z nich.  
+2. Od kandidáta $M$ dál vezmeš **prvního, který je lepší než všichni předchozí**.  
+3. Pokud takový nepřijde, musíš vybrat posledního.
+
+
+### Pravděpodobnost úspěchu pro dané $r$
+
+Označme:
+
+- $B$ = pozice nejlepšího kandidáta (1…N, rovnoměrně).  
+- $m$ = pozice nejlepšího z prvních $r+1$ kandidátů.
+
+Úspěch nastane, když:
+
+- nejlepší kandidát je **za** pozicí $r$: $B = k > r$  
+- a nejlepší z prvních $r$ je **před** ním: $m < k$
+
+Pro pevné $k$ (pozice nejlepšího):
+
+- pravděpodobnost, že nejlepší je na pozici $k$: $\frac{1}{N}$  
+- mezi prvních $k-1$ je nejlepší z nich rovnoměrně rozložen   
+
+$$
+\begin{equation}
+\mathbb{P}(m \le r \mid B = k) = \frac{r}{k-1}
+\end{equation}
+$$
+
+
+Celková pravděpodobnost úspěchu:
+
+$$
+P(r) = \sum_{k=r+1}^{N} \frac{1}{N} \cdot \frac{r}{k-1}
+= \frac{r}{N} \sum_{k=r+1}^{N} \frac{1}{k-1}
+= \frac{r}{N} \sum_{j=r}^{N-1} \frac{1}{j}
+$$
+
+```{=typst}
+#pagebreak()
+``` 
+
+### Program pro ověření shody analytického vzorce se simulací
+
+Vrací pravděpodobnosti shodné se simulací
+
+
+```{julia}
+# analytická pravděpodobnost úspěchu pro dané r
+function P(N, M)
+    if M == 1 
+        return 1/N
+    else
+        r=M-1
+        return (r / N) * sum(1 / j for j in r:(N-1))
+    end
+end
+P(10, 4)
+
+```
+
+
+a generuje i shodný graf jako simulace:
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+
+# najde M, které maximalizuje P(N,M)
+function optimal_r_formula(N, ticks_step; val_labels=true)
+    probs = [P(N, M) for M in 1:N]
+    M_opt = argmax(probs) + 1
+    plot_p_bar(probs, N, ticks_step=ticks_step, val_labels=val_labels)
+    return M_opt, probs[M_opt-1] # , probs
+end
+
+optimal_r_formula(10, 1, val_labels=false);
+
+```
+
+
+```{=typst}
+#pagebreak()
+``` 
+
+Analytické řešení umožňuje spočítat optimální strategii i pro velké hodnoty N:
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+optimal_r_formula(30, 10, val_labels=false);
+```
+
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+optimal_r_formula(100, 10, val_labels=false);
+```
+
+
+```{=typst}
+#pagebreak()
+``` 
+
+```{julia}
+#| echo: true
+#| output: asis
+#| code-fold: false
+optimal_r_formula(300, 50, val_labels=false);
+```
+
+
+
+```{=typst}
+#pagebreak()
+``` 
+
+### Asymptotické řešení pro velké $N$
+
+Pro velké $N$ nahradíme sumu integrálem:
+
+$$
+\sum_{j=r}^{N-1} \frac{1}{j} \approx \int_{r}^{N} \frac{1}{x}\,dx = \ln\frac{N}{r}
+$$
+
+Takže:
+
+$$
+P(r) \approx \frac{r}{N} \ln\frac{N}{r}
+$$
+
+Označme $x = \frac{r}{N}$ (relativní „cutoff“). Pak:
+
+$$
+P(x) \approx x \ln\frac{1}{x}
+$$
+
+Derivace:
+
+$$
+P'(x) = \ln\frac{1}{x} - 1
+$$
+
+Nula derivace:
+
+$$
+\ln\frac{1}{x} - 1 = 0 \quad\Rightarrow\quad \ln\frac{1}{x} = 1 \quad\Rightarrow\quad \frac{1}{x} = e \quad\Rightarrow\quad x = \frac{1}{e}
+$$
+
+Tedy optimální je:
+
+$$
+r^* \approx \frac{N}{e} \approx 0{.}3679\,N
+$$
+
+A maximální pravděpodobnost úspěchu:
+
+$$
+P_{\max} \approx \frac{1}{e} \approx 0{.}3679
+$$
+
+
+### Shrnutí řešení
+
+- **Optimální strategie:**  
+  přeskočit prvních $\approx N/e$ kandidátů, pak vzít prvního, který je lepší než všichni předchozí.
+
+- **Optimální cutoff:**  
+  $r^{*} \approx \frac{N}{e}$
+
+- **Maximální pravděpodobnost, že vybereš nejlepšího:**  
+  $\approx \frac{1}{e} \approx 37\%$
+
+
+## Závěr
+Existuje optimální počet kandidátek, které je nutno otestovat. Optimální hodnota  M je rovna zhruba $N/e$  
