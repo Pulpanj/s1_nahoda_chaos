@@ -1,0 +1,262 @@
+---
+title: "Dokonale pružný náraz"
+date: "2026-04-26"
+updated: "2026-04-28"
+description: "Jak se mění rychlosti po nárazu,když se neztrácí žádná energie."
+draft: false
+categories: ["Klasická mechanika","Odvození","Přednáška 18"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p18_brownuv_svet/pruzny_naraz.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "pruzny_naraz"
+        output-ext: "pdf"
+        engine: typst
+---
+
+## Popis problému
+
+Tato krátká úvaha se zabývá pružnou (elastickou) srážkou v 1D mezi dvěma tělesy s různými hmotnostmi a rychlostmi. 
+Cílem je pochopit, jak se mění rychlosti obou těles po srážce, zejména v limitním případě, kdy jedno těleso je mnohem lehčí než druhé. 
+Tento problém je klíčový pro pochopení základů mechaniky a má široké uplatnění v různých oblastech fyziky.
+
+
+Vezměme pružnou (elastickou) přímou srážku dvou kuliček ve **1D** se známými hmotnostmi a počátečními rychlostmi:
+
+- **před srážkou:** $m_1, v_1$, $m_2, v_2$  
+
+
+```{julia}
+#| echo: false
+#| output: true  #asis
+#| fig-cap:  "Náčrt situace před pružnou srážkou dvou kuliček ve 1D "
+using Plots, Plots.PlotMeasures, LaTeXStrings
+
+function int_plot()
+    p = plot(
+        size=(800, 400),
+        framestyle=:origin,
+        axis=false,          # vypne osy
+        grid=true,           # necháme mřížku
+        aspect_ratio=1,
+        margins=5mm,
+        minorgrid=true,
+        xlims=(-1, 3), ylims=(-1, 1);
+    )
+    return p
+end
+
+# Parametric circle generator
+function circle_xy(center, r; n=50, alpha1=0, alpha2=360)
+    θ = range(deg2rad(alpha1), deg2rad(alpha2); length=n)
+    x = center[1] .+ r .* cos.(θ)
+    y = center[2] .+ r .* sin.(θ)
+    return x, y
+end
+
+# --- Add arrows with independent angles in degrees ---
+function draw_radius_arrow!(p, C, R, angle_deg, label, color)
+    θ = deg2rad(angle_deg)
+    dx = R * cos(θ)
+    dy = R * sin(θ)
+
+    plot!(p,
+        [C[1], C[1] + dx],
+        [C[2], C[2] + dy],
+        arrow=:start, color=color, linewidth=2, label=false
+    )
+
+    annotate!(p,
+        C[1] + (dx + 0.25) / 2,
+        C[2] + (dy + 0.1) / 2,
+        text(label, 10, color)
+    )
+end
+
+# Radii
+R1 = 0.6
+R2 = 0.4
+
+# Centers C1 and C2
+C1 = (0.0, 0.0)
+C2 = (2.0, 0.0)
+
+p1 = int_plot()
+# Draw circles
+x1, y1 = circle_xy(C1, R1)
+plot!(p1, x1, y1, color=:red, linewidth=8, linestyle=:solid, label="m1")
+
+x2, y2 = circle_xy(C2, R2)
+plot!(p1, x2, y2, color=:green, linewidth=8, linestyle=:solid, label="m2")
+
+# Example angles for each circle
+draw_radius_arrow!(p1, C1, R1 + 0.6, 360, "v1", :red)
+draw_radius_arrow!(p1, C2, R2 + 0.4, 180, "v2", :green)
+display(p1)
+```
+
+- **po srážce:** $v_1', v_2'$
+
+```{julia}
+#| echo: false
+#| output: true  #asis
+#| fig-cap:  "Náčrt situace po pružné srážce dvou kuliček ve 1D "
+
+# Radii
+R1 = 0.6
+R2 = 0.4
+# Centers C1 and C2
+C1 = (0.6, 0.0)
+C2 = (1.6, 0.0)
+C3 = (1.2, 0.0)
+
+p2 = int_plot()
+# Draw circles
+x1, y1 = circle_xy(C1, R1)
+plot!(p2, x1, y1, color=:red, linewidth=8, linestyle=:solid, label="m1")
+
+x2, y2 = circle_xy(C2, R2)
+plot!(p2, x2, y2, color=:green, linewidth=8, linestyle=:solid, label="m2")
+
+# Example angles for each circle
+draw_radius_arrow!(p2, C3, R1 + 0.5, 180, "v1'", :red)
+draw_radius_arrow!(p2, C3, R2 + 0.5, 0, "v2'", :green)
+display(p2)
+```
+
+
+## Obecné vzorce pro pružnou srážku
+
+Dvě částice s hmotnostmi 4m_1, m_2$ a počátečními rychlostmi $v_1, v_2$ (v jedné přímce) se srazí **pružně**.  
+
+Platí zákony zachování momentu hybnosti a energie:
+
+- hybnost  
+  $$
+  m_1 v_1 + m_2 v_2 = m_1 v_1' + m_2 v_2'
+  $$
+
+- energie  
+  $$
+  \frac12 m_1 v_1^2 + \frac12 m_2 v_2^2
+  = \frac12 m_1 {v_1'}^2 + \frac12 m_2 {v_2'}^2
+  $$
+
+
+Vzorce pro výsledné rychlosti odvozené z těchto rovnic jsou:
+
+$$
+v_1' = \frac{m_1 - m_2}{m_1 + m_2} \, v_1 + \frac{2m_2}{m_1 + m_2} \, v_2
+$$
+
+$$
+v_2' = \frac{2m_1}{m_1 + m_2} \, v_1 + \frac{m_2 - m_1}{m_1 + m_2} \, v_2
+$$
+
+
+### Změny rychlostí
+
+$$
+\Delta v_1 = v_1' - v_1
+$$
+
+$$
+\Delta v_2 = v_2' - v_2
+$$
+
+Dosadíme:
+
+$$
+\Delta v_1 
+= \left(\frac{m_1 - m_2}{m_1 + m_2} - 1\right)v_1 + \frac{2m_2}{m_1 + m_2} v_2
+= \frac{-2m_2}{m_1 + m_2} v_1 + \frac{2m_2}{m_1 + m_2} v_2
+= \frac{2m_2}{m_1 + m_2}(v_2 - v_1)
+$$
+
+$$
+\Delta v_2 
+= \left(\frac{m_2 - m_1}{m_1 + m_2} - 1\right)v_2 + \frac{2m_1}{m_1 + m_2} v_1
+= \frac{-2m_1}{m_1 + m_2} v_2 + \frac{2m_1}{m_1 + m_2} v_1
+= \frac{2m_1}{m_1 + m_2}(v_1 - v_2)
+$$
+
+
+### Vyjádření přes poměry
+
+Označ:
+
+- **hmotnostní poměr:** $r = \dfrac{m_1}{m_2}$  
+<!-- - **poměr rychlostí před srážkou:** $q = \dfrac{v_1}{v_2}$ (pokud $v_2 \neq 0$) -->
+
+Pak:
+
+$$
+\Delta v_1 = \frac{2}{1 + r^{-1}} (v_2 - v_1)
+= \frac{2r}{r + 1}(v_2 - v_1)
+$$
+
+$$
+\Delta v_2 = \frac{2}{1 + r}(v_1 - v_2)
+$$
+
+a výsledné rychlosti:
+
+$$
+v_1' = v_1 + \Delta v_1
+= v_1 + \frac{2r}{r + 1}(v_2 - v_1)
+$$
+
+$$
+v_2' = v_2 + \Delta v_2
+= v_2 + \frac{2}{r + 1}(v_1 - v_2)
+$$
+
+
+## Speciální případ: srážka těžké a malé částice
+
+Pokud na těžkou částici (desku) naráží malá částice s   pak při označení:
+- velká kulička (deska):  velká hmotnost $M$ , rychlost $V$
+- malá kulička: malou hmotnost $m$, rychlost $u$
+
+dostaneme  dosazením  do vztahů pro rychlosti po srážce:
+
+$$
+V' = \frac{M - m}{M + m} V + \frac{2m}{M + m} u
+$$
+
+$$
+u' = \frac{2M}{M + m} V + \frac{m - M}{M + m} u
+$$
+
+A protože $m \ll M$:
+
+$$
+V' \approx V + \frac{2m}{M}(u - V) \approx V
+
+$$
+
+
+$$
+u' \approx 2(𝑉 - u)
+$$
+
+
+## Zhrnutí
+
+Pohyb částic po pružné srážce závisí na poměru jejich hmotností a jejich počátečních rychlostech, v limitním případě srážky těžké a lehké částice pak:
+- **Velké těleso dostane impuls proti směru své rychlosti** (brzdí se, případně se rozjíždí opačným směrem).
+- Pokud je těžké těleso opravdu masivní, tak se **jeho rychlost se nezmění**.
+- Lehká částice se odrazí jako od **zdi jedoucí rychlostí $V$**.
+- Její rychlost se „překlopí“ kolem rychlosti těžkého tělesa:
+
+$$
+u' -V \approx-(u-V )
+$$
+
+Stručně řečené  malá kulička se **jen odraží** , zatímco velká deska 
+dostane malý příspěvek ke své rychlosti, který je **úměrný podílu hmotností rozdílu rychlostí před srážkou**.
+

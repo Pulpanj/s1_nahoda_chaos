@@ -1,0 +1,349 @@
+---
+title: "Trpaslík Brown lyžuje v kuličkách vodní páry"
+date: "2026-05-05"
+updated: "2026-05-10"
+description: "Jak se mění rychlost malé lyže trpaslíka Browna, když na ni naráží molekuly vodní páry."
+draft: false
+categories: ["Statistická mechanika","Odvození","Přednáška 18"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p18_brownuv_svet/trpaslik_brown_lyzuje_ve_vodní_pare.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "trpaslik_brown_lyzuje_ve_vodní_pare"
+        output-ext: "pdf"
+        engine: typst
+---
+
+## Popis problému
+
+I v tomto případě pokračujeme v analýze lyžování (viz. [Lyžování v malých kuličkách sněhu](lyzovani_v_kulickach.qmd)), ale tentokrát opustíme model těžkých lyží a kuliček sněhu. Místo toho se zaměříme na situaci, kdy 
+- lyže trpaslíka Browna má konečnou hmotnost, která je sice mnohem větší než hmotnost jednotlivých kuliček, ale nelze jí vůči kuličkám považovat za nekonečnou.
+- kuličky sněhu jsou nahrazeny molekulami vodní páry, které se pohybují v jednom směru různými rychlostmi  a mohou pružně se odrazit od lyže.
+
+I tomto modelu budeme uvažovat o pružných srážkách mezi lyží a molekulami vodní páry, což znamená, že se neztrácí žádná kinetická energie během srážky. Cílem je zjistit, jak se mění rychlost Brownovy lyže po nárazu a jaký vliv má rozdělení rychlostí molekul vodní páry na brzdění lyže.
+
+
+
+```{julia}
+#| echo: false
+#| output: true  #asis
+#| fig-cap:  "Nárazy vodní páry na  Brownovu jedoucí lyži"
+using Plots, Plots.PlotMeasures, LaTeXStrings
+using Random
+
+function int_plot()
+    p = plot(
+        size=(800, 400),
+        framestyle=:origin,
+        axis=false,          # vypne osy
+        grid=true,           # necháme mřížku
+        aspect_ratio=1,
+        margins=5mm,
+        minorgrid=true,
+        xlims=(-3, 5), ylims=(-1, 1);
+    )
+    return p
+end
+
+# Parametric circle generator
+function circle_xy(center, r; n=50, alpha1=0, alpha2=360)
+    θ = range(deg2rad(alpha1), deg2rad(alpha2); length=n)
+    x = center[1] .+ r .* cos.(θ)
+    y = center[2] .+ r .* sin.(θ)
+    return x, y
+end
+
+# --- Add arrows with independent angles in degrees ---
+function draw_radius_arrow!(p, C, R, angle_deg, label, color)
+    θ = deg2rad(angle_deg)
+    dx = R * cos(θ)
+    dy = R * sin(θ)
+
+    plot!(p,
+        [C[1], C[1] + dx],
+        [C[2], C[2] + dy],
+        arrow=:start, color=color, linewidth=1, label=false
+    )
+
+    annotate!(p,
+        C[1] + (dx + 0.25) / 2,
+        C[2] + (dy + 0.2) / 2,
+        text(label, 10, color)
+    )
+end
+
+
+# Radii
+R = 0.6
+
+p1 = int_plot()
+# Draw circles
+x1 = [0.0, 0.0]
+y1 = [-1, 1]
+plot!(p1, x1, y1, color=:red, linewidth=6, linestyle=:solid, label="Lyže - M")
+draw_radius_arrow!(p1, [0, 0], R + 0.6, 0, "V", :red)
+
+
+Random.seed!(12)
+
+for i in 1:10
+    cx = -1.8 + 3.6 * rand()   # uniform on [-1,1]
+    if cx > -0.3 && cx < 0.5
+        continue
+    end
+    cy = -0.8 + 1.6 * rand()   # uniform on [-1,1]
+    d=rand(1:2)
+    x2, y2 = circle_xy([cx, cy], 0.05)
+    plot!(p1, x2, y2, color=:green, linewidth=4, linestyle=:solid, label="Pára - m")
+    draw_radius_arrow!(p1,[cx, cy], R + 0.3, d*180, "u$i", :green)
+end
+display(p1)
+```
+
+
+## Řešení
+
+Řešení problému bude velmi podobné jako v případě nekonečně těžké lyže, ale s důležitou změnou: místo toho, aby každá srážka měnila rychlost lyže o konstantní hodnotu (jako v modelu s nekonečně těžkou lyží), bude změna rychlosti záviset na relativní rychlosti mezi lyží a molekulami vodní páry. To znamená, že musíme vzít v úvahu rozdělení rychlostí molekul vodní páry a jak se tyto rychlosti vztahují k rychlosti lyže.
+
+
+
+### Parametry modelu
+Následující parametry budou použity v našem modelu: 
+
+ - Lyže (deska): hmotnost **M**, rychlost **V(t)**.
+ - Částice: hmotnost **m**, rychlosti **u** s rozdělením **f(u)** (normalizované: ∫ f(u) du = 1).
+ - Hustota částic v 1D: **n** (počet na jednotku délky).
+ - Srážky: **pružné**, 1D.
+
+
+### Impuls od jedné srážky
+
+Obecný vzorec pro pružnou srážku: 
+
+$$
+V' = \frac{M-m}{M+m}V + \frac{2m}{M+m}u.
+$$
+
+Změna hybnosti desky:
+
+$$
+\Delta p = M(V' - V) = \frac{2Mm}{M+m}(u - V).
+$$
+
+Zavedem-li **redukovanou hmotnost**:
+
+$$
+\mu = \frac{mM}{m+M}.
+$$
+
+Pak:
+
+$$
+\Delta p = 2\mu (u - V).
+$$
+
+
+### Tok částic, které narážejí do desky
+
+Částice s rychlostí u narazí do desky, pokud **u > V** (zleva) nebo **u < V** (zprava).
+
+Počet částic (tok) s rychlostí $u$ které narazí do desky je roven hustotě částic $n$ krát relativní rychlosti $|u - V|$:
+
+$$
+N(u) = n\,|u - V|.
+$$
+
+Počet srážek za jednotku času:
+
+$$
+dN = n\,|u - V|\, f(u)\, du.
+$$
+
+### Celková síla na desku
+
+Síla = tok srážek × impuls na srážku dostaneme integrací přes hustotu pravděpodobnosti přes všechny rychlosti částic $u$ :
+
+$$
+F = \int_{-\infty}^{\infty} 2\mu (u - V)\, n\,|u - V|\, f(u)\, du.
+$$
+
+
+To lze zapsat jako:
+
+$$
+F = 2\mu n \int (u - V)|u - V| f(u)\, du.
+$$
+
+
+### Lineární aproximace pro malé V a symetrické f(u)
+
+Pokud je V malé oproti typickým rychlostem v rozdělení f(u), můžeme použít lineární aproximaci:
+
+$$
+(u - V)|u - V| = u|u| - 2V|u| + O(V^2).
+$$
+
+Pak lze sílu na desku zapsat jako :
+
+$$
+F \approx 2\mu n \left[ \int u|u| f(u)\, du - 2V \int |u| f(u)\, du \right].
+$$
+
+Pokud je f(u) **symetrické** (f(u)=f(-u)), pak:
+
+$$
+\int u|u| f(u)\, du = 0.
+$$
+
+a tak zůstává:
+
+$$
+F = - 4\mu n \left(\int |u| f(u)\, du\right) V.
+$$
+
+Takováto síla se nazývá **viskózní tření**.
+
+
+#### Rovnice pohybu desky
+
+$$
+M\frac{dV}{dt} = F = -\Gamma V,
+$$
+
+kde
+
+$$
+\Gamma = 4\mu n \int |u| f(u)\, du.
+$$
+
+A tedy:
+
+$$
+\frac{dV}{dt} = -\frac{\Gamma}{M} V.
+$$
+
+Tato diferenciální rovnice má řešení:
+
+$$
+V(t) = V(0)\, e^{-(\Gamma/M)t}.
+$$
+
+
+####  Časová konstanta brzdění
+
+- Lyže trpaslíka Browna (deska) se tedy **exponenciálně brzdí**. Časová konstanta brzdění je:
+
+$$
+\tau = \frac{M}{\Gamma}
+= \frac{M}{4\mu n \int |u| f(u)\, du}.
+$$
+
+- Pokud je M ≫ m, pak μ ≈ m a:
+
+$$
+\tau \approx \frac{M}{4mn \int |u| f(u)\, du}.
+$$
+
+Pokud je M ~ m, brzdění je silnější (větší μ). Následující graf ukazuje, jak se
+mění rychlost desky v čase pro různé poměry m/M, což odpovídá různým časovým
+konstantám brzdění τ (osa x ma logaritmickou škálu).
+
+
+
+```{julia}
+#| echo: true
+#| output: true  #asis
+#| code-fold: TRUE
+using Plots
+using Measures
+using Printf
+
+# --- Parametry prostředí ---
+n = 1.0
+kT = 1.0
+V0 = 1.0
+M = 1.0
+
+mean_abs_u(m) = sqrt(2 * kT / (π * m))
+μ(m) = (m * M) / (m + M)
+Γ(m) = 4 * μ(m) * n * mean_abs_u(m)
+τ(m) = M / Γ(m)
+
+ratios = [1e-8, 1e-5, 1e-3, 0.1, 1.0]
+
+# časová osa na logaritmické škále
+t = exp.(range(log(1e-3), log(100000), length=400))
+
+# --- Tick pozice ---
+xticks_major = [1e-3, 1e-2, 1e-1, 1, 10, 100, 1000, 10000, 100000]  # hlavní ticky
+# xtick_labels = [@sprintf("%.0e", x) for x in xticks_major]
+xtick_labels = [@sprintf("%g", x) for x in xticks_major]
+
+xticks_minor = [10^x for x in -3:0.1:1]   # hustší minor ticks
+
+p = plot(
+    title="Exponenciální brzdění pro různé m/M ",
+    xlabel="Čas - t",
+    ylabel="Rychlost Brownovy lyže - V(t)",
+    xscale=:log10,
+    xticks=(xticks_major, xtick_labels),   # exponenciální formát
+    # xticks=(xticks_major, string.(xticks_major)),  # hlavní ticky
+    xminorticks=xticks_minor,                      # minor ticky
+    xminorgrid=true,                               # minor grid
+    grid=true,                                     # hlavní grid
+    lw=3,
+    size=(1000, 800),
+    legend=:bottomleft,
+    left_margin=10mm,
+)
+
+for r in ratios
+    m = r * M
+    tau = τ(m)
+    Vt = V0 .* exp.(-t ./ tau)
+    plot!(p, t, Vt, label="m/M=$(r),  τ=$(round(tau, digits=3))")
+end
+
+display(p)
+
+```
+
+
+## Shrnutí
+
+Graf jasně ukazuje, že pro velmi malé poměry m/M (např. 1e-8) je brzdění velmi
+pomalé (velká τ), zatímco pro poměry blízké 1 je brzdění velmi rychlé (malá τ).
+To ilustruje, jak hmotnost lyže ovlivňuje její brzdění v prostředí s molekulami
+vodní páry.
+
+Pan Brown prostě žije ve světě molekul a tak se mu **zdá, že setrvačnost
+neexistuje a že se jeho lyže okamžitě zastaví**, i když ve skutečnosti se jen
+velmi rychle brzdí v závislosti na poměru m/M. Tohle jeho pozorování zdánlivě
+paradoxní - jakoby popírající Newtonovy zákony o setrvačnosti, ale je zcela v
+souladu s fyzikálními zákony pružných srážek a statistické mechaniky.
+
+
+<!-- **Obecná síla:**
+
+$$
+F = 2\mu n \int (u - V)|u - V| f(u)\, du.
+$$
+
+**Pro malé V a symetrické f(u):**
+
+$$
+F = -\Gamma V, \qquad 
+\Gamma = 4\mu n \int |u| f(u)\, du.
+$$
+
+**Rychlost desky:**
+
+$$
+V(t) = V_0 e^{-(\Gamma/M)t}.
+$$
+
+Toto je kompletní řešení problému brzdění tělesa v plynu s obecným rozdělením rychlostí. -->

@@ -1,0 +1,215 @@
+---
+title: "Lyžování v malých kuličkách sněhu"
+date: "2026-04-30"
+updated: "2026-05-02"
+description: "Jak se lyžuje v malých kuličkách sněhu a jak to souvisí s modelem tření úměrného rychlosti a pružnými srážkami ?"
+draft: false
+categories: ["Klasická mechanika","Odvození","Přednáška 18"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p18_brownuv_svet/lyzovani_v_kulickach.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "lyzovani_v_kulickach"
+        output-ext: "pdf"
+        engine: typst
+---
+
+## Popis problému
+
+Tato úloha rozšiřuje předchozí úvahu o lyžování Isaaca Newtona, ale tentokrát
+modifikujeme jednoduchým popisem tření sněhu. Newton bude lyžovat po sněhu,
+který se skládá z malých částic (vločky sněhu), které jsou schopné pružně se
+odrazit od lyže. Brzděni popíšeme jako **dokonalé pružné nárazy** malých
+kuliček sněhu do jedoucí lyže.
+
+
+
+```{julia}
+#| echo: false
+#| output: true  #asis
+#| fig-cap:  "Nárazy malých kuliček sněhu do jedoucí lyže"
+using Plots, Plots.PlotMeasures, LaTeXStrings
+using Random
+
+function int_plot()
+    p = plot(
+        size=(800, 400),
+        framestyle=:origin,
+        axis=false,          # vypne osy
+        grid=true,           # necháme mřížku
+        aspect_ratio=1,
+        margins=5mm,
+        minorgrid=true,
+        xlims=(-1, 2), ylims=(-1, 1);
+    )
+    return p
+end
+
+# Parametric circle generator
+function circle_xy(center, r; n=50, alpha1=0, alpha2=360)
+    θ = range(deg2rad(alpha1), deg2rad(alpha2); length=n)
+    x = center[1] .+ r .* cos.(θ)
+    y = center[2] .+ r .* sin.(θ)
+    return x, y
+end
+
+# --- Add arrows with independent angles in degrees ---
+function draw_radius_arrow!(p, C, R, angle_deg, label, color)
+    θ = deg2rad(angle_deg)
+    dx = R * cos(θ)
+    dy = R * sin(θ)
+
+    plot!(p,
+        [C[1], C[1] + dx],
+        [C[2], C[2] + dy],
+        arrow=:start, color=color, linewidth=2, label=false
+    )
+
+    annotate!(p,
+        C[1] + (dx + 0.25) / 2,
+        C[2] + (dy + 0.1) / 2,
+        text(label, 10, color)
+    )
+end
+
+
+# Radii
+R = 0.1
+
+p1 = int_plot()
+# Draw circles
+x1 = [0.0, 0.0]
+y1 = [-1, 1]
+plot!(p1, x1, y1, color=:red, linewidth=20, linestyle=:solid, label="Lyže - M")
+draw_radius_arrow!(p1, [0, 0], R + 0.6, 0, "V", :red)
+
+
+Random.seed!(12363)
+
+for i in 1:8
+    cx = 0.2 + rand()   # uniform on [-1,1]
+    cy = -0.8 + 1.6 * rand()   # uniform on [-1,1]
+
+    x2, y2 = circle_xy([cx, cy], 0.05)
+    plot!(p1, x2, y2, color=:green, linewidth=3, linestyle=:solid, label="Snih - m")
+    draw_radius_arrow!(p1,[cx, cy], R + 0.3, 180, "u", :green)
+end
+display(p1)
+```
+
+Obecné vztahy pro rychlosti po pružné srážce v 1D jsou popsány v postu
+[Dokonale pružný náraz](pruzny_naraz.qmd), ale zde se zaměříme na limitní
+případ, kdy jedna částice je **hodně těžká** (lyžař) a druhá **velmi lehká**
+(sněhová vločka).
+
+## Pružné srážky těžké a malé částice
+
+Pokud na těžkou částici (desku/lyži) naráží malá částice (sníh) s pak při označení:
+- velká kulička (lyže):  velká hmotnost $M$ , rychlost $V$
+- malá kulička (vodní molekuly): malou hmotnost $m$, rychlost $u$
+
+dostaneme  dosazením  do vztahů pro rychlosti po srážce:
+
+$$
+V' = \frac{M - m}{M + m} V + \frac{2m}{M + m} u
+$$
+
+$$
+u' = \frac{2M}{M + m} V + \frac{m - M}{M + m} u
+$$
+
+A protože $m \ll M$:
+
+$$
+V' \approx V + \frac{2m}{M}(u - V) \approx V
+$$
+
+
+$$
+u' \approx 2(𝑉 - u)
+$$
+
+
+### Fyzikální interpretace
+
+- **Velké těleso dostane impuls proti směru své rychlosti** (brzdí se).
+- Lehká částice se odrazí jako od **zdi jedoucí rychlostí $V$**, její rychlost se „překlopí“ kolem rychlosti těžkého tělesa:
+
+$$
+u' -V \approx-(u-V )
+$$
+
+Stručně řečené  malá kulička se **jen odraží** , zatímco velká deska 
+dostane malý (záporný) příspěvek ke své rychlosti, který 
+je **úměrný podílu hmotností a rozdílu rychlostí před srážkou**.
+
+
+## Mnoho malých kuliček narážejících čelně do velkého tělesa
+
+Představme si proud malých stojících kuliček sněhu, které **narážejí čelně** do velkého tělesa pohybujícího se rychlostí $V$. 
+Dle předchozího odstavce můžeme očekávat, že: 
+
+- každá kulička sněhu:
+- před srážkou: $u \approx 0$ (velké těleso letí proti nim),
+- po srážce: $u'-V \approx -(u-V)$ $ (odráží se zpět),
+- velké těleso:
+- po každé srážce dostane malý příspěvek $\Delta V \approx (2m/M)(u- V) < 0$.
+
+Pokud se na velké těleso sype hodně kuliček, a velké těleso jelo původně proti nim ($V>0$) pak
+každá srážka ho **brzdí**, a může se až zastavit.
+
+### Tření jako vliv srážek proudu malých kuliček
+
+Když na velké těleso naráží za čas $\Delta t$ počet $\Delta N$ kuliček, každá s hybností $mu$, pak:
+
+- změna hybnosti velkého tělesa za $\Delta t$ je zhruba (pro $u = 0$ a $V > 0$ ):
+$$
+\Delta P \approx \Delta N \cdot 2m(u - V) \approx -2m V \cdot \Delta N
+$$
+- průměrná síla
+$$
+F_t \approx \frac{\Delta P}{\Delta t} =-2m V \cdot \frac{\Delta N}{\Delta t}= -2m V \cdot n
+$$
+
+kde 
+$$
+n=\frac{\Delta N}{\Delta t}
+$$ 
+
+je **tok kuliček** (počet kuliček dopadajících na velké těleso za jednotku času).
+
+- zrychlení velkého tělesa:
+$$
+a_t \approx \frac{F}{M} \sim -\frac{2nmV}{M}
+$$
+
+Znaménko mínus indikuje, že síla i zrychlení jsou **proti směru jízdy lyžaře**.
+
+
+## Závěr
+
+Stojící lehké kuličky, proti kterým letí velké těleso (lyže), ho postupně
+každou srážkou ho trochu brzdí. Brzdící síla je úměrná rychlosti velkého
+tělesa, takže se dá psát jako
+
+$F_t =-2m \cdot n \cdot V=  -k \cdot V$ 
+
+kde $k$ je konstanta závislá na hmotnosti kuliček a jejich toku.
+
+To je vlastně **třecí síla**: čím rychleji se velké těleso pohybuje, tím více
+kuliček naráží a tím větší je brzdná síla, tj. **tření je úměrné rychlosti**,
+což je typické pro pohyb v prostředí s viskózním odporem (např. pohyb v
+kapalině).
+
+Shodnou závislost jsme použili  i v předchozím postu, kde jsme modelovali pohyb  
+[lyžaře Newtona](isaac_newton_na_lyzich.qmd)). 
+Tam byla  definována **třecí (odporová) síla úměrná rychlosti:** $F_t = -kv$ (proti pohybu).
+
+To znamená, že model pružných srážek malých kuliček s velkým tělesem je
+konzistentní s modelem tření úměrného rychlosti, který jsme použili v
+předchozím postu a další pohybové rovnice jsou tedy také shodné.
+

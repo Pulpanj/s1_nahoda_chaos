@@ -85,7 +85,7 @@ $$
 
 ## Řešení pomocí Markovova řetězce 
 
-**následující odstavce jsou jen pokusem, jak se na úlohu divat pomocí konečného Markovova řetězce, ale  nedává to smysluplné  výsledky. Nechci ho mazat, protože je obsahuje simulaci Markovova řetězce, ktera funguje a ověřuje počty průchodů stavy Markovového řetězce.**
+
 
 Kromě předchozích řešení lze tento problém lze modelovat i simulací  Markovova řetězce a využít tak výpočet střední hodnoty počtu hodů do první šestky pomocí fundamentální matice.
 
@@ -144,10 +144,12 @@ $$
 ## Simulace průchodů Markovovým řetězcem
 
 Ověření počtu do první šestky po sudých hodnotách pomoci simulace Markovova řetězce. 
+Tato simulace Markovova řetězce funguje pro obecnou matici přechodů Markovovského řetězce.
 
-**col_avg** je vektor středního počtu průchodů stavy Markovovského řetězce a
-jeho poslední sloupec jsou pozorované počty hodů po sudých do prvni šestky.
-
+Následující kód simuluje průchody Markovovským řetězcem a počítá počet průchodů jednotlivými stavy až do dosažení absorpčního stavu (v našem případě jen S7).
+Kód vrací vektor **col_avg** středního počtu průchodů stavy Markovovského řetězce a
+jeho poslední sloupec tak obsahuje průměrný počet hodů po sudých do prvni šestky. 
+Až na statistickou chybu tento průměr odpovídá analytickému výsledku 3/2, který jsme získali pomocí geometrické náhodné veličiny a rekurence.
 
 ```{julia}
 #| echo: true
@@ -214,8 +216,12 @@ col_avg = mean(tally, dims=1)
 
 
 ### Výpočet středního počtu průchodů 
+**následující odstavce jsou jen pokusem, jak se na úlohu divat pomocí vypočtu středního počtu průchodů stavy konečného Markovova řetězce, 
+ale  nedává žádné smysluplné  výsledky. Tak mě alespoň zaujala možnost generovat korelovaná náhodná čísla pomocí Markovova řetězce  **
 
-Postup výpočtu středního počtu průchodů nějakým stavem $E[N]$ v Markovově řetězci, který má absorpční stav, je odvozena v [Náhodná procházka opilého námořníka](../p4_markovuv_proces/absorpcni_markovovuv_retezec.qmd). Stejný postup použijeme na výpočet středního počtu průchodů do první šestky po sudých hodech.
+Postup výpočtu středního počtu průchodů nějakým stavem $E[N]$ v Markovově řetězci, který má absorpční stav, je odvozena v 
+[Náhodná procházka opilého námořníka](../p4_markovuv_proces/absorpcni_markovovuv_retezec.qmd). 
+Stejný postup použijeme na výpočet středního počtu průchodů do první šestky po sudých hodech.
 
 
 ```{julia}
@@ -294,7 +300,6 @@ println()
 
 ```
 
-A výsledky souhlasí (drobné rozdíly jsou dány statistikou simulací ).
 
 
 ### Divný obrázek nakonec

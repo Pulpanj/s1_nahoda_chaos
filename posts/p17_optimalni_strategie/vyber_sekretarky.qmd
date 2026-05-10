@@ -2,7 +2,7 @@
 title: "Výběr sekretářky "
 date: "2026-04-13"
 updated: "2026-04-14"
-description: "Jak lze simulovat téměř jakékoliv pohyblivé  obrázky na čtvercové síti bílých a černých čtverečků"
+description: "Optimalizace strategie výběru nejlepšího kandidáta v náhodném pořadí"
 draft: false
 categories: ["Optimální strategie","Odvození","Přednáška 17"]
 pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p17_optimalni_strategie/vyber_sekretarky.pdf)"

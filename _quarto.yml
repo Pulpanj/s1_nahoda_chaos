@@ -44,6 +44,7 @@ website:
       - text: Kurz
         menu:
           - ocem.qmd
+          - zakonceni.qmd
           - literatura.qmd
           - odkazy.qmd
           - todo.qmd
@@ -96,7 +97,7 @@ website:
   announcement: 
     icon: info-circle
     dismissable: true
-    content: "**Varování** - tento blog je stále ve výstavbě, časem přidám i materialy z počátečních seancí. "
+    content: "**INFO** - slavnostní zakončení kurzů U3V se bude konat 5.6. 2026 od 11 hodin v Karolinu. "
     type: primary
     position: below-navbar  
   # reader-mode: true            

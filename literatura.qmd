@@ -155,7 +155,7 @@ book_list = [
         # "URL" => "https://www.scribd.com/document/472537596/The-science-of-soap-films-and-soap-bubbles-by-Cyril-Isenberg-pdf",
         "Rok" => "2000",
         "cover" => "/images/almgren.jpg"
-    ), 
+    ),
     # OrderedDict(
     #     "Název" => "Plateau's Problem An Invitation to Varifold Geometry  ",
     #     "Autor" => "Frederick J. Almgren, Jr, Kenneth J. Brakke and John M. Sullivan",
@@ -206,8 +206,18 @@ characteristic earthquake",
         "PDF" => "https://link.springer.com/content/pdf/10.1186/BF03351762.pdf",
         "Rok" => "1987",
         # "cover" => "/images/m_cover.jpeg"
+    ), OrderedDict(
+        "label" => "Přednáška 18 (Brownův svět)"
     ),
-
+    OrderedDict(
+        "Název" => "Life at low Reynolds number",
+        "Autor" => "E. M. Purcell",
+        "Reference" => " American Journal of Physics, Vol. 45, No. 1, January 1977, pp. 3-11",
+        "PDF" => "https://www.damtp.cam.ac.uk/user/tong/fluids/lowreynolds.pdf",
+        # "URL" => "",
+        "Rok" => "1976",
+        # "cover" => "/images/m_cover.jpeg"
+    ),
 
     # OrderedDict(
     #     "Název" => "",
