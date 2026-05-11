@@ -5,7 +5,7 @@ updated: "2026-05-10"
 description: "Jak se mění rychlost malé lyže trpaslíka Browna, když na ni naráží molekuly vodní páry."
 draft: false
 categories: ["Statistická mechanika","Odvození","Přednáška 18"]
-pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p18_brownuv_svet/trpaslik_brown_lyzuje_ve_vodní_pare.pdf)"
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p18_brownuv_svet/trpaslik_brown_lyzuje_ve_vodni_pare.pdf)"
 
 engine: julia
 
@@ -13,7 +13,7 @@ lang: cs
 
 format:
     typst:
-        output-file: "trpaslik_brown_lyzuje_ve_vodní_pare"
+        output-file: "trpaslik_brown_lyzuje_ve_vodni_pare"
         output-ext: "pdf"
         engine: typst
 ---
