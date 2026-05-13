@@ -1,0 +1,253 @@
+---
+title: "Odmocnina 2 není racionální číslo"
+date: "2026-05-11"
+updated: "2026-05-13"
+description: "Důkaz indukcí (a sporem), že odmocnina 2 není racionální číslo"
+draft: false
+categories: ["Důkaz", "Přednáška 20"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p20_den_dukazu/odmocnina2.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "odmocnina2"
+        output-ext: "pdf"
+        engine: typst
+---
+
+## Historický kontext: 
+
+Pythagorejské škola (cca 5. století př. n. l.) řešila geometrické problémy a
+věřila, že všechny délky lze vyjádřit jako poměr celých čísel (racionální
+čísla).
+
+Objev, že $\sqrt{2}$ není racionální číslo, byl pro ně šokem, protože to
+znamenalo, že existují délky, které nelze vyjádřit jako poměr celých čísel.
+Legenda dokonce praví, že objevitel (často zmiňován Hippasos z Metapontu) byl
+za prozrazení tohoto "tajemství" potrestán bohy.
+
+## Mocnina sudého a lichého čísla 
+
+Než se pustíme do důkazu že $\sqrt{2}$ není racionální číslo, připomeňme si
+důležité vlastnosti mocnin sudých a lichých čísel: 
+
+- mocnina sudého čísla je sudé číslo, 
+- a mocnina lichého čísla je liché číslo. 
+
+Tyto vlastnosti jsou důležité pro následující důkazy.
+
+**Důkaz mocnina sudého čísla je sudé číslo**:
+
+Nechť $n$ je sudé číslo, což znamená, že existuje celé číslo $k$ takové, že $n
+= 2k$. Potom:
+
+$$
+n^{2} = (2k)^{2} = 4k^{2}
+$$
+
+Protože $4k^{2}$ je dvojnásobkem $2{2k}$, musí to být sudé číslo.
+
+
+**Důkaz mocnina lichého čísla je liché číslo**:
+
+Nechť $n$ je liché číslo, což znamená, že existuje celé číslo $k$ takové, že $n
+= 2k + 1$. Potom:
+
+$$
+n^{2} = (2k + 1)^{2} = 4k^{2} + 4k + 1
+$$
+
+Protože $4k^{2} + 4k$ je sudé číslo, musí to být sudé číslo.
+
+A protože $4k^{2} + 4k + 1$ je o 1 větší než sudé číslo, musí být liché číslo.
+
+## Důkaz sporem
+
+Předpokládejme, že $\sqrt{2}$ je racionální číslo. To znamená, že existují
+dvě celá čísla $a$ a $b$ (kde $b \neq 0$), která jsou nesoudělná (nemají
+společného dělitele kromě 1) a splňují rovnici:
+
+$$
+\sqrt{2} = \frac{a}{b}
+$$
+
+Umocněním obou stran rovnice získáme:
+
+$$
+2 = \frac{a^2}{b^2}
+$$
+
+Násobením obou stran rovnice $b^2$ získáme:
+
+$$
+a^2 = 2b^2
+$$
+
+Z této rovnice vyplývá, že $a^2$ je sudé číslo (protože je dvojnásobkem nějakého celého čísla).
+Pak ale  **$a$ musí být také sudé číslo** (protože druhá mocnina lichého čísla je lichá).
+
+Nechť $a = 2k$ pro nějaké celé číslo $k$. Dosadíme zpět do rovnice $a^2 = 2b^2$:
+
+$$
+(2k)^2 = 2b^2
+$$
+
+$$
+4k^2 = 2b^2
+$$
+
+$$
+4k^2 = 2b^2
+$$
+
+$$
+2k^2 = b^2
+$$
+
+Z této rovnice vyplývá, že $b^2$ je také sudé číslo, 
+což znamená, že **$b$ musí být také sudé číslo**.
+
+Tím jsme dospěli k závěru, že obě čísla $a$ a $b$ jsou sudá, což znamená, že
+mají společného dělitele 2. To je v rozporu s naším původním předpokladem, že
+$a$ a $b$ jsou nesoudělná čísla. Tento rozpor znamená, že náš 
+**původní předpoklad, že $\sqrt{2}$ je racionální číslo, musí být nepravdivý**. 
+
+Proto je $\sqrt{2}$ iracionální číslo.
+
+## Důkaz založený na indukci 
+
+Další důkaz, že $\sqrt{2}$ není racionální číslo, lze provést pomocí
+matematické indukce. Jedná se o důkaz, který předpokládá, 
+že pokud $\sqrt{2}$ lze vyjádříme jako
+poměr dvou celých čísel $\frac{k_0}{k_1}$ je možné, pak $\sqrt{2}$ lze vyjádřit i jako poměr dvou celých čísel $\frac{k_1}{k_2}$, kde $k_2 < k_1$. 
+
+Tento proces lze opakovat, což vede k nekonečnému řetězci zmenšujících se jmenovatelů, což je nemožné, protože jmenovatel musí být kladné celé číslo>0.
+
+
+**Předpoklad**: 
+
+Nechť $P(0)$ je tvrzení, že $\sqrt{2}$ lze vyjádřit jako poměr dvou celých čísel 
+
+
+$$
+\begin{equation}
+P(0): \sqrt{2} = \frac{k_0}{k_1}
+\end{equation}
+$$
+
+
+**První indukční krok**: 
+
+Pokud provedeme umocnění rovnice $P(0)$, získáme: 
+
+$$
+2 = \frac{{k_0}^2}{{k_1}^2}
+$$
+
+A odtud lze po vynásobením obou stran rovnice ${k_1}^2$:
+
+$$
+2{k_1}^2 = {k_0}^2
+$$
+
+lze vydedukovat, že ${k_0}^2$ je sudé číslo (protože je dvojnásobkem
+${k_1}^2$). Proto i $k_0$ také musí být sudé číslo. Pak ovšem můžeme zapsat
+$k_0$ jako $2k_2$ pro nějaké celé číslo $k_2$, pro které platí $k_2 < k_0$. 
+
+Dosadíme  výraz $k_0=2k_2$ zpět do rovnice $P(0)$:
+
+$$
+\begin{equation}
+\sqrt{2} = \frac{2k_2}{k_1}
+\end{equation}
+$$
+
+Po umocnění obou stran (a vynásobením obou stran $k_1$) získáme:
+
+$$
+\begin{equation}
+2{k_1}^2= 4{k_2}^2
+\end{equation}
+$$
+
+Po vydělení obou stran rovnice 2 a odmocněním získáme: 
+
+$$
+\begin{equation}
+k_1 = \sqrt{2}k_2
+\end{equation}
+$$
+
+kterou lze upravit do rovnice pro  následující rovnici pro tvrzeni $P(1)$:
+
+$$
+\begin{equation}
+P(1): \sqrt{2} = \frac{k_1}{k_2}
+\end{equation}
+$$
+
+Z faktu, že $\sqrt{2} > 1$ vyplývá, že **$k_1 > k_2$**.
+
+
+**Další indukční kroky**: 
+
+Pro rovnici $P(1)$ můžeme opět provést všechny stejné kroky jako v prvním
+indukčním kroku, což nám umožní odvodit rovnici $P(2)$ mající stejnou formu
+jako $P(1)$:
+
+$$
+\begin{equation}
+P(2): \sqrt{2} = \frac{k_2}{k_3}
+\end{equation}
+$$
+
+A opět z faktu, že $\sqrt{2} > 1$ vyplývá, že **$k_2 > k_3$**.
+
+Tímto způsobem můžeme pokračovat dále a ze vztahu v kroku $P(i)$ 
+
+$$
+\begin{equation}
+P(i): \sqrt{2} = \frac{k_i}{k_{i+1}}
+\end{equation}
+$$
+
+odvodit rovnici $P(i+1)$, která bude mít stejnou formu jako $P(i)$: 
+$$
+\begin{equation}
+P(i+1): \sqrt{2} = \frac{k_{i+1}}{k_{i+2}}
+\end{equation}
+$$
+
+A opět z faktu, že $\sqrt{2} > 1$ vyplývá, že **$k_{i+1} > k_{i+2}$**.
+
+Tímto způsobem můžeme pokračovat dále a odvodit nekonečný řetězec rovnic
+$P(i)$, které všechny mají stejnou formu jako $P(0)$, ale s postupně se
+zmenšujícími se jmenovateli $k_i$. V každém kroku indukce jsme odvodili, že
+$k_{i} > k_{i+1}$, což znamená, že jmenovatel se stále zmenšuje. 
+
+Ale protože původní jmenovatel $k_1$ je kladné celé číslo, může existovat jen
+konečný řetězec zmenšujících se kladných celých čísel $k_i$. Pokud v $n$-tém
+kroku indukce dospějeme k tomu, že $k_n = 1$, pak z rovnice $P(n)$:
+
+$$
+\begin{equation}
+P(n): \sqrt{2} = \frac{k_n}{1}
+\end{equation}
+$$
+
+vyplývá, že $P(n)$ není pravdivé, protože by to znamenalo, že $\sqrt{2}$ je
+nějaké celé číslo. To je ale v rozporu s tím, že $\sqrt{2}$ určitě není celé
+číslo.
+
+Z indukce vyplývá, že náš **původní předpoklad $P(0)$**, (který předpokládal,
+že $\sqrt{2}$ lze vyjádřit jako poměr dvou celých čísel), **musí být nepravdivý**.
+
+Proto je $\sqrt{2}$ iracionální číslo.
+
+## Závěr
+Objev iracionality $\sqrt{2}$ je jedním z nejvýznamnějších momentů v historii matematiky.
+Tento objev vedl k rozvoji teorie iracionálních čísel a měl hluboký dopad na matematiku a filozofii.
+

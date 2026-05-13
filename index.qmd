@@ -9,6 +9,7 @@ author:
 
 listing:
   contents: posts
+  page-size: 6
   feed: false
   sort: 
     - date desc

@@ -107,12 +107,12 @@ draft: false
     - nekonečny Markovův řetězec pro 6 po sudých
 
 -   Matematika
-        - geometrie
-            - pruseciky tecen 3 kruznic (leží na přímce)
-            - dukaz pythagorovy vety (ctverec + dukaz zalozeny na skalovani plocha=zvetseni **2 )
-        - lin algebra
-            - vlastni cisla matice vysvetleni (na 2d matici)
-    -   dukaz nekonecneho poctu prvocisel
+    - geometrie
+        - pruseciky tecen 3 kruznic (leží na přímce)
+        - dukaz pythagorovy vety (ctverec + dukaz zalozeny na skalovani plocha=zvetseni **2 )
+    - lin algebra
+        - vlastni cisla matice vysvetleni (na 2d matici)
+    -   ~~dukaz nekonecneho poctu prvocisel~~
     -   pingeon princip 
 
 - Bubliny

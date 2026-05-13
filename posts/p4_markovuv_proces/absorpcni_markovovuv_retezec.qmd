@@ -20,7 +20,12 @@ format:
 
 # Absorpční Markovův řetězec
 
-Pokud Markovův řetězec obsahuje alespoň jeden absorpční stav, pak se realizace tohoto řetězce nakonec vždy dostane do jednoho z těchto stavů a zůstane v něm navždy. Absorpční stav je takový stav, ze kterého není možné odejít (neexistuje žádný přechod z tohoto stavu do jiného stavu). Počet průchodů nějakým stavem $E[N]$ v markovově řetězci, který má absorpční stav, je odvozena v [Grinstead and Snell’s Introduction to Probability (kapitola 11.2)](../../literatura.qmd).
+Pokud Markovův řetězec obsahuje alespoň jeden absorpční stav, pak se realizace
+tohoto řetězce nakonec vždy dostane do jednoho z těchto stavů a zůstane v něm
+navždy. Absorpční stav je takový stav, ze kterého není možné odejít (neexistuje
+žádný přechod z tohoto stavu do jiného stavu). Počet průchodů nějakým stavem
+$E[N]$ v markovově řetězci, který má absorpční stav, je odvozena v [Grinstead
+and Snell’s Introduction to Probability (kapitola 11.2)](../../literatura.qmd).
 
 ## Příklad - náhodná procházka opilého námořníka
 
@@ -69,8 +74,8 @@ P(S5  \to S1) & P(S5 \to S2) & P(S5 \to S3) & P(S5 \to S4) & P(S5 \to S5) \\
 0 & \frac{1}{2} & \frac{1}{2} & 0  & 0 \\
 \frac{1}{2} & 0 & 0 & \frac{1}{2} & 0 \\
 \frac{1}{2} & 0 & 0 & 0 &  \frac{1}{2} \\
-0 & 0  & 0 &  \frac{1}{2}  & 0  \\
-0 & 0  & 0 & 0 & \frac{1}{2}  \\
+0 & 0  & 0 &  1 & 0  \\
+0 & 0  & 0 & 0 & 1  \\
 \end{pmatrix}
 \end{equation}
 $$

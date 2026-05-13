@@ -236,7 +236,6 @@ A protože $m \ll M$:
 
 $$
 V' \approx V + \frac{2m}{M}(u - V) \approx V
-
 $$
 
 
@@ -245,7 +244,7 @@ u' \approx 2(𝑉 - u)
 $$
 
 
-## Zhrnutí
+## Shrnutí
 
 Pohyb částic po pružné srážce závisí na poměru jejich hmotností a jejich počátečních rychlostech, v limitním případě srážky těžké a lehké částice pak:
 - **Velké těleso dostane impuls proti směru své rychlosti** (brzdí se, případně se rozjíždí opačným směrem).
@@ -257,6 +256,6 @@ $$
 u' -V \approx-(u-V )
 $$
 
-Stručně řečené  malá kulička se **jen odraží** , zatímco velká deska 
+Stručně řečené  malá kulička se **jen odraží**, zatímco velká deska 
 dostane malý příspěvek ke své rychlosti, který je **úměrný podílu hmotností rozdílu rychlostí před srážkou**.
 

@@ -1,0 +1,366 @@
+---
+title: "Nekonečné prvočísel  "
+date: "2026-05-11"
+updated: "2026-05-12"
+description: "Důkaz sporem, že prvočísel je nekonečně mnoho vymyšlený Eukleidem"
+draft: false
+categories: ["Důkaz", "Přednáška 20"]
+pdflink: "[![PDF](images/pdf_icon.png){width=60px}](posts/p20_den_dukazu/nekonecne_prvocisel.pdf)"
+
+engine: julia
+
+lang: cs
+
+format:
+    typst:
+        output-file: "nekonecne_prvocisel"
+        output-ext: "pdf"
+        engine: typst
+---
+
+# Nekonečné prvočísel
+
+Prvočíslo je přirozené číslo větší než 1, které je beze zbytku dělitelné jen
+dvěma děliteli: jedničkou a samo sebou. Jednička není prvočíslo, neboť nemá dva
+různé dělitele. Přirozená čísla větší než jedna, která nejsou prvočísly, se
+nazývají složená čísla. Prvním prvočíslem je číslo 2, které je jediným sudým
+prvočíslem.
+
+Je zajímavé, že otázka zdali existuje nekonečně mnoho prvočísel vrtala hlavou
+již za starého Řecka . A již tehdy byla nalezena odpověď. Poprvé ji našel
+starověký řecký matematik Eukleides kolem roku 300 př. n. l. Jeho důkaz je
+krásným následným příkladem důkazu sporem.
+
+## Důkaz sporem
+
+Důkaz, že prvočísel je nekonečně mnoho vymyšlený Eukleidem je založen na
+**předpokladu, že existuje konečný počet prvočísel** a pak se dokazuje, že tento
+předpoklad vede k **rozporu**. Tím dokázal, že prvočísel je nekonečně mnoho.
+
+Předpokládejme tedy, že existuje konečný seznam prvočísel: $p_1, p_2, p_3, ...,
+p_n$ a vytvoříme nové číslo Q, které je součinem všech těchto prvočísel plus
+jedna:
+
+$$
+Q = p_1 \cdot p_2 \cdot p_3 \cdot ... \cdot p_n + 1
+$$
+
+Nyní se podíváme na dělitelnost čísla Q. Každé z prvočísel $p_1, p_2, p_3, ..., p_n$
+dělí součin $p_1 \cdot p_2 \cdot p_3 \cdot ... \cdot p_n$, ale když přidáme 1, žádné z těchto
+prvočísel již nedělí Q beze zbytku. To znamená, že Q není dělitelné žádným z
+těchto prvočísel. Existují dvě možnosti:
+
+1. Q je samo o sobě prvočíslem (ale není v našem původním seznamu), protože je určitě
+větší než všechna $p_1, p_2, ..., p_n$, nebo
+
+1. Q musí být dělitelné nějakým jiným prvočíslem P, které není v našem původním
+seznamu, ale protože  prvočíslo P není na našem seznamu, (a musí být opět
+větší než všechna $p_1, p_2, ..., p_n$, a tedy ani ono není v našem seznamu).
+
+**Příklad 1**
+
+Předpokládejme, že máme konečný seznam prvočísel: 2, 3, 5. Vytvoříme číslo Q:
+
+Q = 2 * 3 * 5 + 1 = 30 + 1 = 31
+
+- 31 není dělitelné ani jedním z prvočísel 2, 3, 5 (zbytek je vždy 1).
+
+- proto je 31 tedy buď prvočíslem samo o sobě, nebo musí být dělitelné nějakým
+jiným prvočíslem, které není v našem původním seznamu. V tomto případě je 31
+skutečně prvočíslem, které není v našem původním seznamu.
+
+**Příklad 2**
+
+Předpokládejme, že máme konečný seznam prvočísel: 2, 3, 5, 7,11,13. Vytvoříme číslo Q:
+
+Q = 2 * 3 * 5 * 7 * 11 * 13 + 1 = 30030 + 1 = 30031
+
+- 30031 není dělitelné žádným z  prvočísel 2, 3, 5, 7,11,13, 
+- ale v tomto případě 30031 není prvočíslem protože jej lze rozložit jako součin 
+
+$$
+59 \cdot 509 = 30031 
+$$
+
+a 59 a 509 jsou prvočísla, která nejsou v našem původním seznamu.
+
+V obou případech dochází k **rozporu** s předpokladem, že existuje konečný
+počet prvočísel, protože obě možnosti vedou k nalezení dalšího prvočísla (nebo
+dalších prvočísel), které není (nejsou) v našem původním seznamu.
+
+Prvotní předpoklad o konečném počtu prvočísel tedy není pravdivý a proto musí
+být pravdivá věta, že **prvočísel je nekonečně mnoho**.
+
+## Počítačové algoritmy pro hledání prvočísel
+
+Následuje několik počítačových programů pro hledání prvočísel. Jsou to
+elementární algoritmy, existují jistě pokročilejší algoritmy, které jsou
+schopné najít velmi velká prvočísla, což je důležité například v kryptografii.
+
+**Eratosthenesovo síto**
+
+Tento algoritmus potřebuje předem stanovit horní hranici n, do které chceme
+hledat prvočísla. Vytvoříme pole, které označuje, zda je číslo prvočíslem, a
+postupně označujeme násobky každého nalezeného prvočísla jako složená čísla.
+
+```{julia}
+function eratosthenes_sieve(n)
+# Vytvoříme pole delky n, které bude označovat, zda je číslo prvočíslem
+    is_prime = trues(n)
+    is_prime[1] = false
+    for i in 2:floor(Int, sqrt(n))
+        if is_prime[i]
+            for j in i^2:i:n
+                is_prime[j] = false
+            end
+        end
+    end
+    return findall(is_prime)
+end
+println((eratosthenes_sieve(100))')
+```
+
+
+**Kontrola prvočísla**
+
+```{julia}
+function isprime(n)
+    if n < 2
+        return false
+    end
+    for i in 2:floor(Int, sqrt(n))
+        if n % i == 0
+            return false
+        end 
+    end
+    return true
+end
+println(isprime(31))
+println(isprime(30031))
+```
+
+**Generování prvočísel pomocí nekonečného iterátoru**
+
+Pro tento účel můžeme vytvořit vlastní iterátor, který bude generovat prvočísla
+nekonečně dlouho. Tento iterátor bude začínat od čísla 2 a bude postupně
+kontrolovat každé další číslo, zda je prvočíslem, a pokud ano, vrátí ho. Není
+potřeba předem nastavit v velké pole ani stanovit horní hranici, protože
+iterátor bude generovat prvočísla nekonečně dlouho, dokud ho nebudeme
+zastavovat. Je to ale pomalejší způsob, jak generovat prvočísla, protože
+kontroluje každé číslo.
+
+```{julia}
+struct PrimeGenerator
+    n::Int
+end
+
+Base.iterate(pg::PrimeGenerator) = iterate(pg, pg.n)
+
+function Base.iterate(pg::PrimeGenerator, state)
+    n = state
+    while true
+        if isprime(n)
+            return n, n + 1
+        end
+        n += 1
+    end
+end
+
+pg = PrimeGenerator(2)
+
+for p in Iterators.take(pg, 20)
+    print(p, ",")
+end
+println("...")
+```
+
+**Dijkstrův algoritmus pro generování prvočísel**
+
+Elegantní algoritmus pro generování prvočísel, který nevyžaduje dělení, modulo,
+síťové pole, označování násobků a jeho paměť roste pouze s počtem nalezených
+prvočísel. Tento algoritmus je založen na myšlence udržovat seznam "svědků" pro
+každé nalezené prvočíslo, což nám umožňuje efektivně generovat další prvočísla
+bez nutnosti kontrolovat každé číslo dělením.
+
+```{julia}
+struct DijkstraPrimes
+    next::Int
+    witnesses::Vector{Tuple{Int,Int}}
+end
+
+DijkstraPrimes() = DijkstraPrimes(2, [])
+
+function Base.iterate(dp::DijkstraPrimes)
+    return iterate(dp, (dp.next, dp.witnesses))
+end
+
+function Base.iterate(::DijkstraPrimes, state)
+    n, witnesses = state
+
+    # find smallest witness multiple
+    m = isempty(witnesses) ? typemax(Int) : minimum(w[2] for w in witnesses)
+
+    if n < m
+        # n is prime
+        push!(witnesses, (n, n * n))
+        return n, (n + 1, witnesses)
+    else
+        # n is composite: update witnesses that match
+        for i in eachindex(witnesses)
+            p, m = witnesses[i]
+            if m == n
+                witnesses[i] = (p, m + p)
+            end
+        end
+        return iterate(DijkstraPrimes(), (n + 1, witnesses))
+    end
+end
+
+
+for p in Iterators.take(DijkstraPrimes(), 20)
+    print(p, ",")
+end
+println("...")
+
+```
+
+**Pollardův algoritmus pro faktorizaci**
+
+Pollardův algoritmus pro faktorizaci je efektivní metoda pro nalezení dělitelů složených čísel, která využívá náhodné funkce a vlastnosti modulární aritmetiky. Tento algoritmus je založen na myšlence, že pokud máme dvě různé posloupnosti generované náhodnou funkcí, které se shodují v nějakém bodě, můžeme použít tento bod k nalezení dělitele čísla.
+
+```{julia}
+function powmod(a::Integer, d::Integer, n::Integer)
+    a = mod(a, n)
+    res = one(n)
+    while d > 0
+        if d & 1 == 1
+            res = (res * a) % n
+        end
+        a = (a * a) % n
+        d >>= 1
+    end
+    return res
+end
+
+function is_probable_prime(n::Integer; k::Int=20)
+    n < 2 && return false
+    n == 2 || n == 3 && return true
+    iseven(n) && return false
+
+    # n - 1 = d * 2^s
+    d = n - 1
+    s = 0
+    while iseven(d)
+        d >>= 1
+        s += 1
+    end
+
+    for _ in 1:k
+        a = BigInt(rand(2:10^9)) % (n - 3) + 2   # náhodná báze 2..n-2
+        x = powmod(a, d, n)
+        if x == 1 || x == n - 1
+            continue
+        end
+        composite = true
+        for _ in 1:(s-1)
+            x = (x * x) % n
+            if x == n - 1
+                composite = false
+                break
+            end
+        end
+        composite && return false
+    end
+
+    return true
+end
+
+using Random
+
+function pollard_rho(n::Integer)
+    n % 2 == 0 && return 2
+    is_probable_prime(n) && return n
+
+    while true
+        x = BigInt(rand(2:10^9))
+        c = BigInt(rand(1:10^9))
+        y = x
+        d = one(n)
+
+        f(z) = (z * z + c) % n
+
+        while d == 1
+            x = f(x)
+            y = f(f(y))
+            d = gcd(abs(x - y), n)
+        end
+
+        if d != n
+            return d
+        end
+    end
+end
+
+function factor(n::Integer, facs::Vector{BigInt}=BigInt[])
+    n == 1 && return facs
+    if is_probable_prime(n)
+        push!(facs, BigInt(n))
+    else
+        d = pollard_rho(n)
+        factor(d, facs)
+        factor(div(n, d), facs)
+    end
+    return facs
+end
+
+print("Faktorizace 1_000_000_011: ")
+n = BigInt(1_000_000_011)
+f = factor(n)
+sort!(f)
+println(n, " = ", join(f, " × "))
+
+print("Faktorizace 1_000_000_007: ")
+n = BigInt(1_000_000_007)
+f = factor(n)
+sort!(f)
+println(n, " = ", join(f, " × "))
+
+```
+
+
+**Generování prvočísel pro Euklidův důkaz sporem**
+
+Pomocí Dijkstrova algoritmu pro generování prvočísel můžeme vytvořit konečný seznam prvočísel delky n, spočítat Q jako součin těchto prvočísel plus jedna, a pak zjistit, zda je Q prvočíslem nebo jej rozložit na součin prvočísel. Tento proces nám umožní vidět, jak Euklidův důkaz sporem funguje v "praxi".
+
+```{julia}
+for n in 1:25  # Počet prvočísel -  maximum 28 prvočísel
+    # Vytvoříme konečný seznam prvočísel delky n
+    Q = BigInt(1)
+    P=[]
+    for p in Iterators.take(DijkstraPrimes(), n)
+        Q *= p
+        push!(P, p)
+    end
+    Q += 1
+    println("(n = ", n, ") Q = ", join(P, "×"), " + 1 = ")
+    f = factor(Q)
+    sort!(f)
+    print("  = ", Q, " = ", join(f, " × "))
+    if length(f) == 1 && f[1] == Q
+        println(" (Q je prvočíslo !)")
+    else
+        println()
+    end
+end
+```
+
+
+## Závěr
+
+Euklidův důkaz nám ukazuje, že bez ohledu na to, jakkoliv dlouhý konečný seznam
+prvočísel si představíme, vždy existuje další prvočíslo, které není v tomto
+seznamu zahrnuto. Tím se potvrzuje, že prvočísel je nekonečně mnoho.
+
+Euklidův důkaz je elegantní a jednoduchý, a je to první příklad důkazu sporem v
+matematice.
+

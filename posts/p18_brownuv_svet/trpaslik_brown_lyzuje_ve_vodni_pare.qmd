@@ -107,7 +107,12 @@ display(p1)
 
 ## Řešení
 
-Řešení problému bude velmi podobné jako v případě nekonečně těžké lyže, ale s důležitou změnou: místo toho, aby každá srážka měnila rychlost lyže o konstantní hodnotu (jako v modelu s nekonečně těžkou lyží), bude změna rychlosti záviset na relativní rychlosti mezi lyží a molekulami vodní páry. To znamená, že musíme vzít v úvahu rozdělení rychlostí molekul vodní páry a jak se tyto rychlosti vztahují k rychlosti lyže.
+Řešení problému bude velmi podobné jako v případě nekonečně těžké lyže, ale s
+důležitou změnou: místo toho, aby každá srážka měnila rychlost lyže o
+konstantní hodnotu (jako v modelu s nekonečně těžkou lyží), bude změna
+rychlosti záviset na relativní rychlosti mezi lyží a molekulami vodní páry. To
+znamená, že musíme vzít v úvahu rozdělení rychlostí molekul vodní páry a jak se
+tyto rychlosti vztahují k rychlosti lyže.
 
 
 
@@ -165,7 +170,8 @@ $$
 
 ### Celková síla na desku
 
-Síla = tok srážek × impuls na srážku dostaneme integrací přes hustotu pravděpodobnosti přes všechny rychlosti částic $u$ :
+Síla = tok srážek × impuls na srážku dostaneme integrací přes hustotu
+pravděpodobnosti přes všechny rychlosti částic $u$ :
 
 $$
 F = \int_{-\infty}^{\infty} 2\mu (u - V)\, n\,|u - V|\, f(u)\, du.
@@ -181,7 +187,8 @@ $$
 
 ### Lineární aproximace pro malé V a symetrické f(u)
 
-Pokud je V malé oproti typickým rychlostem v rozdělení f(u), můžeme použít lineární aproximaci:
+Pokud je V malé oproti typickým rychlostem v rozdělení f(u), můžeme použít
+lineární aproximaci:
 
 $$
 (u - V)|u - V| = u|u| - 2V|u| + O(V^2).
@@ -250,7 +257,7 @@ $$
 
 Pokud je M ~ m, brzdění je silnější (větší μ). Následující graf ukazuje, jak se
 mění rychlost desky v čase pro různé poměry m/M, což odpovídá různým časovým
-konstantám brzdění τ (osa x ma logaritmickou škálu).
+konstantám brzdění τ (osa x má logaritmickou škálu).
 
 
 

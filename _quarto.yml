@@ -65,6 +65,7 @@ website:
         href: "mailto:pulpanj@volny.cz"
         aria-label: "Email"
 
+
   page-footer:
     border: true
   # Theme default

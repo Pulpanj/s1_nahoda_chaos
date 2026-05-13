@@ -2,7 +2,7 @@
 title: "Dvě kulové bubliny"
 date: "2025-12-08"
 updated: "2026-01-25"
-description: "Jak se napojují dvě kulové mýdlové bubliny různých velikostí ?"
+description: "Jak se napojují dvě kulové mýdlové bubliny různých velikostí?"
 draft: false
 categories: ["Optimalizace", "Přednáška 11" , "Bubliny"]
 # image: "image.jpg"
